@@ -7,10 +7,10 @@ as a YAML file, which facilitates model sharing, reuse, and interoperability.
 A reference implementation for loading `demes` models into python is
 available from https://github.com/popsim-consortium/demes-python
 
-# Writing a `demes` YAML file.
+## Writing a `demes` YAML file.
 
-TODO: add docs and link here
+https://popsim-consortium.github.io/demes-spec-docs/
 
-# Formal specification.
+## Formal specification.
 
-TODO: add docs and link here
+https://popsim-consortium.github.io/demes-spec-docs/main/spec.html
