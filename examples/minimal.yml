@@ -1,0 +1,6 @@
+description: Minimal one-deme model
+time_units: generations
+demes:
+  - id: a
+    epochs:
+    - start_size: 100

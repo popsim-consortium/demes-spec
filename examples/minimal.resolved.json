@@ -1,0 +1,26 @@
+{
+  "description": "Minimal one-deme model",
+  "time_units": "generations",
+  "doi": [],
+  "generation_time": 1,
+  "demes": [
+    {
+      "description": null,
+      "start_time": Infinity,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 100,
+          "end_size": 100,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [],
+      "ancestors": []
+    }
+  ],
+  "migrations": [],
+  "pulses": []
+}
