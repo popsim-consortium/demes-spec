@@ -38,7 +38,7 @@ properties:
       The number by which times must be divided, to convert them to have
       units of generations. Unless ``time_units`` are ``generations``,
       the ``generation_time`` must be specified.
-    type: number
+    type: ["number", "null"]
     exclusiveMinimum: 0
     exclusiveMaximum: .inf
     examples:
@@ -62,27 +62,14 @@ properties:
 
   migrations:
     description: |
-      Migrations occurring *continuously* over a time interval.
-      Continuous migrations may be symmetric, or asymmetric.
-    type: object
-    properties:
-      symmetric:
-        description: |
-          A list of continuous migrations occuring symmetrically among
-          a set of demes. Symmetric migrations offer a convenient shorthand,
-          that would be more cumbersome to define using asymmetric migrations.
-        type: array
-        items:
-          $ref: '#/definitions/symmetric_migration'
-        default: []
-      asymmetric:
-        description: |
-          A list of continuous migrations occuring unidirectionally from
-          a source deme to a destination deme.
-        type: array
-        items:
-          $ref: '#/definitions/asymmetric_migration'
-        default: []
+      A list of migrations occurring *continuously* over a time interval.
+      Each specified migration can define symmetric migration among all
+      pairs in a set of demes, or alternately can define asymmetric migration
+      from one deme to another.
+    type: array
+    items:
+      $ref: '#/definitions/migration'
+    default: []
 
 required:
 - description
@@ -199,7 +186,7 @@ definitions:
         $ref: '#/definitions/id'
       description:
         description: A concise description of the deme.
-        type: string
+        type: ["string", "null"]
         default: null
       ancestors:
         description: |
@@ -329,17 +316,28 @@ definitions:
     - time
     - proportion
 
-  asymmetric_migration:
+  migration:
     description: |
-      Continuous migration from the ``source`` deme to the ``dest`` deme,
-      over an the half-open time interval ``(start_time, end_time]``.
+      Continuous migration over the half-open time interval ``(start_time, end_time]``.
+      If ``demes`` is specified, then migration shall be symmetric between all
+      pairs of demes with deme IDs in the array. If ``source`` and ``dest`` are
+      specified instead, migration shall be asymmetric from the deme with ID
+      ``source`` to the deme with ID ``dest``. Either ``demes``, or alternately
+      both ``source`` and ``dest``, must be specified. If ``demes`` is specified,
+      neither ``source`` nor ``dest`` may be specified.
     type: object
     properties:
+      demes:
+        description: The deme IDs of the symmetrically migrating demes.
+        type: array
+        items:
+          $ref: '#/definitions/id'
+        minItems: 2
       source:
-        description: The deme ID of the migration source.
+        description: The deme ID of the asymmetric migration source.
         $ref: '#/definitions/id'
       dest:
-        description: The deme ID of the migration destination.
+        description: The deme ID of the asymmetric migration destination.
         $ref: '#/definitions/id'
       start_time:
         description: |
@@ -363,42 +361,4 @@ definitions:
         description: The rate of migration per generation.
         $ref: '#/definitions/rate'
     required:
-    - source
-    - dest
     - rate
-
-  symmetric_migration:
-    description: |
-      Continuous migration among a set of demes over the half-open time
-      interval ``(start_time, end_time]``.
-    type: object
-    properties:
-      demes:
-        description: The deme IDs of the migrating demes.
-        type: array
-        items:
-          $ref: '#/definitions/id'
-        minItems: 2
-      start_time:
-        description: |
-          The time at which migration begins, in ``time_units`` before the present.
-          The ``start_time`` must be contained in the
-          ``[deme.start_time, deme.end_time)`` interval of every deme in ``demes``.
-          If not specified, the migration ``start_time`` shall be the minimum
-          ``deme.start_time`` over the demes in ``demes``.
-        $ref: '#/definitions/start_time'
-      end_time:
-        description: |
-          The time at which migration stops, in ``time_units`` before the present.
-          The ``end_time`` must be contained in the
-          ``(deme.start_time, deme.end_time]`` interval of every deme in ``demes``.
-          If not specified, the migration ``end_time`` shall be the maximum
-          ``deme.end_time`` over the demes in ``demes``.
-        $ref: '#/definitions/end_time'
-      rate:
-        description: The rate of migration per generation.
-        $ref: '#/definitions/rate'
-    required:
-    - demes
-    - rate
-
