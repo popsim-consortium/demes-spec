@@ -1,0 +1,189 @@
+{
+  "description": "The Browning et al. (2011) model of admixture in the Americas.",
+  "time_units": "generations",
+  "doi": [
+    "https://doi.org/10.1371/journal.pgen.1007385"
+  ],
+  "generation_time": 1,
+  "demes": [
+    {
+      "description": "Equilibrium/root population",
+      "start_time": Infinity,
+      "epochs": [
+        {
+          "end_time": 5920,
+          "start_size": 7310,
+          "end_size": 7310,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [],
+      "ancestors": []
+    },
+    {
+      "description": "Anatomically modern humans",
+      "start_time": 5920,
+      "epochs": [
+        {
+          "end_time": 2040,
+          "start_size": 14474,
+          "end_size": 14474,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "ancestral"
+      ]
+    },
+    {
+      "description": "Bottleneck out-of-Africa population",
+      "start_time": 2040,
+      "epochs": [
+        {
+          "end_time": 920,
+          "start_size": 1861,
+          "end_size": 1861,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "AMH"
+      ]
+    },
+    {
+      "description": "African population",
+      "start_time": 2040,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 14474,
+          "end_size": 14474,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "AMH"
+      ]
+    },
+    {
+      "description": "European population",
+      "start_time": 920,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 1000,
+          "end_size": 34039,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "OOA"
+      ]
+    },
+    {
+      "description": "East Asian population",
+      "start_time": 920,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 510,
+          "end_size": 45852,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "OOA"
+      ]
+    },
+    {
+      "description": "Admixed America",
+      "start_time": 12,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 30000,
+          "end_size": 54664,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [
+        0.167,
+        0.333,
+        0.5
+      ],
+      "ancestors": [
+        "AFR",
+        "EUR",
+        "EAS"
+      ]
+    }
+  ],
+  "migrations": [
+    {
+      "rate": 0.00015,
+      "start_time": 2040,
+      "end_time": 920,
+      "demes": [
+        "AFR",
+        "OOA"
+      ]
+    },
+    {
+      "rate": 2.5e-05,
+      "start_time": 920,
+      "end_time": 0,
+      "demes": [
+        "AFR",
+        "EUR"
+      ]
+    },
+    {
+      "rate": 7.8e-06,
+      "start_time": 920,
+      "end_time": 0,
+      "demes": [
+        "AFR",
+        "EAS"
+      ]
+    },
+    {
+      "rate": 3.11e-05,
+      "start_time": 920,
+      "end_time": 0,
+      "demes": [
+        "EUR",
+        "EAS"
+      ]
+    }
+  ],
+  "pulses": []
+}

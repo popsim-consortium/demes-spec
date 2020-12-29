@@ -1,0 +1,165 @@
+{
+  "description": "The Gutenkunst et al. (2009) OOA model.",
+  "time_units": "years",
+  "doi": [
+    "https://doi.org/10.1371/journal.pgen.1000695"
+  ],
+  "generation_time": 25,
+  "demes": [
+    {
+      "description": "Equilibrium/root population",
+      "start_time": Infinity,
+      "epochs": [
+        {
+          "end_time": 220000.0,
+          "start_size": 7300,
+          "end_size": 7300,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [],
+      "ancestors": []
+    },
+    {
+      "description": "Anatomically modern humans",
+      "start_time": 220000.0,
+      "epochs": [
+        {
+          "end_time": 140000.0,
+          "start_size": 12300,
+          "end_size": 12300,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "ancestral"
+      ]
+    },
+    {
+      "description": "Bottleneck out-of-Africa population",
+      "start_time": 140000.0,
+      "epochs": [
+        {
+          "end_time": 21200.0,
+          "start_size": 2100,
+          "end_size": 2100,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "AMH"
+      ]
+    },
+    {
+      "description": "Yoruba in Ibadan, Nigeria",
+      "start_time": 140000.0,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 12300,
+          "end_size": 12300,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "AMH"
+      ]
+    },
+    {
+      "description": "Utah Residents (CEPH) with Northern and Western European Ancestry",
+      "start_time": 21200.0,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 1000,
+          "end_size": 29725,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "OOA"
+      ]
+    },
+    {
+      "description": "Han Chinese in Beijing, China",
+      "start_time": 21200.0,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 510,
+          "end_size": 54090,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "OOA"
+      ]
+    }
+  ],
+  "migrations": [
+    {
+      "rate": 0.00025,
+      "start_time": 140000.0,
+      "end_time": 21200.0,
+      "demes": [
+        "YRI",
+        "OOA"
+      ]
+    },
+    {
+      "rate": 3e-05,
+      "start_time": 21200.0,
+      "end_time": 0,
+      "demes": [
+        "YRI",
+        "CEU"
+      ]
+    },
+    {
+      "rate": 1.9e-05,
+      "start_time": 21200.0,
+      "end_time": 0,
+      "demes": [
+        "YRI",
+        "CHB"
+      ]
+    },
+    {
+      "rate": 9.6e-05,
+      "start_time": 21200.0,
+      "end_time": 0,
+      "demes": [
+        "CEU",
+        "CHB"
+      ]
+    }
+  ],
+  "pulses": []
+}

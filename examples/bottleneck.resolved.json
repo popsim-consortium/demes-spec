@@ -1,0 +1,42 @@
+{
+  "description": "A single-population bottleneck model. Also tests a finite start_time.",
+  "time_units": "generations",
+  "doi": [],
+  "generation_time": 1,
+  "demes": [
+    {
+      "description": "Bottleneck population using epochs",
+      "start_time": 10000,
+      "epochs": [
+        {
+          "end_time": 500,
+          "start_size": 10000.0,
+          "end_size": 10000.0,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        },
+        {
+          "end_time": 100,
+          "start_size": 100.0,
+          "end_size": 100.0,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        },
+        {
+          "end_time": 0,
+          "start_size": 10000.0,
+          "end_size": 10000.0,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [],
+      "ancestors": []
+    }
+  ],
+  "migrations": [],
+  "pulses": []
+}

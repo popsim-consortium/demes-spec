@@ -18,6 +18,7 @@
 #
 # Type annotations are used where they help with readability, but not applied
 # exhaustively.
+from __future__ import annotations
 
 import math
 import numbers
@@ -27,7 +28,7 @@ import dataclasses
 from typing import Dict, List, Union, Any
 
 
-# Validator functions. These are use as arguments to the pop_x functions and
+# Validator functions. These are used as arguments to the pop_x functions and
 # check properties of the values.
 
 
@@ -53,9 +54,12 @@ def is_identifier(value):
 
 def validate_item(name, value, required_type, validator=None):
     if not isinstance(value, required_type):
-        raise TypeError(f"Attribute '{name}' must be a {required_type}")
+        raise TypeError(
+            f"Attribute '{name}' must be a {required_type}; "
+            f"current type is {type(value)}."
+        )
     if validator is not None and not validator(value):
-        validator_name = validator.__name__[3:]  # Strip of is_ from function name
+        validator_name = validator.__name__[3:]  # Strip off is_ from function name
         raise ValueError(f"Attribute '{name}' is not {validator_name}")
 
 
@@ -134,7 +138,7 @@ class Deme:
     id: str
     start_time: Union[None, float]
     description: Union[str, None]
-    ancestors: List[Any]  # FIXME should be Deme, but can't figure out how to do it.
+    ancestors: List[Deme]
     proportions: Union[List[float], None]
     epochs: List[Epoch] = dataclasses.field(default_factory=list)
 
@@ -210,24 +214,30 @@ class Deme:
             last_time = epoch.end_time
 
     def __resolve_sizes(self):
-        epoch = self.epochs[0]
+        first_epoch = self.epochs[0]
         # The first epoch must specify either start_size or end_size
-        if epoch.start_size is None and epoch.end_size is None:
+        if first_epoch.start_size is None and first_epoch.end_size is None:
             raise ValueError(
                 "Must specify one or more of start_size and end_size "
                 "for the initial epoch"
             )
-        if epoch.start_size is None:
-            epoch.start_size = epoch.end_size
-        if epoch.end_size is None:
-            epoch.end_size = epoch.start_size
-        last_epoch = epoch
+        if first_epoch.start_size is None:
+            first_epoch.start_size = first_epoch.end_size
+        if first_epoch.end_size is None:
+            first_epoch.end_size = first_epoch.start_size
+        last_epoch = first_epoch
         for epoch in self.epochs[1:]:
             if epoch.start_size is None:
                 epoch.start_size = last_epoch.end_size
             if epoch.end_size is None:
                 epoch.end_size = epoch.start_size
             last_epoch = epoch
+
+        if self.start_time == math.inf:
+            if first_epoch.start_size != first_epoch.end_size:
+                raise ValueError(
+                    "Cannot have varying population size in an infinitely time interval"
+                )
 
         # TODO validate the size_function. E.g., if the size_function is constant
         # and the values aren't the same then it should be an error.
@@ -422,6 +432,8 @@ class Graph:
 
     def validate(self):
         if self.time_units == "generations":
+            # Not clear this is a good idea:
+            # https://github.com/popsim-consortium/demes-spec/issues/41
             if self.generation_time not in (None, 1):
                 raise ValueError(
                     "If time_units is generations, generation_time must be either "
@@ -442,8 +454,8 @@ class Graph:
             migration.validate()
 
     def resolve(self):
-        # Demes are required to be listed in non-decreasing time order so
-        # any deme we visit always be visited after its ancestors.
+        # A demes ancestors must be listed before it, so any deme we
+        # visit must always be visited after its ancestors.
         for deme in self.demes.values():
             deme.resolve()
         for migration in self.migrations:
@@ -473,7 +485,8 @@ def parse(data: dict) -> Graph:
     check_empty(defaults)
 
     graph = Graph(
-        # TODO should description be a required field? Is according to spec.
+        # FIXME The spec says that the descriptions is mandatory, see
+        # https://github.com/popsim-consortium/demes-spec/issues/42
         description=pop_string(data, "description", ""),
         time_units=pop_string(data, "time_units", None),
         doi=pop_list(data, "doi", [], str, is_nonempty),

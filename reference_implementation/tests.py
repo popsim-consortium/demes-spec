@@ -258,7 +258,7 @@ class TestValidateDeme:
         with pytest.raises(ValueError, match="explicitly set Deme.start_time"):
             parser.parse(data)
 
-    def test_missing_proporition_two_ancestors(self):
+    def test_missing_proportion_two_ancestors(self):
         data = two_ancestor_graph()
         graph = parser.parse(data)
         assert len(graph.demes) == 3
@@ -328,6 +328,14 @@ class TestValidateEpoch:
         with pytest.raises(TypeError):
             parser.parse(data)
         epoch["end_size"] = -1000
+        with pytest.raises(ValueError):
+            parser.parse(data)
+
+    def test_infinite_interval_non_constant(self):
+        data = minimal_graph()
+        epoch = data["demes"][0]["epochs"][0]
+        epoch["end_size"] = 1000
+        epoch["start_size"] = 1000.01
         with pytest.raises(ValueError):
             parser.parse(data)
 
@@ -701,7 +709,7 @@ class TestDefaults:
         data = {
             "time_units": "generations",
             "defaults": {"epoch": {"start_size": 1, "end_size": 2, "end_time": 10}},
-            "demes": [{"id": f"deme{j}"} for j in range(num_demes)],
+            "demes": [{"id": f"deme{j}", "start_time": 100} for j in range(num_demes)],
         }
         graph = parser.parse(data)
         assert len(graph.demes) == 4
@@ -727,6 +735,7 @@ class TestDefaults:
             "demes": [
                 {
                     "id": "deme0",
+                    "start_time": 100,
                     "epochs": [{"end_time": j} for j in range(num_epochs - 1, -1, -1)],
                 }
             ],
@@ -747,6 +756,7 @@ class TestDefaults:
             "demes": [
                 {
                     "id": "deme0",
+                    "start_time": 100,
                     "defaults": {
                         "epoch": {
                             "start_size": 1,
@@ -773,12 +783,13 @@ class TestDefaults:
         data = {
             "time_units": "generations",
             "defaults": {
+                "deme": {"start_time": 100},
                 "epoch": {
                     "start_size": 1,
                     "end_size": 2,
                     "cloning_rate": 0.5,
                     "selfing_rate": 0.1,
-                }
+                },
             },
             "demes": [
                 {
@@ -827,7 +838,9 @@ class TestGraphUtilities:
         assert len(str(graph)) > 0
 
 
-@pytest.mark.parametrize("yaml_path", pathlib.Path("../examples/").glob("*.yml"))
+@pytest.mark.parametrize(
+    "yaml_path", map(str, pathlib.Path("../examples/").glob("*.yaml"))
+)
 def test_examples(yaml_path):
     yaml = YAML(typ="safe")
     with open(yaml_path) as source:
@@ -835,6 +848,7 @@ def test_examples(yaml_path):
     graph = parser.parse(data)
     graph_data = graph.asdict()
 
+    yaml_path = pathlib.Path(yaml_path)
     json_path = yaml_path.parent / yaml_path.with_suffix(".resolved.json")
     with open(json_path) as source:
         json_data = json.load(source)

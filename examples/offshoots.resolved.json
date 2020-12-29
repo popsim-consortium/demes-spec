@@ -1,0 +1,99 @@
+{
+  "description": "An example demography with one main population that is unchanged, that spawns multiple offshoot populations.",
+  "time_units": "generations",
+  "doi": [],
+  "generation_time": 1,
+  "demes": [
+    {
+      "description": "Main population",
+      "start_time": Infinity,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 1000,
+          "end_size": 1000,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [],
+      "ancestors": []
+    },
+    {
+      "description": "More recent offshoot population",
+      "start_time": 500,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 100,
+          "end_size": 100,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "ancestral"
+      ]
+    },
+    {
+      "description": "More ancient offshoot population",
+      "start_time": 1000,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 200,
+          "end_size": 200,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "ancestral"
+      ]
+    }
+  ],
+  "migrations": [
+    {
+      "rate": 0.0001,
+      "start_time": 200,
+      "end_time": 100,
+      "source": "ancestral",
+      "dest": "offshoot1"
+    },
+    {
+      "rate": 1e-05,
+      "start_time": 1000,
+      "end_time": 0,
+      "demes": [
+        "ancestral",
+        "offshoot2"
+      ]
+    },
+    {
+      "rate": 2e-05,
+      "start_time": 500,
+      "end_time": 0,
+      "demes": [
+        "offshoot1",
+        "offshoot2"
+      ]
+    }
+  ],
+  "pulses": [
+    {
+      "source": "offshoot1",
+      "dest": "ancestral",
+      "time": 50,
+      "proportion": 0.1
+    }
+  ]
+}
