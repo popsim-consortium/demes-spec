@@ -6,7 +6,6 @@ description: |
   demes are described using `pulses` for instantaneous migrations, and
   `migrations` for continuous migration over a time interval.
 type: object
-
 properties:
   description:
     description: A concise description of the demographic model.
@@ -46,6 +45,34 @@ properties:
     - 29.5
     default: null
 
+  defaults:
+    description: |
+      The default values for omitted properties in demes, epochs, migrations and pulses.
+    type: object
+    default: {}
+    additionalProperties: false
+    properties:
+      epoch:
+        $ref: '#/definitions/epoch'
+      migration:
+        $ref: '#/definitions/migration'
+      pulse:
+        $ref: '#/definitions/pulse'
+      deme:
+        properties:
+          description:
+            type: "string"
+          ancestors:
+            type: array
+            items:
+              $ref: '#/definitions/id'
+          proportions:
+            type: array
+            items:
+              $ref: '#/definitions/proportion'
+          start_time:
+            $ref: '#/definitions/start_time'
+
   demes:
     description: A list of demes in the demographic model.
     type: array
@@ -75,6 +102,7 @@ required:
 - description
 - time_units
 - demes
+additionalProperties: false
 
 definitions:
   id:
@@ -142,6 +170,7 @@ definitions:
      ``(start_time, end_time]``, in which a fixed set of population parameters
      apply.
     type: object
+    additionalProperties: false
     properties:
       start_time:
         description: |
@@ -151,17 +180,19 @@ definitions:
         description: |
           The most recent time of the epoch, in ``time_units`` before the present.
         $ref: '#/definitions/end_time'
-      initial_size:
+      start_size:
         description: The population size at the epoch's ``start_time``.
         $ref: '#/definitions/size'
-      final_size:
+      end_size:
         description: The population size at the epoch's ``end_time``.
         $ref: '#/definitions/size'
       size_function:
+        # TODO: make this an enumeration
         description: |
           A function describing the population size change between
           ``start_time`` and ``end_time``.
         type: string
+        default: exponential
         examples:
         - constant
         - exponential
@@ -178,6 +209,7 @@ definitions:
       ``(start_time, end_time]``, and it may continue to exist after
       contributing ancestry to a descendant deme.
     type: object
+    additionalProperties: false
     properties:
       id:
         description: |
@@ -213,12 +245,6 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/proportion'
-      initial_size:
-        description: The population size at the deme's ``start_time``.
-        $ref: '#/definitions/size'
-      final_size:
-        description: The population size at the deme's ``end_time``.
-        $ref: '#/definitions/size'
       start_time:
         description: |
           The most ancient time at which the deme exists, in ``time_units``
@@ -238,7 +264,7 @@ definitions:
              shall be used.
            - If the deme has one ancestor, and the ancestor has an
              ``end_time > 0``, the ancestor's ``end_time`` value shall be
-             used. 
+             used.
            - If the deme has no ancestors, the ``start_time`` shall be
              infinitely far into the past. I.e. the ``start_time`` shall
              have the value ``infinity``.
@@ -255,31 +281,23 @@ definitions:
              start time is specified.
 
         $ref: '#/definitions/start_time'
-      end_time:
-        description: |
-          The most recent time at which the deme exists, in ``time_units``
-          before the present.
-          If ``end_time`` is specified, and the deme's last epoch's
-          ``end_time`` is also specified, they must have the same value.
-
-          If not specified, the deme's ``end_time`` shall be obtained
-          according to the following rules (the first matching rule shall
-          be used).
-
-           - If the last epoch's ``end_time`` is specified, its value
-             shall be used.
-           - The ``end_time`` shall be the present. I.e. the ``end_time``
-             shall have the value ``0``.
-        $ref: '#/definitions/end_time'
       epochs:
         description: |
-          The list of epochs applying to the deme. If not specified,
-          a single epoch shall be constructed from the deme's ``start_time``,
-          ``end_time``, ``initial_size``, and ``final_size`` properties.
+          The list of epochs for this deme.
         type: array
-        minItems: 1
+        default: []
+        minItems: 0
         items:
           $ref: '#/definitions/epoch'
+      defaults:
+        description: |
+          The default values for omitted properties in epochs.
+        type: object
+        default: {}
+        additionalProperties: false
+        properties:
+          epoch:
+            $ref: '#/definitions/epoch'
     required:
     - id
 
@@ -288,6 +306,7 @@ definitions:
       An instantaneous pulse of migration at ``time``, from the ``source`` deme
       into the ``dest`` deme.
     type: object
+    additionalProperties: false
     properties:
       source:
         description: The deme ID of the migration source.
@@ -310,11 +329,6 @@ definitions:
           The proportion of the ``source`` deme's ancestry in the ``dest`` deme
           immediately after the ``time`` of migration.
         $ref: '#/definitions/proportion'
-    required:
-    - source
-    - dest
-    - time
-    - proportion
 
   migration:
     description: |
@@ -326,6 +340,7 @@ definitions:
       both ``source`` and ``dest``, must be specified. If ``demes`` is specified,
       neither ``source`` nor ``dest`` may be specified.
     type: object
+    additionalProperties: false
     properties:
       demes:
         description: The deme IDs of the symmetrically migrating demes.
@@ -360,5 +375,3 @@ definitions:
       rate:
         description: The rate of migration per generation.
         $ref: '#/definitions/rate'
-    required:
-    - rate
