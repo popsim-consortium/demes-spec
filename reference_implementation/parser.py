@@ -348,10 +348,10 @@ class AsymmetricMigration(Migration):
 
 @dataclasses.dataclass
 class Graph:
-    description: str
     time_units: str
-    doi: List[str]
     generation_time: Union[float, None]
+    doi: List[str]
+    description: Union[str, None]
     demes: Dict[str, Deme] = dataclasses.field(default_factory=dict)
     migrations: List[Migration] = dataclasses.field(default_factory=list)
     pulses: List[Pulse] = dataclasses.field(default_factory=list)
@@ -485,9 +485,7 @@ def parse(data: dict) -> Graph:
     check_empty(defaults)
 
     graph = Graph(
-        # FIXME The spec says that the descriptions is mandatory, see
-        # https://github.com/popsim-consortium/demes-spec/issues/42
-        description=pop_string(data, "description", ""),
+        description=pop_string(data, "description", None),
         time_units=pop_string(data, "time_units", None),
         doi=pop_list(data, "doi", [], str, is_nonempty),
         generation_time=pop_number(data, "generation_time", None, is_positive),

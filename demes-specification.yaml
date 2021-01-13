@@ -6,10 +6,11 @@ description: |
   demes are described using `pulses` for instantaneous migrations, and
   `migrations` for continuous migration over a time interval.
 type: object
+additionalProperties: false
 properties:
   description:
     description: A concise description of the demographic model.
-    type: string
+    type: ["string", "null"]
     examples:
       - An island stepping stone model with 5 demes.
       - |
@@ -99,10 +100,8 @@ properties:
     default: []
 
 required:
-- description
 - time_units
 - demes
-additionalProperties: false
 
 definitions:
   id:
