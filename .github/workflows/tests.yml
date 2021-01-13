@@ -1,0 +1,27 @@
+name: Run tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  tests:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+      - name: Tests for reference implementation
+        run: |
+          cd reference_implementation
+          # Require 100% test coverage for reference implementation.
+          python -m pytest --cov=parser --cov-fail-under=100 tests.py
+      - name: Tests for schema
+        run: |
+          python -m pytest tests.py
