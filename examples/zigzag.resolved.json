@@ -1,0 +1,76 @@
+{
+  "description": "A single population model with epochs of exponential growth and decay.",
+  "time_units": "generations",
+  "doi": [
+    "https://doi.org/10.1038/ng.3015"
+  ],
+  "generation_time": 1,
+  "demes": [
+    {
+      "description": null,
+      "start_time": Infinity,
+      "epochs": [
+        {
+          "end_time": 34133.31,
+          "start_size": 1431,
+          "end_size": 1431,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        },
+        {
+          "end_time": 8533.33,
+          "start_size": 1431,
+          "end_size": 14312,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        },
+        {
+          "end_time": 2133.33,
+          "start_size": 14312,
+          "end_size": 1431,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        },
+        {
+          "end_time": 533.33,
+          "start_size": 1431,
+          "end_size": 14312,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        },
+        {
+          "end_time": 133.33,
+          "start_size": 14312,
+          "end_size": 1431,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        },
+        {
+          "end_time": 33.333,
+          "start_size": 1431,
+          "end_size": 14312,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        },
+        {
+          "end_time": 0,
+          "start_size": 14312,
+          "end_size": 14312,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [],
+      "ancestors": []
+    }
+  ],
+  "migrations": [],
+  "pulses": []
+}

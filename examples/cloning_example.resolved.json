@@ -1,0 +1,90 @@
+{
+  "description": "An example demography to play around with cloning attributes.",
+  "time_units": "generations",
+  "doi": [],
+  "generation_time": 1,
+  "demes": [
+    {
+      "description": "Root population",
+      "start_time": Infinity,
+      "epochs": [
+        {
+          "end_time": 1000,
+          "start_size": 1000.0,
+          "end_size": 1000.0,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0.1
+        }
+      ],
+      "proportions": [],
+      "ancestors": []
+    },
+    {
+      "description": "Population with epochs and changing cloning rates",
+      "start_time": 1000,
+      "epochs": [
+        {
+          "end_time": 500,
+          "start_size": 10000.0,
+          "end_size": 10000.0,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0.2
+        },
+        {
+          "end_time": 100,
+          "start_size": 100.0,
+          "end_size": 100.0,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0.2
+        },
+        {
+          "end_time": 0,
+          "start_size": 10000.0,
+          "end_size": 10000.0,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0.5
+        }
+      ],
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "root"
+      ]
+    },
+    {
+      "description": "Population with epochs and changing cloning rates",
+      "start_time": 1000,
+      "epochs": [
+        {
+          "end_time": 500,
+          "start_size": 10000.0,
+          "end_size": 10000.0,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0.9
+        },
+        {
+          "end_time": 0,
+          "start_size": 100.0,
+          "end_size": 100.0,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 1.0
+        }
+      ],
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "root"
+      ]
+    }
+  ],
+  "migrations": [],
+  "pulses": []
+}

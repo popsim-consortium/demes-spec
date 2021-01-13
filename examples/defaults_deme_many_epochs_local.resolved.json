@@ -1,0 +1,50 @@
+{
+  "description": "Set epoch defaults using deme-local values.",
+  "time_units": "generations",
+  "doi": [],
+  "generation_time": 1,
+  "demes": [
+    {
+      "description": null,
+      "start_time": 100,
+      "epochs": [
+        {
+          "end_time": 3,
+          "start_size": 1,
+          "end_size": 2,
+          "size_function": "exponential",
+          "selfing_rate": 0.1,
+          "cloning_rate": 0.5
+        },
+        {
+          "end_time": 2,
+          "start_size": 1,
+          "end_size": 2,
+          "size_function": "exponential",
+          "selfing_rate": 0.1,
+          "cloning_rate": 0.5
+        },
+        {
+          "end_time": 1,
+          "start_size": 1,
+          "end_size": 2,
+          "size_function": "exponential",
+          "selfing_rate": 0.1,
+          "cloning_rate": 0.5
+        },
+        {
+          "end_time": 0,
+          "start_size": 1,
+          "end_size": 2,
+          "size_function": "exponential",
+          "selfing_rate": 0.1,
+          "cloning_rate": 0.5
+        }
+      ],
+      "proportions": [],
+      "ancestors": []
+    }
+  ],
+  "migrations": [],
+  "pulses": []
+}

@@ -1,0 +1,66 @@
+{
+  "description": "Example of a simple line topology graph.",
+  "time_units": "generations",
+  "doi": [],
+  "generation_time": 1,
+  "demes": [
+    {
+      "description": null,
+      "start_time": Infinity,
+      "epochs": [
+        {
+          "end_time": 20,
+          "start_size": 1,
+          "end_size": 1,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [],
+      "ancestors": []
+    },
+    {
+      "description": null,
+      "start_time": 20,
+      "epochs": [
+        {
+          "end_time": 10,
+          "start_size": 1,
+          "end_size": 1,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "deme0"
+      ]
+    },
+    {
+      "description": null,
+      "start_time": 10,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 1,
+          "end_size": 1,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "deme1"
+      ]
+    }
+  ],
+  "migrations": [],
+  "pulses": []
+}

@@ -1,0 +1,77 @@
+{
+  "description": "Stepping stone model illustrating default value propagation.",
+  "time_units": "years",
+  "doi": [],
+  "generation_time": 25,
+  "demes": [
+    {
+      "description": null,
+      "start_time": Infinity,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 1000,
+          "end_size": 1000,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [],
+      "ancestors": []
+    },
+    {
+      "description": null,
+      "start_time": Infinity,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 1000,
+          "end_size": 1000,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [],
+      "ancestors": []
+    },
+    {
+      "description": null,
+      "start_time": Infinity,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 1000,
+          "end_size": 1000,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [],
+      "ancestors": []
+    }
+  ],
+  "migrations": [
+    {
+      "rate": 0.1,
+      "start_time": Infinity,
+      "end_time": 0,
+      "demes": [
+        "deme1",
+        "deme2"
+      ]
+    },
+    {
+      "rate": 0.1,
+      "start_time": Infinity,
+      "end_time": 0,
+      "demes": [
+        "deme2",
+        "deme3"
+      ]
+    }
+  ],
+  "pulses": []
+}

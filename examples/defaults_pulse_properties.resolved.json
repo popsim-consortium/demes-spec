@@ -1,0 +1,71 @@
+{
+  "description": "Example setting pulse properties using defaults",
+  "time_units": "generations",
+  "doi": [],
+  "generation_time": 1,
+  "demes": [
+    {
+      "description": null,
+      "start_time": Infinity,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 1,
+          "end_size": 1,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [],
+      "ancestors": []
+    },
+    {
+      "description": null,
+      "start_time": Infinity,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 1,
+          "end_size": 1,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [],
+      "ancestors": []
+    },
+    {
+      "description": null,
+      "start_time": Infinity,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 1,
+          "end_size": 1,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [],
+      "ancestors": []
+    }
+  ],
+  "migrations": [],
+  "pulses": [
+    {
+      "source": "deme0",
+      "dest": "deme1",
+      "time": 1,
+      "proportion": 0.5
+    },
+    {
+      "source": "deme1",
+      "dest": "deme2",
+      "time": 1,
+      "proportion": 0.5
+    }
+  ]
+}

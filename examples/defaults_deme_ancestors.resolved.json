@@ -1,0 +1,86 @@
+{
+  "description": "Setting deme ancestor and proportion values using defaults.",
+  "time_units": "generations",
+  "doi": [],
+  "generation_time": 1,
+  "demes": [
+    {
+      "description": null,
+      "start_time": 2,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 1,
+          "end_size": 1,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [],
+      "ancestors": []
+    },
+    {
+      "description": null,
+      "start_time": 2,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 1,
+          "end_size": 1,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [],
+      "ancestors": []
+    },
+    {
+      "description": null,
+      "start_time": 1,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 1,
+          "end_size": 1,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [
+        0.5,
+        0.5
+      ],
+      "ancestors": [
+        "deme0",
+        "deme1"
+      ]
+    },
+    {
+      "description": null,
+      "start_time": 1,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 1,
+          "end_size": 1,
+          "size_function": "exponential",
+          "selfing_rate": 0,
+          "cloning_rate": 0
+        }
+      ],
+      "proportions": [
+        0.5,
+        0.5
+      ],
+      "ancestors": [
+        "deme0",
+        "deme1"
+      ]
+    }
+  ],
+  "migrations": [],
+  "pulses": []
+}
