@@ -1,11 +1,13 @@
 # A data model for describing demographic models.
 
-The `demes` specification defines a data model for describing one or
+The Demes specification defines a data model for describing one or
 more demes (or populations), how they change over time, and their
-relationships to one another. A human-readable `demes` model is written
+relationships to one another. A human-readable Demes model is written
 as a YAML file, which facilitates model sharing, reuse, and interoperability.
-A reference implementation for loading `demes` models into python is
-available from https://github.com/popsim-consortium/demes-python
+A minimal reference implementation for loading Demes models into python is
+available in this repository under the `reference_implementation` folder,
+but users are recommended to instead use the official pip-installable
+package: https://github.com/popsim-consortium/demes-python
 
 ## Writing a `demes` YAML file.
 
