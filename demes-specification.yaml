@@ -167,14 +167,11 @@ definitions:
   epoch:
     description: A deme-specific period of time spanning the half-open interval
      ``(start_time, end_time]``, in which a fixed set of population parameters
-     apply.
+     apply. The epoch's ``start_time`` is defined as the ``end_time`` of the
+     previous epoch, or the deme's ``start_time`` if it is the first epoch.
     type: object
     additionalProperties: false
     properties:
-      start_time:
-        description: |
-          The most ancient time of the epoch, in ``time_units`` before the present.
-        $ref: '#/definitions/start_time'
       end_time:
         description: |
           The most recent time of the epoch, in ``time_units`` before the present.
@@ -206,7 +203,8 @@ definitions:
       The deme may be a descendant of one or more demes in the graph, and may
       be an ancestor to others. The deme exists over the half-open time interval
       ``(start_time, end_time]``, and it may continue to exist after
-      contributing ancestry to a descendant deme.
+      contributing ancestry to a descendant deme. The deme's ``end_time`` is
+      defined as the ``end_time`` of the deme's last epoch.
     type: object
     additionalProperties: false
     properties:
@@ -252,15 +250,11 @@ definitions:
           for each of the deme's ``ancestors``. I.e. the ``start_time`` must
           be within the half-open interval ``(deme.start_time, deme.end_time]``
           for each deme in ``ancestors``.
-          If ``start_time`` is specified, and the deme's first epoch's
-          ``start_time`` is also specified, they must have the same value.
 
           If not specified, the deme's ``start_time`` shall be obtained
           according to the following rules (the first matching rule shall
           be used).
 
-           - If the first epoch's ``start_time`` is specified, its value
-             shall be used.
            - If the deme has one ancestor, and the ancestor has an
              ``end_time > 0``, the ancestor's ``end_time`` value shall be
              used.
@@ -273,11 +267,9 @@ definitions:
           raised for the following conditions.
 
            - If the deme has multiple ancestors,
-             and neither the deme's ``start_time`` nor the first epoch's
-             ``start_time`` is specified.
+             and the deme's ``start_time`` is not specified.
            - If the deme has one ancestor with an ``end_time == 0``,
-             and neither the deme's ``start_time`` nor the first epoch's
-             start time is specified.
+             and the deme's ``start_time`` is not specified.
 
         $ref: '#/definitions/start_time'
       epochs:
