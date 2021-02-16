@@ -1,8 +1,8 @@
 {
-  "description": "Example setting pulse properties using defaults",
   "time_units": "generations",
-  "doi": [],
   "generation_time": 1,
+  "doi": [],
+  "description": "Example setting pulse properties using defaults",
   "demes": [
     {
       "description": null,

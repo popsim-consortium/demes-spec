@@ -1,10 +1,15 @@
 description: Set epoch defaults using a mixture of local and global defaults.
 time_units: generations
 defaults:
-  deme: {start_time: 100}
+  deme: {start_time: 100, ancestors: [ancestral]}
   epoch: {cloning_rate: 0.5, end_size: 2, selfing_rate: 0.1, start_size: 1}
 
 demes:
+- id: ancestral
+  ancestors: []
+  start_time: .inf
+  epochs:
+  - {start_size: 1, end_size: 1}
 - id: deme0
   defaults:
     epoch: {cloning_rate: 0.6, end_size: 3, selfing_rate: 0.2, start_size: 2}

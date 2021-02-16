@@ -1,8 +1,8 @@
 {
-  "description": "Stepping stone model illustrating default value propagation.",
   "time_units": "years",
-  "doi": [],
   "generation_time": 25,
+  "doi": [],
+  "description": "Stepping stone model illustrating default value propagation.",
   "demes": [
     {
       "description": null,

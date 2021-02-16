@@ -1,10 +1,10 @@
 {
-  "description": "The Gutenkunst et al. (2009) OOA model.",
   "time_units": "years",
+  "generation_time": 25,
   "doi": [
     "https://doi.org/10.1371/journal.pgen.1000695"
   ],
-  "generation_time": 25,
+  "description": "The Gutenkunst et al. (2009) OOA model.",
   "demes": [
     {
       "description": "Equilibrium/root population",

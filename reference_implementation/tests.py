@@ -271,13 +271,29 @@ class TestValidateDeme:
             "time_units": "generations",
             "defaults": {"epoch": {"start_size": 1}},
             "demes": [
-                {"id": "deme0", "start_time": 100, "epochs": [{"end_time": 20}]},
+                {"id": "deme0"},
                 {
                     "id": "deme1",
-                    "start_time": 150,
+                    "start_time": 100,
                     "ancestors": ["deme0"],
+                    "epochs": [{"end_time": 20}],
+                },
+                {
+                    "id": "deme2",
+                    "start_time": 150,
+                    "ancestors": ["deme1"],
                     "epochs": [{"end_time": 120}],
                 },
+            ],
+        }
+        with pytest.raises(ValueError):
+            parser.parse(data)
+
+    def test_root_with_finite_start_time(self):
+        data = {
+            "time_units": "generations",
+            "demes": [
+                {"id": "deme0", "start_time": 100, "epochs": [{"start_size": 1}]}
             ],
         }
         with pytest.raises(ValueError):
@@ -416,7 +432,8 @@ class TestPulse:
 
     def test_bad_time(self):
         data = minimal_graph(num_demes=2)
-        data["demes"][0]["start_time"] = 10
+        data["demes"][1]["start_time"] = 10
+        data["demes"][1]["ancestors"] = ["deme0"]
         data["pulses"] = [
             {"source": "deme0", "dest": "deme1", "proportion": 0.5, "time": 20}
         ]
@@ -533,7 +550,8 @@ class TestMigration:
 
     def test_bad_time_asymmetric(self):
         data = minimal_graph(num_demes=2)
-        data["demes"][0]["start_time"] = 10
+        data["demes"][1]["start_time"] = 10
+        data["demes"][1]["ancestors"] = ["deme0"]
         data["migrations"] = [
             {
                 "source": "deme0",
@@ -548,7 +566,8 @@ class TestMigration:
 
     def test_bad_time_symmetric(self):
         data = minimal_graph(num_demes=2)
-        data["demes"][0]["start_time"] = 10
+        data["demes"][1]["start_time"] = 10
+        data["demes"][1]["ancestors"] = ["deme0"]
         data["migrations"] = [
             {"demes": ["deme0", "deme1"], "rate": 0.5, "start_time": 20, "end_time": 11}
         ]
@@ -672,15 +691,19 @@ class TestDefaults:
         assert graph.pulses[1].dest.id == "deme2"
 
     def test_deme_description_start_time(self):
-        data = minimal_graph(num_demes=2)
-        data["defaults"] = {"deme": {"description": "default", "start_time": 1}}
-        data["demes"][0]["description"] = "not default"
-        data["demes"][0]["start_time"] = 2
+        data = minimal_graph(num_demes=3)
+        data["defaults"] = {
+            "deme": {"description": "default", "start_time": 1, "ancestors": ["deme0"]}
+        }
+        data["demes"][0]["start_time"] = math.inf
+        data["demes"][0]["ancestors"] = []
+        data["demes"][1]["description"] = "not default"
+        data["demes"][1]["start_time"] = 2
         parsed = parser.parse(data).asdict()
-        assert parsed["demes"][0]["description"] == "not default"
-        assert parsed["demes"][0]["start_time"] == 2
-        assert parsed["demes"][1]["description"] == "default"
-        assert parsed["demes"][1]["start_time"] == 1
+        assert parsed["demes"][1]["description"] == "not default"
+        assert parsed["demes"][1]["start_time"] == 2
+        assert parsed["demes"][2]["description"] == "default"
+        assert parsed["demes"][2]["start_time"] == 1
 
     def test_deme_ancestors_proportions(self):
         data = minimal_graph(num_demes=4)
@@ -692,7 +715,7 @@ class TestDefaults:
             }
         }
         for j in range(2):
-            data["demes"][j]["start_time"] = 2
+            data["demes"][j]["start_time"] = math.inf
             data["demes"][j]["ancestors"] = []
             data["demes"][j]["proportions"] = []
         parsed = parser.parse(data).asdict()
@@ -705,15 +728,19 @@ class TestDefaults:
         assert parsed["demes"][3]["proportions"] == [0.5, 0.5]
 
     def test_no_epochs_specified(self):
-        num_demes = 4
+        num_demes = 5
         data = {
             "time_units": "generations",
             "defaults": {"epoch": {"start_size": 1, "end_size": 2, "end_time": 10}},
-            "demes": [{"id": f"deme{j}", "start_time": 100} for j in range(num_demes)],
+            "demes": [{"id": "deme0", "epochs": [{"start_size": 1, "end_size": 1}]}]
+            + [
+                {"id": f"deme{j}", "start_time": 100, "ancestors": ["deme0"]}
+                for j in range(1, num_demes)
+            ],
         }
         graph = parser.parse(data)
-        assert len(graph.demes) == 4
-        for deme in graph.demes.values():
+        assert len(graph.demes) == num_demes
+        for deme in list(graph.demes.values())[1:]:
             assert len(deme.epochs) == 1
             epoch = deme.epochs[0]
             assert epoch.start_size == 1
@@ -735,15 +762,15 @@ class TestDefaults:
             "demes": [
                 {
                     "id": "deme0",
-                    "start_time": 100,
-                    "epochs": [{"end_time": j} for j in range(num_epochs - 1, -1, -1)],
+                    "epochs": [{"end_time": 100, "start_size": 1, "end_size": 1}]
+                    + [{"end_time": j} for j in range(num_epochs - 1, -1, -1)],
                 }
             ],
         }
         graph = parser.parse(data)
         deme = graph.demes["deme0"]
-        assert len(deme.epochs) == num_epochs
-        for epoch in deme.epochs:
+        assert len(deme.epochs) == num_epochs + 1
+        for epoch in deme.epochs[1:]:
             assert epoch.start_size == 1
             assert epoch.end_size == 2
             assert epoch.cloning_rate == 0.5
@@ -756,7 +783,6 @@ class TestDefaults:
             "demes": [
                 {
                     "id": "deme0",
-                    "start_time": 100,
                     "defaults": {
                         "epoch": {
                             "start_size": 1,
@@ -765,14 +791,15 @@ class TestDefaults:
                             "selfing_rate": 0.1,
                         }
                     },
-                    "epochs": [{"end_time": j} for j in range(num_epochs - 1, -1, -1)],
+                    "epochs": [{"end_time": 100, "start_size": 1, "end_size": 1}]
+                    + [{"end_time": j} for j in range(num_epochs - 1, -1, -1)],
                 }
             ],
         }
         graph = parser.parse(data)
         deme = graph.demes["deme0"]
-        assert len(deme.epochs) == num_epochs
-        for epoch in deme.epochs:
+        assert len(deme.epochs) == num_epochs + 1
+        for epoch in deme.epochs[1:]:
             assert epoch.start_size == 1
             assert epoch.end_size == 2
             assert epoch.cloning_rate == 0.5
@@ -783,7 +810,7 @@ class TestDefaults:
         data = {
             "time_units": "generations",
             "defaults": {
-                "deme": {"start_time": 100},
+                "deme": {"start_time": 100, "ancestors": ["ancestral"]},
                 "epoch": {
                     "start_size": 1,
                     "end_size": 2,
@@ -792,6 +819,12 @@ class TestDefaults:
                 },
             },
             "demes": [
+                {
+                    "id": "ancestral",
+                    "start_time": math.inf,
+                    "ancestors": [],
+                    "epochs": [{"start_size": 1, "end_size": 1}],
+                },
                 {
                     "id": "deme0",
                     "defaults": {

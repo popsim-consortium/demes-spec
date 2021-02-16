@@ -1,12 +1,12 @@
 {
-  "description": "A single-population bottleneck model. Also tests a finite start_time.",
   "time_units": "generations",
-  "doi": [],
   "generation_time": 1,
+  "doi": [],
+  "description": "A single-population bottleneck model.",
   "demes": [
     {
       "description": "Bottleneck population using epochs",
-      "start_time": 10000,
+      "start_time": Infinity,
       "epochs": [
         {
           "end_time": 500,

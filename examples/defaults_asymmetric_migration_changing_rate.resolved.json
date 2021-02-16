@@ -1,8 +1,8 @@
 {
-  "description": "Set migration source and dest using defaults.",
   "time_units": "generations",
-  "doi": [],
   "generation_time": 1,
+  "doi": [],
+  "description": "Set migration source and dest using defaults.",
   "demes": [
     {
       "description": null,

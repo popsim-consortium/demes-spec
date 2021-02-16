@@ -1,11 +1,27 @@
 {
-  "description": "Set epoch defaults using a mixture of local and global defaults.",
   "time_units": "generations",
-  "doi": [],
   "generation_time": 1,
+  "doi": [],
+  "description": "Set epoch defaults using a mixture of local and global defaults.",
   "demes": [
     {
       "description": null,
+      "start_time": Infinity,
+      "epochs": [
+        {
+          "end_time": 0,
+          "start_size": 1,
+          "end_size": 1,
+          "size_function": "exponential",
+          "selfing_rate": 0.1,
+          "cloning_rate": 0.5
+        }
+      ],
+      "proportions": [],
+      "ancestors": []
+    },
+    {
+      "description": null,
       "start_time": 100,
       "epochs": [
         {
@@ -41,8 +57,12 @@
           "cloning_rate": 0.6
         }
       ],
-      "proportions": [],
-      "ancestors": []
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "ancestral"
+      ]
     },
     {
       "description": null,
@@ -81,8 +101,12 @@
           "cloning_rate": 0.5
         }
       ],
-      "proportions": [],
-      "ancestors": []
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "ancestral"
+      ]
     },
     {
       "description": null,
@@ -121,8 +145,12 @@
           "cloning_rate": 0.5
         }
       ],
-      "proportions": [],
-      "ancestors": []
+      "proportions": [
+        1
+      ],
+      "ancestors": [
+        "ancestral"
+      ]
     }
   ],
   "migrations": [],
