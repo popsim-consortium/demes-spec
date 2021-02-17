@@ -15,11 +15,11 @@ demes:
 - id: deme0
   ancestors: []
   proportions: []
-  start_time: 2
+  start_time: .inf
 - ancestors: []
   id: deme1
   proportions: []
-  start_time: 2
+  start_time: .inf
 # Two child demes, both of which inherit from deme0 and deme1, as set
 # by the defaults.
 - id: deme2

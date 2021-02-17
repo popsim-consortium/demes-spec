@@ -1,8 +1,8 @@
 {
-  "description": null,
   "time_units": "generations",
-  "doi": [],
   "generation_time": 1,
+  "doi": [],
+  "description": null,
   "demes": [
     {
       "description": null,

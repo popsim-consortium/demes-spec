@@ -1,8 +1,8 @@
 {
-  "description": "An example demography with one main population that is unchanged, that spawns multiple offshoot populations.",
   "time_units": "generations",
-  "doi": [],
   "generation_time": 1,
+  "doi": [],
+  "description": "An example demography with one main population that is unchanged, that spawns multiple offshoot populations.",
   "demes": [
     {
       "description": "Main population",

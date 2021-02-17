@@ -1,8 +1,8 @@
 {
-  "description": "Set general migration properties using defaults.",
   "time_units": "generations",
-  "doi": [],
   "generation_time": 1,
+  "doi": [],
+  "description": "Set general migration properties using defaults.",
   "demes": [
     {
       "description": null,

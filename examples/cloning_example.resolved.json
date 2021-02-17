@@ -1,8 +1,8 @@
 {
-  "description": "An example demography to play around with cloning attributes.",
   "time_units": "generations",
-  "doi": [],
   "generation_time": 1,
+  "doi": [],
+  "description": "An example demography to play around with cloning attributes.",
   "demes": [
     {
       "description": "Root population",

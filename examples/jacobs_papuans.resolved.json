@@ -1,11 +1,11 @@
 {
-  "description": "A ten population model of out-of-Africa, including two pulses of\nDenisovan admixture into Papuans, and several pulses of Neandertal\nadmixture into non-Africans.\nMost parameters are from Jacobs et al. (2019), Table S5 and Figure S5.\nThis model is an extension of one from Malaspinas et al. (2016), thus\nsome parameters are inherited from there.\n",
   "time_units": "generations",
+  "generation_time": 1,
   "doi": [
     "https://doi.org/10.1016/j.cell.2019.02.035",
     "https://doi.org/10.1038/nature18299"
   ],
-  "generation_time": 1,
+  "description": "A ten population model of out-of-Africa, including two pulses of\nDenisovan admixture into Papuans, and several pulses of Neandertal\nadmixture into non-Africans.\nMost parameters are from Jacobs et al. (2019), Table S5 and Figure S5.\nThis model is an extension of one from Malaspinas et al. (2016), thus\nsome parameters are inherited from there.\n",
   "demes": [
     {
       "description": null,

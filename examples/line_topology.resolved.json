@@ -1,8 +1,8 @@
 {
-  "description": "Example of a simple line topology graph.",
   "time_units": "generations",
-  "doi": [],
   "generation_time": 1,
+  "doi": [],
+  "description": "Example of a simple line topology graph.",
   "demes": [
     {
       "description": null,

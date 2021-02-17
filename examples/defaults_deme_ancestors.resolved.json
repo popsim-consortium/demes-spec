@@ -1,12 +1,12 @@
 {
-  "description": "Setting deme ancestor and proportion values using defaults.",
   "time_units": "generations",
-  "doi": [],
   "generation_time": 1,
+  "doi": [],
+  "description": "Setting deme ancestor and proportion values using defaults.",
   "demes": [
     {
       "description": null,
-      "start_time": 2,
+      "start_time": Infinity,
       "epochs": [
         {
           "end_time": 0,
@@ -22,7 +22,7 @@
     },
     {
       "description": null,
-      "start_time": 2,
+      "start_time": Infinity,
       "epochs": [
         {
           "end_time": 0,

@@ -25,7 +25,7 @@ import numbers
 import copy
 import pprint
 import dataclasses
-from typing import Dict, List, Union, Any
+from typing import Dict, List, Union
 
 
 # Validator functions. These are used as arguments to the pop_x functions and
@@ -193,6 +193,10 @@ class Deme:
                     "Must explicitly set Deme.start_time when > 1 ancestor"
                 )
             self.start_time = default
+        if len(self.ancestors) == 0 and not math.isinf(self.start_time):
+            raise ValueError(
+                f"deme {self.id} has finite start_time, but no ancestors"
+            )
 
         for ancestor in self.ancestors:
             if not ancestor.exists_at(self.start_time, include_end=True):
