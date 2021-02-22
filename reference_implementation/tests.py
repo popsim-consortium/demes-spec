@@ -100,8 +100,7 @@ class TestValidateGraph:
         data = minimal_graph()
         data["time_units"] = "generations"
         data["generation_time"] = 12
-        with pytest.raises(ValueError, match="generation_time must be either"):
-            parser.parse(data)
+        parser.parse(data)
         data["generation_time"] = 1
         graph = parser.parse(data)
         assert graph.generation_time == 1
