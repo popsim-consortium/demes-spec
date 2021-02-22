@@ -194,9 +194,7 @@ class Deme:
                 )
             self.start_time = default
         if len(self.ancestors) == 0 and not math.isinf(self.start_time):
-            raise ValueError(
-                f"deme {self.id} has finite start_time, but no ancestors"
-            )
+            raise ValueError(f"deme {self.id} has finite start_time, but no ancestors")
 
         for ancestor in self.ancestors:
             if not ancestor.exists_at(self.start_time, include_end=True):
@@ -435,17 +433,10 @@ class Graph:
         return d
 
     def validate(self):
-        if self.time_units == "generations":
-            # Not clear this is a good idea:
-            # https://github.com/popsim-consortium/demes-spec/issues/41
-            if self.generation_time not in (None, 1):
-                raise ValueError(
-                    "If time_units is generations, generation_time must be either "
-                    "null or 1"
-                )
-            self.generation_time = 1
-        else:
-            if self.generation_time is None:
+        if self.generation_time is None:
+            if self.time_units == "generations":
+                self.generation_time = 1
+            else:
                 raise ValueError(
                     "Must specify Graph.generation_time if time_units is not "
                     "'generations'"
