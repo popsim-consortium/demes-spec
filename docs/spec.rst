@@ -1,6 +1,8 @@
-=============
-Specification
-=============
+.. _sec_spec:
+
+===================
+Demes Specification
+===================
 
 The structure of ``demes``' data model is formally defined using
 `JSON schema <https://json-schema.org/>`_ and rendered below as a table.

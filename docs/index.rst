@@ -11,6 +11,8 @@ Welcome to the Demes Specification!
    :caption: Contents:
 
    introduction
+   tutorial
+   gallery
    spec
 
 
