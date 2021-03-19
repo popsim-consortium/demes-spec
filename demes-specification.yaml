@@ -66,7 +66,7 @@ properties:
           ancestors:
             type: array
             items:
-              $ref: '#/definitions/id'
+              $ref: '#/definitions/name'
           proportions:
             type: array
             items:
@@ -104,7 +104,7 @@ required:
 - demes
 
 definitions:
-  id:
+  name:
     description: |
       A unique string identifier for a deme.
       Must be a valid `python identifier
@@ -208,11 +208,11 @@ definitions:
     type: object
     additionalProperties: false
     properties:
-      id:
+      name:
         description: |
           An identifier for this deme. Must be unique among all demes in the
           graph.
-        $ref: '#/definitions/id'
+        $ref: '#/definitions/name'
       description:
         description: A concise description of the deme.
         type: ["string", "null"]
@@ -228,7 +228,7 @@ definitions:
           specified only once. A deme must not be one of its own ancestors.
         type: array
         items:
-          $ref: '#/definitions/id'
+          $ref: '#/definitions/name'
         default: []
       proportions:
         description: |
@@ -292,7 +292,7 @@ definitions:
           epoch:
             $ref: '#/definitions/epoch'
     required:
-    - id
+    - name
 
   pulse:
     description: |
@@ -303,10 +303,10 @@ definitions:
     properties:
       source:
         description: The deme ID of the migration source.
-        $ref: '#/definitions/id'
+        $ref: '#/definitions/name'
       dest:
         description: The deme ID of the migration destination.
-        $ref: '#/definitions/id'
+        $ref: '#/definitions/name'
       time:
         description: |
           The time of migration, in ``time_units`` before the present.
@@ -339,14 +339,14 @@ definitions:
         description: The deme IDs of the symmetrically migrating demes.
         type: array
         items:
-          $ref: '#/definitions/id'
+          $ref: '#/definitions/name'
         minItems: 2
       source:
         description: The deme ID of the asymmetric migration source.
-        $ref: '#/definitions/id'
+        $ref: '#/definitions/name'
       dest:
         description: The deme ID of the asymmetric migration destination.
-        $ref: '#/definitions/id'
+        $ref: '#/definitions/name'
       start_time:
         description: |
           The time at which migration begins, in ``time_units`` before the present.

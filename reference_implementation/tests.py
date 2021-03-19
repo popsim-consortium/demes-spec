@@ -17,7 +17,7 @@ def minimal_graph(num_demes=1, population_size=1):
     graph = {
         "time_units": "generations",
         "demes": [
-            {"id": f"deme{j}", "epochs": [{"start_size": population_size}]}
+            {"name": f"deme{j}", "epochs": [{"start_size": population_size}]}
             for j in range(num_demes)
         ],
     }
@@ -28,7 +28,7 @@ def island_model_graph(num_demes=1, population_size=1, migration_rate=1):
     graph = {
         "time_units": "generations",
         "demes": [
-            {"id": f"deme{j}", "epochs": [{"start_size": population_size}]}
+            {"name": f"deme{j}", "epochs": [{"start_size": population_size}]}
             for j in range(num_demes)
         ],
         "migrations": [
@@ -43,7 +43,7 @@ def single_deme_graph(num_epochs=1, population_size=1):
         "time_units": "generations",
         "demes": [
             {
-                "id": "deme0",
+                "name": "deme0",
                 "epochs": [
                     {"start_size": population_size + j, "end_time": num_epochs - j - 1}
                     for j in range(num_epochs)
@@ -58,8 +58,8 @@ def single_ancestor_graph(num_demes=1, population_size=1):
     graph = {
         "time_units": "generations",
         "defaults": {"epoch": {"start_size": population_size}},
-        "demes": [{"id": "ancestor", "epochs": [{"end_time": 10}]}]
-        + [{"id": f"child_{j}", "ancestors": ["ancestor"]} for j in range(num_demes)],
+        "demes": [{"name": "ancestor", "epochs": [{"end_time": 10}]}]
+        + [{"name": f"child_{j}", "ancestors": ["ancestor"]} for j in range(num_demes)],
     }
     return graph
 
@@ -69,12 +69,12 @@ def two_ancestor_graph(num_demes=1, population_size=1):
         "time_units": "generations",
         "defaults": {"epoch": {"start_size": population_size}},
         "demes": [
-            {"id": "ancestor0", "epochs": [{"end_time": 10}]},
-            {"id": "ancestor1", "epochs": [{"end_time": 10}]},
+            {"name": "ancestor0", "epochs": [{"end_time": 10}]},
+            {"name": "ancestor1", "epochs": [{"end_time": 10}]},
         ]
         + [
             {
-                "id": f"child_{j}",
+                "name": f"child_{j}",
                 "ancestors": ["ancestor0", "ancestor1"],
                 "proportions": [0.5, 0.5],
                 "start_time": 10,
@@ -212,10 +212,10 @@ class TestExtraFieldsDefaults:
 class TestValidateDeme:
     def test_id(self):
         data = minimal_graph()
-        data["demes"][0]["id"] = 1234
+        data["demes"][0]["name"] = 1234
         with pytest.raises(TypeError):
             parser.parse(data)
-        data["demes"][0]["id"] = "not an identifier"
+        data["demes"][0]["name"] = "not an identifier"
         with pytest.raises(ValueError):
             parser.parse(data)
 
@@ -227,7 +227,7 @@ class TestValidateDeme:
 
     def test_duplicate_deme_ids(self):
         data = minimal_graph(num_demes=2)
-        data["demes"][0]["id"] = data["demes"][1]["id"]
+        data["demes"][0]["name"] = data["demes"][1]["name"]
         with pytest.raises(ValueError):
             parser.parse(data)
 
@@ -270,15 +270,15 @@ class TestValidateDeme:
             "time_units": "generations",
             "defaults": {"epoch": {"start_size": 1}},
             "demes": [
-                {"id": "deme0"},
+                {"name": "deme0"},
                 {
-                    "id": "deme1",
+                    "name": "deme1",
                     "start_time": 100,
                     "ancestors": ["deme0"],
                     "epochs": [{"end_time": 20}],
                 },
                 {
-                    "id": "deme2",
+                    "name": "deme2",
                     "start_time": 150,
                     "ancestors": ["deme1"],
                     "epochs": [{"end_time": 120}],
@@ -292,7 +292,7 @@ class TestValidateDeme:
         data = {
             "time_units": "generations",
             "demes": [
-                {"id": "deme0", "start_time": 100, "epochs": [{"start_size": 1}]}
+                {"name": "deme0", "start_time": 100, "epochs": [{"start_size": 1}]}
             ],
         }
         with pytest.raises(ValueError):
@@ -375,9 +375,9 @@ class TestResolveEpochTimes:
             "time_units": "generations",
             "defaults": {"epoch": {"start_size": 1}},
             "demes": [
-                {"id": "deme0", "epochs": [{"end_time": 20}]},
-                {"id": "deme1", "ancestors": ["deme0"], "epochs": [{"end_time": 10}]},
-                {"id": "deme2", "ancestors": ["deme1"]},
+                {"name": "deme0", "epochs": [{"end_time": 20}]},
+                {"name": "deme1", "ancestors": ["deme0"], "epochs": [{"end_time": 10}]},
+                {"name": "deme2", "ancestors": ["deme1"]},
             ],
         }
         graph = parser.parse(data)
@@ -627,8 +627,8 @@ class TestDefaults:
         graph = parser.parse(data)
         assert len(graph.migrations) == 2
         for migration in graph.migrations:
-            assert migration.source.id == "deme0"
-            assert migration.dest.id == "deme1"
+            assert migration.source.name == "deme0"
+            assert migration.dest.name == "deme1"
         assert graph.migrations[0].rate == 1
         assert graph.migrations[0].start_time == 2
         assert graph.migrations[0].end_time == 1
@@ -667,10 +667,10 @@ class TestDefaults:
             migration.start_time == 2
             migration.end_time == 1
             migration.rate == 1
-        assert graph.migrations[0].source.id == "deme0"
-        assert graph.migrations[0].dest.id == "deme1"
-        assert graph.migrations[1].source.id == "deme1"
-        assert graph.migrations[1].dest.id == "deme2"
+        assert graph.migrations[0].source.name == "deme0"
+        assert graph.migrations[0].dest.name == "deme1"
+        assert graph.migrations[1].source.name == "deme1"
+        assert graph.migrations[1].dest.name == "deme2"
 
     def test_pulse_time_proportion(self):
         data = minimal_graph(num_demes=3)
@@ -684,10 +684,10 @@ class TestDefaults:
         for pulse in graph.pulses:
             pulse.time == 1
             pulse.proportion == 0.5
-        assert graph.pulses[0].source.id == "deme0"
-        assert graph.pulses[0].dest.id == "deme1"
-        assert graph.pulses[1].source.id == "deme1"
-        assert graph.pulses[1].dest.id == "deme2"
+        assert graph.pulses[0].source.name == "deme0"
+        assert graph.pulses[0].dest.name == "deme1"
+        assert graph.pulses[1].source.name == "deme1"
+        assert graph.pulses[1].dest.name == "deme2"
 
     def test_deme_description_start_time(self):
         data = minimal_graph(num_demes=3)
@@ -731,9 +731,9 @@ class TestDefaults:
         data = {
             "time_units": "generations",
             "defaults": {"epoch": {"start_size": 1, "end_size": 2, "end_time": 10}},
-            "demes": [{"id": "deme0", "epochs": [{"start_size": 1, "end_size": 1}]}]
+            "demes": [{"name": "deme0", "epochs": [{"start_size": 1, "end_size": 1}]}]
             + [
-                {"id": f"deme{j}", "start_time": 100, "ancestors": ["deme0"]}
+                {"name": f"deme{j}", "start_time": 100, "ancestors": ["deme0"]}
                 for j in range(1, num_demes)
             ],
         }
@@ -760,7 +760,7 @@ class TestDefaults:
             },
             "demes": [
                 {
-                    "id": "deme0",
+                    "name": "deme0",
                     "epochs": [{"end_time": 100, "start_size": 1, "end_size": 1}]
                     + [{"end_time": j} for j in range(num_epochs - 1, -1, -1)],
                 }
@@ -781,7 +781,7 @@ class TestDefaults:
             "time_units": "generations",
             "demes": [
                 {
-                    "id": "deme0",
+                    "name": "deme0",
                     "defaults": {
                         "epoch": {
                             "start_size": 1,
@@ -819,13 +819,13 @@ class TestDefaults:
             },
             "demes": [
                 {
-                    "id": "ancestral",
+                    "name": "ancestral",
                     "start_time": math.inf,
                     "ancestors": [],
                     "epochs": [{"start_size": 1, "end_size": 1}],
                 },
                 {
-                    "id": "deme0",
+                    "name": "deme0",
                     "defaults": {
                         "epoch": {
                             "start_size": 2,
@@ -837,11 +837,11 @@ class TestDefaults:
                     "epochs": [{"end_time": j} for j in range(num_epochs - 1, -1, -1)],
                 },
                 {
-                    "id": "deme1",
+                    "name": "deme1",
                     "epochs": [{"end_time": j} for j in range(num_epochs - 1, -1, -1)],
                 },
                 {
-                    "id": "deme2",
+                    "name": "deme2",
                     "epochs": [{"end_time": j} for j in range(num_epochs - 1, -1, -1)],
                 },
             ],
