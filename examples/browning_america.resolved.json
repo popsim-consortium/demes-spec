@@ -7,6 +7,7 @@
   "description": "The Browning et al. (2011) model of admixture in the Americas.",
   "demes": [
     {
+      "name": "ancestral",
       "description": "Equilibrium/root population",
       "start_time": Infinity,
       "epochs": [
@@ -23,6 +24,7 @@
       "ancestors": []
     },
     {
+      "name": "AMH",
       "description": "Anatomically modern humans",
       "start_time": 5920,
       "epochs": [
@@ -43,6 +45,7 @@
       ]
     },
     {
+      "name": "OOA",
       "description": "Bottleneck out-of-Africa population",
       "start_time": 2040,
       "epochs": [
@@ -63,6 +66,7 @@
       ]
     },
     {
+      "name": "AFR",
       "description": "African population",
       "start_time": 2040,
       "epochs": [
@@ -83,6 +87,7 @@
       ]
     },
     {
+      "name": "EUR",
       "description": "European population",
       "start_time": 920,
       "epochs": [
@@ -103,6 +108,7 @@
       ]
     },
     {
+      "name": "EAS",
       "description": "East Asian population",
       "start_time": 920,
       "epochs": [
@@ -123,6 +129,7 @@
       ]
     },
     {
+      "name": "ADMIX",
       "description": "Admixed America",
       "start_time": 12,
       "epochs": [

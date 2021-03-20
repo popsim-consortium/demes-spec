@@ -71,6 +71,9 @@ NO_DEFAULT = object()
 def pop_item(data, name, *, required_type, default=NO_DEFAULT, validator=None):
     if name in data:
         value = data.pop(name)
+        if value is None and default is None:
+            # This is treated the same as not specifying the value
+            return value
         validate_item(name, value, required_type, validator)
     else:
         if default is NO_DEFAULT:
@@ -176,6 +179,7 @@ class Deme:
         # It's easier to make our own asdict here to avoid recursion issues
         # with dataclasses.asdict through the ancestors list
         return {
+            "name": self.name,
             "description": self.description,
             "start_time": self.start_time,
             "epochs": [epoch.asdict() for epoch in self.epochs],

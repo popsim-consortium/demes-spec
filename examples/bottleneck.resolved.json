@@ -5,6 +5,7 @@
   "description": "A single-population bottleneck model.",
   "demes": [
     {
+      "name": "our_population",
       "description": "Bottleneck population using epochs",
       "start_time": Infinity,
       "epochs": [

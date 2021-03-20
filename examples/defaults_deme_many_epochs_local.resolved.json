@@ -5,6 +5,7 @@
   "description": "Set epoch defaults using deme-local values.",
   "demes": [
     {
+      "name": "deme0",
       "description": null,
       "start_time": Infinity,
       "epochs": [

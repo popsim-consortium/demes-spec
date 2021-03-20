@@ -5,6 +5,7 @@
   "description": "An example demography with one main population that is unchanged, that spawns multiple offshoot populations.",
   "demes": [
     {
+      "name": "ancestral",
       "description": "Main population",
       "start_time": Infinity,
       "epochs": [
@@ -21,6 +22,7 @@
       "ancestors": []
     },
     {
+      "name": "offshoot1",
       "description": "More recent offshoot population",
       "start_time": 500,
       "epochs": [
@@ -41,6 +43,7 @@
       ]
     },
     {
+      "name": "offshoot2",
       "description": "More ancient offshoot population",
       "start_time": 1000,
       "epochs": [

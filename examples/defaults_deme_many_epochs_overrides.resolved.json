@@ -5,6 +5,7 @@
   "description": "Set epoch defaults using a mixture of local and global defaults.",
   "demes": [
     {
+      "name": "ancestral",
       "description": null,
       "start_time": Infinity,
       "epochs": [
@@ -21,6 +22,7 @@
       "ancestors": []
     },
     {
+      "name": "deme0",
       "description": null,
       "start_time": 100,
       "epochs": [
@@ -65,6 +67,7 @@
       ]
     },
     {
+      "name": "deme1",
       "description": null,
       "start_time": 100,
       "epochs": [
@@ -109,6 +112,7 @@
       ]
     },
     {
+      "name": "deme2",
       "description": null,
       "start_time": 100,
       "epochs": [
