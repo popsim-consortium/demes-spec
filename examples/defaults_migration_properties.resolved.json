@@ -5,6 +5,7 @@
   "description": "Set general migration properties using defaults.",
   "demes": [
     {
+      "name": "deme0",
       "description": null,
       "start_time": Infinity,
       "epochs": [
@@ -21,6 +22,7 @@
       "ancestors": []
     },
     {
+      "name": "deme1",
       "description": null,
       "start_time": Infinity,
       "epochs": [
@@ -37,6 +39,7 @@
       "ancestors": []
     },
     {
+      "name": "deme2",
       "description": null,
       "start_time": Infinity,
       "epochs": [

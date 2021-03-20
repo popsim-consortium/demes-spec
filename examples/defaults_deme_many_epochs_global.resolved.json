@@ -5,6 +5,7 @@
   "description": "Set epoch values using global defaults.",
   "demes": [
     {
+      "name": "deme0",
       "description": null,
       "start_time": Infinity,
       "epochs": [

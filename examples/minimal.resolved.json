@@ -5,6 +5,7 @@
   "description": null,
   "demes": [
     {
+      "name": "a",
       "description": null,
       "start_time": Infinity,
       "epochs": [

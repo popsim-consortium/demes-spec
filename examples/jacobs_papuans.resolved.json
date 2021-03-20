@@ -8,6 +8,7 @@
   "description": "A ten population model of out-of-Africa, including two pulses of\nDenisovan admixture into Papuans, and several pulses of Neandertal\nadmixture into non-Africans.\nMost parameters are from Jacobs et al. (2019), Table S5 and Figure S5.\nThis model is an extension of one from Malaspinas et al. (2016), thus\nsome parameters are inherited from there.\n",
   "demes": [
     {
+      "name": "YRI",
       "description": null,
       "start_time": Infinity,
       "epochs": [
@@ -40,6 +41,7 @@
       "ancestors": []
     },
     {
+      "name": "DenA",
       "description": null,
       "start_time": 20225.0,
       "epochs": [
@@ -84,6 +86,7 @@
       ]
     },
     {
+      "name": "NeaA",
       "description": null,
       "start_time": 15090.0,
       "epochs": [
@@ -112,6 +115,7 @@
       ]
     },
     {
+      "name": "Den2",
       "description": null,
       "start_time": 12500.0,
       "epochs": [
@@ -132,6 +136,7 @@
       ]
     },
     {
+      "name": "Den1",
       "description": null,
       "start_time": 9750.0,
       "epochs": [
@@ -152,6 +157,7 @@
       ]
     },
     {
+      "name": "Nea1",
       "description": null,
       "start_time": 3375.0,
       "epochs": [
@@ -172,6 +178,7 @@
       ]
     },
     {
+      "name": "Ghost",
       "description": null,
       "start_time": 2218.0,
       "epochs": [
@@ -200,6 +207,7 @@
       ]
     },
     {
+      "name": "Papuan",
       "description": null,
       "start_time": 1784.0,
       "epochs": [
@@ -228,6 +236,7 @@
       ]
     },
     {
+      "name": "CHB",
       "description": null,
       "start_time": 1758.0,
       "epochs": [
@@ -264,6 +273,7 @@
       ]
     },
     {
+      "name": "CEU",
       "description": null,
       "start_time": 1293.0,
       "epochs": [

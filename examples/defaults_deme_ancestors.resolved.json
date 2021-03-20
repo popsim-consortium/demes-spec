@@ -5,6 +5,7 @@
   "description": "Setting deme ancestor and proportion values using defaults.",
   "demes": [
     {
+      "name": "deme0",
       "description": null,
       "start_time": Infinity,
       "epochs": [
@@ -21,6 +22,7 @@
       "ancestors": []
     },
     {
+      "name": "deme1",
       "description": null,
       "start_time": Infinity,
       "epochs": [
@@ -37,6 +39,7 @@
       "ancestors": []
     },
     {
+      "name": "deme2",
       "description": null,
       "start_time": 1,
       "epochs": [
@@ -59,6 +62,7 @@
       ]
     },
     {
+      "name": "deme3",
       "description": null,
       "start_time": 1,
       "epochs": [

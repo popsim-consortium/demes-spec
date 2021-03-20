@@ -5,6 +5,7 @@
   "description": "An example demography to play around with cloning attributes.",
   "demes": [
     {
+      "name": "root",
       "description": "Root population",
       "start_time": Infinity,
       "epochs": [
@@ -21,6 +22,7 @@
       "ancestors": []
     },
     {
+      "name": "pop1",
       "description": "Population with epochs and changing cloning rates",
       "start_time": 1000,
       "epochs": [
@@ -57,6 +59,7 @@
       ]
     },
     {
+      "name": "pop2",
       "description": "Population with epochs and changing cloning rates",
       "start_time": 1000,
       "epochs": [

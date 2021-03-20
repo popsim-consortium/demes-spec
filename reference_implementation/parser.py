@@ -71,6 +71,9 @@ NO_DEFAULT = object()
 def pop_item(data, name, *, required_type, default=NO_DEFAULT, validator=None):
     if name in data:
         value = data.pop(name)
+        if value is None and default is None:
+            # This is treated the same as not specifying the value
+            return value
         validate_item(name, value, required_type, validator)
     else:
         if default is NO_DEFAULT:
@@ -135,7 +138,7 @@ class Epoch:
 
 @dataclasses.dataclass
 class Deme:
-    id: str
+    name: str
     start_time: Union[None, float]
     description: Union[str, None]
     ancestors: List[Deme]
@@ -176,11 +179,12 @@ class Deme:
         # It's easier to make our own asdict here to avoid recursion issues
         # with dataclasses.asdict through the ancestors list
         return {
+            "name": self.name,
             "description": self.description,
             "start_time": self.start_time,
             "epochs": [epoch.asdict() for epoch in self.epochs],
             "proportions": self.proportions,
-            "ancestors": [deme.id for deme in self.ancestors],
+            "ancestors": [deme.name for deme in self.ancestors],
         }
 
     def __resolve_times(self):
@@ -194,13 +198,13 @@ class Deme:
                 )
             self.start_time = default
         if len(self.ancestors) == 0 and not math.isinf(self.start_time):
-            raise ValueError(f"deme {self.id} has finite start_time, but no ancestors")
+            raise ValueError(f"deme {self.name} has finite start_time, but no ancestors")
 
         for ancestor in self.ancestors:
             if not ancestor.exists_at(self.start_time, include_end=True):
                 raise ValueError(
-                    f"Deme {ancestor.id} (end_time={ancestor.end_time}) does not exist "
-                    f"at deme {self.id}'s start_time ({self.start_time})"
+                    f"Deme {ancestor.name} (end_time={ancestor.end_time}) does not exist "
+                    f"at deme {self.name}'s start_time ({self.start_time})"
                 )
 
         # The last epoch has a default end_time of 0
@@ -277,8 +281,8 @@ class Pulse:
 
     def asdict(self) -> dict:
         d = dataclasses.asdict(self)
-        d["source"] = self.source.id
-        d["dest"] = self.dest.id
+        d["source"] = self.source.name
+        d["dest"] = self.dest.name
         return d
 
     def validate(self):
@@ -286,7 +290,7 @@ class Pulse:
             raise ValueError("Cannot have source deme equal to dest")
         for deme in [self.source, self.dest]:
             if not deme.exists_at(self.time, include_end=False):
-                raise ValueError(f"Deme {deme.id} does not exist at time {self.time}")
+                raise ValueError(f"Deme {deme.name} does not exist at time {self.time}")
 
 
 @dataclasses.dataclass
@@ -304,7 +308,7 @@ class Migration:
     def _validate(self, demes):
         if self.start_time <= self.end_time:
             raise ValueError("start_time must be > end_time")
-        if len(set([deme.id for deme in demes])) != len(demes):
+        if len(set([deme.name for deme in demes])) != len(demes):
             raise ValueError("Cannot migrate from a deme to itself")
         for deme in demes:
             if self.start_time > deme.start_time or self.end_time < deme.end_time:
@@ -320,7 +324,7 @@ class SymmetricMigration(Migration):
 
     def asdict(self) -> dict:
         d = dataclasses.asdict(self)
-        d["demes"] = [deme.id for deme in self.demes]
+        d["demes"] = [deme.name for deme in self.demes]
         return d
 
     def resolve(self):
@@ -337,8 +341,8 @@ class AsymmetricMigration(Migration):
 
     def asdict(self) -> dict:
         d = dataclasses.asdict(self)
-        d["source"] = self.source.id
-        d["dest"] = self.dest.id
+        d["source"] = self.source.name
+        d["dest"] = self.dest.name
         return d
 
     def resolve(self):
@@ -360,22 +364,22 @@ class Graph:
 
     def add_deme(
         self,
-        id: str,
+        name: str,
         description: Union[str, None],
         start_time: Union[float, None],
         ancestors: List[str],
         proportions: Union[List[float], None],
     ) -> Deme:
         deme = Deme(
-            id=id,
+            name=name,
             description=description,
             start_time=start_time,
             ancestors=[self.demes[deme_id] for deme_id in ancestors],
             proportions=proportions,
         )
-        if deme.id in self.demes:
+        if deme.name in self.demes:
             raise ValueError("Duplicate deme ID")
-        self.demes[deme.id] = deme
+        self.demes[deme.name] = deme
         return deme
 
     def add_migration(
@@ -492,7 +496,7 @@ def parse(data: dict) -> Graph:
     for deme_data in pop_list(data, "demes"):
         insert_defaults(deme_data, deme_defaults)
         deme = graph.add_deme(
-            id=pop_string(deme_data, "id", validator=is_identifier),
+            name=pop_string(deme_data, "name", validator=is_identifier),
             description=pop_string(deme_data, "description", None),
             start_time=pop_number(deme_data, "start_time", None),
             ancestors=pop_list(deme_data, "ancestors", [], str, is_identifier),

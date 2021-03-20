@@ -5,6 +5,7 @@
   "description": "Set migration source and dest using defaults.",
   "demes": [
     {
+      "name": "deme0",
       "description": null,
       "start_time": Infinity,
       "epochs": [
@@ -21,6 +22,7 @@
       "ancestors": []
     },
     {
+      "name": "deme1",
       "description": null,
       "start_time": Infinity,
       "epochs": [

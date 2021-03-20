@@ -5,6 +5,7 @@
   "description": "Example of a simple line topology graph.",
   "demes": [
     {
+      "name": "deme0",
       "description": null,
       "start_time": Infinity,
       "epochs": [
@@ -21,6 +22,7 @@
       "ancestors": []
     },
     {
+      "name": "deme1",
       "description": null,
       "start_time": 20,
       "epochs": [
@@ -41,6 +43,7 @@
       ]
     },
     {
+      "name": "deme2",
       "description": null,
       "start_time": 10,
       "epochs": [

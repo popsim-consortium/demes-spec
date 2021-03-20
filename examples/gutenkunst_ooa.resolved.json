@@ -7,6 +7,7 @@
   "description": "The Gutenkunst et al. (2009) OOA model.",
   "demes": [
     {
+      "name": "ancestral",
       "description": "Equilibrium/root population",
       "start_time": Infinity,
       "epochs": [
@@ -23,6 +24,7 @@
       "ancestors": []
     },
     {
+      "name": "AMH",
       "description": "Anatomically modern humans",
       "start_time": 220000.0,
       "epochs": [
@@ -43,6 +45,7 @@
       ]
     },
     {
+      "name": "OOA",
       "description": "Bottleneck out-of-Africa population",
       "start_time": 140000.0,
       "epochs": [
@@ -63,6 +66,7 @@
       ]
     },
     {
+      "name": "YRI",
       "description": "Yoruba in Ibadan, Nigeria",
       "start_time": 140000.0,
       "epochs": [
@@ -83,6 +87,7 @@
       ]
     },
     {
+      "name": "CEU",
       "description": "Utah Residents (CEPH) with Northern and Western European Ancestry",
       "start_time": 21200.0,
       "epochs": [
@@ -103,6 +108,7 @@
       ]
     },
     {
+      "name": "CHB",
       "description": "Han Chinese in Beijing, China",
       "start_time": 21200.0,
       "epochs": [

@@ -7,6 +7,7 @@
   "description": "A single population model with epochs of exponential growth and decay.",
   "demes": [
     {
+      "name": "generic",
       "description": null,
       "start_time": Infinity,
       "epochs": [
