@@ -1,8 +1,10 @@
 .. _sec_spec:
 
-===================
-Demes Specification
-===================
+.. _sec_ref:
+
+=========
+Reference
+=========
 
 The structure of ``demes``' data model is formally defined using
 `JSON schema <https://json-schema.org/>`_ and rendered below as a table.
@@ -32,5 +34,4 @@ when processing input for which the formal requirements are not met.
    :lift_definitions:
    :auto_target:
    :auto_reference:
-
 

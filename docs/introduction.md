@@ -1,18 +1,15 @@
-============
-Introduction
-============
+(sec_intro)=
+# Introduction
 
-What is the Demes Specification?
---------------------------------
+## What is the Demes Specification?
 
 The Demes Specification is a concrete proposal to standardise:
 
- - :ref:`how computational biologists write down demographic models <sec_tutorial>`, and
- - :ref:`how those models should be interpreted by software <sec_spec>`.
+ - {ref}`how computational biologists write down demographic models <sec_tutorial>`, and
+ - {ref}`how those models should be interpreted by software <sec_spec>`.
 
 
-Why is it necessary?
---------------------
+## Why is it necessary?
 
 It can be tedious and error prone to write down a demographic model for
 use with population genetics software, such as simulators. Moreover,
@@ -26,3 +23,4 @@ commands, or code, that correspond to their concrete demographic model,
 this is unfortunately tied to specific software.
 
 We believe these problems are fixable.
+

@@ -1,0 +1,39 @@
+# Book settings
+# Learn more at https://jupyterbook.org/customize/config.html
+
+title: Demes Specification
+author: PopSim Consortium
+copyright: "2021"
+only_build_toc_files: true
+# logo: logo.png
+
+execute:
+  execute_notebooks: cache
+
+repository:
+  url: https://github.com/popsim-consortium/demes-spec
+  branch: main
+  path_to_book: docs
+
+html:
+  use_issues_button: true
+  use_repository_button: true
+  use_edit_page_button: true
+  # TODO: proper spec versioning system
+  extra_navbar: demes-spec 0.9
+  extra_footer: demes-spec 0.9
+
+sphinx:
+    extra_extensions:
+    - sphinx.ext.todo
+    - sphinx.ext.intersphinx
+    - sphinx-jsonschema
+
+    config:
+      myst_enable_extensions:
+      - colon_fence
+      - deflist
+      todo_include_todos: true
+      intersphinx_mapping:
+        demes: ["https://popsim-consortium.github.io/demes-docs/main/", null]
+      nitpicky: true
