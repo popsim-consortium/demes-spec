@@ -325,7 +325,7 @@
     {
       "rate": 0.000442,
       "start_time": 1659.0,
-      "end_time": 0,
+      "end_time": 1293.0,
       "demes": [
         "CHB",
         "Ghost"
@@ -379,7 +379,7 @@
       "source": "Den1",
       "dest": "Papuan",
       "time": 1027.5862068965516,
-      "proportion": 0.022000000000000002
+      "proportion": 0.022
     },
     {
       "source": "Nea1",
