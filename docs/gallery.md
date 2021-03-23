@@ -1,32 +1,29 @@
-.. _sec_gallery:
-
-=======
-Gallery
-=======
+(sec_gallery)=
+# Gallery
 
 This page includes examples that illustrate various features of Demes models,
 including some well-known and more complicated models of human history.
 
-.. _sec_zigzag_example:
+(sec_zigzag_example)=
+## Zigzag model
 
-Zigzag model
-------------
-
+```{eval-rst}
 .. literalinclude:: ../examples/zigzag.yaml
    :language: yaml
+```
 
-.. _sec_ooa_example:
+(sec_ooa_example)=
+## Gutenkunst et al. (2009) Out-of-Africa expansion
 
-Gutenkunst et al. (2009) Out-of-Africa expansion
-------------------------------------------------
-
+```{eval-rst}
 .. literalinclude:: ../examples/gutenkunst_ooa.yaml
    :language: yaml
+```
 
-.. _sec_denisova_example:
+(sec_denisova_example)=
+## Jacobs et al. (2019) Denisovan admixture
 
-Jacobs et al. (2019) Denisovan admixture
-----------------------------------------
-
+```{eval-rst}
 .. literalinclude:: ../examples/jacobs_papuans.yaml
    :language: yaml
+```
