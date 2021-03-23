@@ -12,7 +12,7 @@ from ruamel.yaml import YAML
 
 
 @pytest.mark.parametrize(
-    "yaml_path", map(str, pathlib.Path("examples/").glob("*.yaml"))
+    "yaml_path", map(str, pathlib.Path("examples/").glob("**/*.yaml"))
 )
 def test_examples(yaml_path):
     yaml = YAML(typ="safe")

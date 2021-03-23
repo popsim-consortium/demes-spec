@@ -1,17 +1,51 @@
 /*
- * RTD adds horizontal scrollbars to tables, making the tables very difficult
- * to read. The workaround here will wrap lines within table cells.
- * https://github.com/readthedocs/sphinx_rtd_theme/issues/117
+ * Some custom admonitions.
  */
-@media screen and (min-width: 767px) {
 
-   .wy-table-responsive table td {
-      /* !important prevents the common CSS stylesheets from overriding
-         this as on RTD they are loaded after this stylesheet */
-      white-space: normal !important;
-   }
+/* Variables */
+:root {
+  --tip-title-color: #fff6dd;
+  --tip-border-color: #ffc107;
+  --seealso-title-color: rgba(40,167,70,0.1);
+  --seealso-icon-color: #28a745;
+}
 
-   .wy-table-responsive {
-      overflow: visible !important;
-   }
+/* exercise */
+div.exercise {
+  border-color: var(--tip-border-color);
+}
+div.exercise p.admonition-title {
+  background-color: var(--tip-title-color);
+}
+div.exercise p.admonition-title::before {
+  /*
+   * Use an icon from fontawesome. Nagivate to https://fontawesome.com/
+   * and copy the unicode code for the desired icon.
+   */
+  color: var(--tip-border-color);
+  content: "\f11c";
+}
+
+/* question */
+div.question {
+  border-color: var(--tip-border-color);
+}
+div.question p.admonition-title {
+  background-color: var(--tip-title-color);
+}
+div.question p.admonition-title::before {
+  color: var(--tip-border-color);
+  content: "\f059";
+}
+
+/* answer */
+div.answer {
+  border-color: var(--seealso-icon-color);
+}
+div.answer p.admonition-title {
+  background-color: var(--seealso-title-color);
+}
+div.answer p.admonition-title::before {
+  color: var(--seealso-icon-color);
+  content: "\f064";
 }

@@ -1,0 +1,17 @@
+time_units: generations
+demes:
+  - name: alpha
+    epochs: 
+      - start_size: 1000
+  - name: beta
+    epochs: 
+      - start_size: 1000
+  - name: gamma
+    epochs: 
+      - start_size: 1000
+  - name: delta
+    epochs: 
+      - start_size: 1000
+migrations:
+  - demes: [alpha, beta, gamma, delta]
+    rate: 1e-4

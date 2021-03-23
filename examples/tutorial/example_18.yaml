@@ -1,0 +1,13 @@
+time_units: generations
+defaults:
+  # Note: this is spelled "epoch", as distinct from the "epochs" list.
+  epoch:
+    start_size: 1000
+demes:
+  - name: alpha
+  - name: beta
+  - name: gamma
+  - name: delta
+migrations:
+  - demes: [alpha, beta, gamma, delta]
+    rate: 1e-4

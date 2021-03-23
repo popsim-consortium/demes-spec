@@ -6,4 +6,5 @@ pytest==6.1.2
 pytest-cov==2.10.1
 jsonschema==3.2.0
 ruamel.yaml==0.16.12
-
+demes==0.1.0
+demesdraw==0.1.0
