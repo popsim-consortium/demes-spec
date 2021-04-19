@@ -1,0 +1,16 @@
+time_units: generations
+demes:
+  - name: X
+    epochs:
+      - end_time: 1000
+        start_size: 2000
+  - name: A
+    ancestors:
+      - X
+    epochs:
+      - start_size: 2000
+  - name: B
+    ancestors:
+      - X
+    epochs:
+      - start_size: 2000
