@@ -1,0 +1,37 @@
+time_units: generations
+demes:
+- name: deme1
+  start_time: .inf
+  epochs:
+  - {end_size: 75000000.0, end_time: 0, start_size: 75000000.0}
+- name: deme2
+  start_time: .inf
+  epochs:
+  - {end_size: 75000000.0, end_time: 0, start_size: 75000000.0}
+- name: deme3
+  start_time: .inf
+  epochs:
+  - {end_size: 75000000.0, end_time: 0, start_size: 75000000.0}
+- name: deme4
+  start_time: .inf
+  epochs:
+  - {end_size: 75000000.0, end_time: 0, start_size: 75000000.0}
+- name: deme5
+  start_time: .inf
+  epochs:
+  - {end_size: 75000000.0, end_time: 0, start_size: 75000000.0}
+- name: deme6
+  start_time: .inf
+  epochs:
+  - {end_size: 75000000.0, end_time: 0, start_size: 75000000.0}
+migrations:
+- {source: deme1, dest: deme2, start_time: .inf, end_time: 0.0, rate: 8.333333333333334e-09}
+- {source: deme2, dest: deme1, start_time: .inf, end_time: 0.0, rate: 8.333333333333334e-09}
+- {source: deme2, dest: deme3, start_time: .inf, end_time: 0.0, rate: 8.333333333333334e-09}
+- {source: deme3, dest: deme2, start_time: .inf, end_time: 0.0, rate: 8.333333333333334e-09}
+- {source: deme3, dest: deme4, start_time: .inf, end_time: 600000000.0, rate: 8.333333333333334e-09}
+- {source: deme4, dest: deme3, start_time: .inf, end_time: 600000000.0, rate: 8.333333333333334e-09}
+- {source: deme4, dest: deme5, start_time: .inf, end_time: 0.0, rate: 8.333333333333334e-09}
+- {source: deme5, dest: deme4, start_time: .inf, end_time: 0.0, rate: 8.333333333333334e-09}
+- {source: deme5, dest: deme6, start_time: .inf, end_time: 0.0, rate: 8.333333333333334e-09}
+- {source: deme6, dest: deme5, start_time: .inf, end_time: 0.0, rate: 8.333333333333334e-09}

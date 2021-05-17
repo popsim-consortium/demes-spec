@@ -1,0 +1,27 @@
+time_units: generations
+demes:
+- name: deme1
+  start_time: .inf
+  epochs:
+  - {end_size: 7310.0, end_time: 8874.36924, start_size: 7310.0}
+  - {end_size: 12295.566200000001, end_time: 0, start_size: 12295.566200000001}
+- name: deme2
+  start_time: 5788.43812
+  epochs:
+  - {end_size: 2099.31504, end_time: 847.5214, start_size: 2099.31504}
+  - {end_size: 27316.2273, end_time: 0, start_size: 946.4000874072888}
+  ancestors: [deme1]
+- name: deme3
+  start_time: 847.5214
+  epochs:
+  - {end_size: 53304.8855, end_time: 0, start_size: 512.3723434688803}
+  ancestors: [deme2]
+migrations:
+- {source: deme1, dest: deme2, start_time: 5788.43812, end_time: 847.5214, rate: 0.0002494233926128591}
+- {source: deme2, dest: deme1, start_time: 5788.43812, end_time: 847.5214, rate: 0.0002494233926128591}
+- {source: deme1, dest: deme2, start_time: 847.5214, end_time: 0.0, rate: 3.0133310533515732e-05}
+- {source: deme1, dest: deme3, start_time: 847.5214, end_time: 0.0, rate: 1.921908344733242e-05}
+- {source: deme2, dest: deme1, start_time: 847.5214, end_time: 0.0, rate: 3.0133310533515732e-05}
+- {source: deme2, dest: deme3, start_time: 847.5214, end_time: 0.0, rate: 9.567236662106703e-05}
+- {source: deme3, dest: deme1, start_time: 847.5214, end_time: 0.0, rate: 1.921908344733242e-05}
+- {source: deme3, dest: deme2, start_time: 847.5214, end_time: 0.0, rate: 9.567236662106703e-05}

@@ -1,0 +1,9 @@
+time_units: generations
+demes:
+- name: deme1
+  start_time: .inf
+  epochs:
+  - {end_size: 10000.0, end_time: 24000.0, start_size: 10000.0}
+  - {end_size: 5001.472022241883, end_time: 16000.0, start_size: 5001.472022241883}
+  - {end_size: 20000.0, end_time: 0, start_size: 5001.472022241883}
+migrations: []

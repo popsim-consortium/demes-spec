@@ -1,0 +1,403 @@
+time_units: generations
+demes:
+- name: deme1
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme2
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme3
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme4
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme5
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme6
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme7
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme8
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme9
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme10
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme11
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme12
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme13
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme14
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme15
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme16
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme17
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme18
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme19
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme20
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme21
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme22
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme23
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme24
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme25
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme26
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme27
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme28
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme29
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme30
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme31
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme32
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme33
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme34
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme35
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme36
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme37
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme38
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme39
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme40
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme41
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme42
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme43
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme44
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme45
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme46
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme47
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme48
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme49
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme50
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme51
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme52
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme53
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme54
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme55
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme56
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme57
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme58
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme59
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme60
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme61
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme62
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme63
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme64
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme65
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme66
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme67
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme68
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme69
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme70
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme71
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme72
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme73
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme74
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme75
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme76
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme77
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme78
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme79
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme80
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme81
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme82
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme83
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme84
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme85
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme86
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme87
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme88
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme89
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme90
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme91
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme92
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme93
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme94
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme95
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme96
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme97
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme98
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme99
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme100
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+migrations: []

@@ -1,0 +1,5 @@
+time_units: generations
+deems:
+- name: a
+  epochs:
+  - {start_size: 1}

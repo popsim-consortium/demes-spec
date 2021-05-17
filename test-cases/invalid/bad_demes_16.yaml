@@ -1,0 +1,10 @@
+time_units: generations
+demes:
+- name: a
+  epochs:
+  - {start_size: 1}
+- name: b
+  ancestors: [a, x]
+  proportions: [0.5, 0.5]
+  epochs:
+  - {start_size: 1}

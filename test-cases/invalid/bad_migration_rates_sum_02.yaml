@@ -1,0 +1,12 @@
+time_units: generations
+defaults:
+  epoch: {start_size: 1}
+demes:
+- {name: A}
+- {name: B}
+- {name: C}
+- {name: D}
+migrations:
+- {rate: 0.6, source: C, dest: A, start_time: 100, end_time: 50}
+- {rate: 0.6, source: B, dest: A, start_time: 200, end_time: 100}
+- {rate: 0.6, source: D, dest: A, start_time: 60, end_time: 20}

@@ -1,0 +1,22 @@
+time_units: generations
+defaults:
+  epoch: {start_size: 1}
+demes:
+- {name: a}
+- {name: b}
+- {name: c}
+- name: d
+  epochs:
+  - {start_size: 2}
+- name: e
+  epochs:
+  - {end_time: 100}
+  - {end_time: 50, end_size: 99}
+  - {start_size: 3}
+- name: f
+  epochs:
+  - {end_time: 100}
+  - {end_time: 50, end_size: 99}
+  - {start_size: 5, end_size: 99}
+  defaults:
+    epoch: {start_size: 4}

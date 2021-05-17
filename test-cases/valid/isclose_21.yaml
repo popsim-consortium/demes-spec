@@ -1,0 +1,12 @@
+time_units: generations
+description: test
+demes:
+- name: d2
+  epochs:
+  - {start_size: 1000, end_time: 0}
+- name: d1
+  epochs:
+  - {start_size: 1000, end_time: 0}
+migrations:
+- {rate: 1e-05, source: d2, dest: d1}
+- {rate: 0.0001, source: d1, dest: d2, start_time: 50, end_time: 40}

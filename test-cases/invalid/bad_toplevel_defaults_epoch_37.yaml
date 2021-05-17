@@ -1,0 +1,7 @@
+time_units: generations
+defaults:
+  epoch: {cloning_rate: {}}
+demes:
+- name: a
+  epochs:
+  - start_size: 1

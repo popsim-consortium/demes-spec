@@ -1,0 +1,10 @@
+time_units: generations
+defaults:
+  pulse:
+    foo: {}
+    bar: []
+    baz: null
+demes:
+- name: a
+  epochs:
+  - {start_size: 1}

@@ -1,0 +1,5 @@
+time_units: generations
+demes:
+  - name: "\ueffa"
+    epochs:
+    - start_size: 100

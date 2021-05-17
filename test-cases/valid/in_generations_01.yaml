@@ -1,0 +1,7 @@
+time_units: generations
+generation_time: 13
+demes:
+- name: A
+  epochs:
+  - {start_size: 2000, end_time: 100}
+  - {start_size: 100}

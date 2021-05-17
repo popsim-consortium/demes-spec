@@ -1,0 +1,7 @@
+time_units: generations
+defaults:
+  epoch: {end_size: .inf}
+demes:
+- name: a
+  epochs:
+  - start_size: 1

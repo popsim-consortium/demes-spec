@@ -1,0 +1,4 @@
+demes:
+- name: a
+  epochs:
+  - {start_size: 1}

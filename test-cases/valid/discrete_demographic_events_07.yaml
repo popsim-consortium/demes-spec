@@ -1,0 +1,11 @@
+time_units: generations
+defaults:
+  epoch: {start_size: 1}
+demes:
+- name: a
+  epochs:
+  - {end_time: 100}
+- name: b
+  ancestors: [a]
+- name: c
+  ancestors: [a]
