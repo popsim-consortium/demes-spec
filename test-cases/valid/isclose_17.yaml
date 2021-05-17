@@ -1,0 +1,7 @@
+time_units: generations
+description: test
+doi: ['https://example.com/foo.bar']
+demes:
+- name: d1
+  epochs:
+  - {start_size: 1000, end_time: 0}

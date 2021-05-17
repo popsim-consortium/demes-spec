@@ -1,0 +1,14 @@
+time_units: generations
+description: test
+demes:
+- name: d1
+  epochs:
+  - {start_size: 1000, end_time: 0}
+- name: dX
+  epochs:
+  - {start_size: 1000}
+- name: d2
+  ancestors: [d1]
+  start_time: 50
+  epochs:
+  - {start_size: 1000, end_time: 0}

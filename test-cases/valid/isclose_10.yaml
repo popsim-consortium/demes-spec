@@ -1,0 +1,6 @@
+time_units: generations
+description: some other description
+demes:
+- name: d1
+  epochs:
+  - {start_size: 1000, end_time: 0}

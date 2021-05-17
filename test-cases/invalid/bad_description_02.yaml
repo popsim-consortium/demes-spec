@@ -1,0 +1,6 @@
+description: ["something"]
+time_units: generations
+demes:
+  - name: a
+    epochs:
+    - start_size: 100

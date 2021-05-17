@@ -1,0 +1,134 @@
+time_units: generations
+demes:
+- name: deme1
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme2
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme4
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme5
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme6
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme7
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme8
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme9
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme10
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme3
+  start_time: 400.0
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+  ancestors: [deme8]
+migrations:
+- {source: deme1, dest: deme2, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme1, dest: deme4, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme1, dest: deme5, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme1, dest: deme6, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme1, dest: deme7, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme1, dest: deme8, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme1, dest: deme9, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme1, dest: deme10, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme2, dest: deme1, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme2, dest: deme4, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme2, dest: deme5, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme2, dest: deme6, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme2, dest: deme7, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme2, dest: deme8, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme2, dest: deme9, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme2, dest: deme10, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme4, dest: deme1, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme4, dest: deme2, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme4, dest: deme5, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme4, dest: deme6, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme4, dest: deme7, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme4, dest: deme8, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme4, dest: deme9, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme4, dest: deme10, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme5, dest: deme1, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme5, dest: deme2, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme5, dest: deme4, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme5, dest: deme6, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme5, dest: deme7, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme5, dest: deme8, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme5, dest: deme9, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme5, dest: deme10, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme6, dest: deme1, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme6, dest: deme2, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme6, dest: deme4, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme6, dest: deme5, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme6, dest: deme7, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme6, dest: deme8, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme6, dest: deme9, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme6, dest: deme10, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme7, dest: deme1, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme7, dest: deme2, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme7, dest: deme4, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme7, dest: deme5, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme7, dest: deme6, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme7, dest: deme8, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme7, dest: deme9, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme7, dest: deme10, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme8, dest: deme1, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme8, dest: deme2, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme8, dest: deme4, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme8, dest: deme5, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme8, dest: deme6, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme8, dest: deme7, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme8, dest: deme9, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme8, dest: deme10, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme9, dest: deme1, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme9, dest: deme2, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme9, dest: deme4, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme9, dest: deme5, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme9, dest: deme6, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme9, dest: deme7, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme9, dest: deme8, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme9, dest: deme10, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme10, dest: deme1, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme10, dest: deme2, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme10, dest: deme4, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme10, dest: deme5, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme10, dest: deme6, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme10, dest: deme7, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme10, dest: deme8, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme10, dest: deme9, start_time: .inf, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme1, dest: deme3, start_time: 400.0, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme2, dest: deme3, start_time: 400.0, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme3, dest: deme1, start_time: 400.0, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme3, dest: deme2, start_time: 400.0, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme3, dest: deme4, start_time: 400.0, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme3, dest: deme5, start_time: 400.0, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme3, dest: deme6, start_time: 400.0, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme3, dest: deme7, start_time: 400.0, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme3, dest: deme8, start_time: 400.0, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme3, dest: deme9, start_time: 400.0, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme3, dest: deme10, start_time: 400.0, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme4, dest: deme3, start_time: 400.0, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme5, dest: deme3, start_time: 400.0, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme6, dest: deme3, start_time: 400.0, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme7, dest: deme3, start_time: 400.0, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme8, dest: deme3, start_time: 400.0, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme9, dest: deme3, start_time: 400.0, end_time: 0.0, rate: 0.0002777777777777778}
+- {source: deme10, dest: deme3, start_time: 400.0, end_time: 0.0, rate: 0.0002777777777777778}

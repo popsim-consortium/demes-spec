@@ -1,0 +1,7 @@
+time_units: generations
+demes:
+- name: a
+  defaults:
+    epoch: {size_function: something}
+  epochs:
+  - start_size: 1

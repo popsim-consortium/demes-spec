@@ -1,0 +1,11 @@
+time_units: generations
+defaults:
+  deme: {description: Demey MacDemeFace}
+demes:
+- name: a
+  epochs:
+  - {start_size: 1}
+- name: b
+  description: deme bee
+  epochs:
+  - {start_size: 1}

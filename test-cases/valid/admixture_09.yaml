@@ -1,0 +1,49 @@
+time_units: generations
+demes:
+- name: deme1
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme2
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme3
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme4
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme5
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme6
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme7
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme8
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme9
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme10
+  start_time: .inf
+  epochs:
+  - {end_size: 1200.0, end_time: 0, start_size: 1200.0}
+- name: deme11
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 4.0, start_size: 100}
+pulses:
+- {source: deme11, dest: deme3, proportion: 0.09999999999999998, time: 4.0}
+migrations: []

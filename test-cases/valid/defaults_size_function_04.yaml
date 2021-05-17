@@ -1,0 +1,8 @@
+time_units: generations
+demes:
+- name: a
+  defaults:
+    epoch: {size_function: exponential}
+  epochs:
+  - {start_size: 100, end_time: 100, size_function: constant}
+  - {start_size: 100, end_size: 500}

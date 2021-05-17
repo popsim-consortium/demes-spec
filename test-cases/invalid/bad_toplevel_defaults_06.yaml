@@ -1,0 +1,6 @@
+time_units: generations
+defaults: {rate: 0.1, proportion: 0.1}
+demes:
+- name: a
+  epochs:
+  - {start_size: 1}

@@ -1,0 +1,12 @@
+time_units: generations
+demes:
+- name: deme1
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+- name: deme2
+  start_time: .inf
+  epochs:
+  - {end_size: 100, end_time: 0, start_size: 100}
+migrations:
+- {source: deme1, dest: deme2, start_time: .inf, end_time: 4000.0, rate: 2.5000000000000002e-08}

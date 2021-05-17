@@ -1,0 +1,7 @@
+time_units: generations
+description: toplevel-description
+demes:
+- name: a
+  description: deme-description
+  epochs:
+  - {start_size: 100}

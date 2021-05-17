@@ -1,0 +1,14 @@
+time_units: generations
+demes:
+- name: a
+  epochs:
+  - {start_size: 1}
+  defaults:
+    epoch: {cloning_rate: 0.1}
+- name: b
+  epochs:
+  - {start_size: 1, end_time: 90}
+  - {start_size: 1, end_time: 50}
+  - {start_size: 1, cloning_rate: 0.2}
+  defaults:
+    epoch: {cloning_rate: 0.1}

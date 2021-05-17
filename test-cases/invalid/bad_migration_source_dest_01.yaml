@@ -1,0 +1,12 @@
+time_units: generations
+demes:
+- name: a
+  epochs:
+  - {start_size: 100}
+- name: b
+  epochs:
+  - {start_size: 100}
+migrations:
+- rate: 0.1
+  source: 0
+  dest: b

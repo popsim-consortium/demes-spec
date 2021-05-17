@@ -1,0 +1,5 @@
+time_units: generations
+demes:
+  - name: a
+    epochs:
+    - end_size: []

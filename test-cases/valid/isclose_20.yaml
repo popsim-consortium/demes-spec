@@ -1,0 +1,6 @@
+time_units: generations
+description: test
+demes:
+- name: dX
+  epochs:
+  - {start_size: 1000, end_time: 0}

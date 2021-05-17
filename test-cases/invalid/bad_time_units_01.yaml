@@ -1,0 +1,5 @@
+time_units: []
+demes:
+  - name: a
+    epochs:
+    - start_size: 100
