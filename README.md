@@ -9,10 +9,7 @@ available in this repository under the `reference_implementation` folder,
 but users are recommended to instead use the official pip-installable
 package: https://github.com/popsim-consortium/demes-python
 
-## Writing a `demes` YAML file.
+# Documentation
 
 https://popsim-consortium.github.io/demes-spec-docs/
 
-## Formal specification.
-
-https://popsim-consortium.github.io/demes-spec-docs/main/spec.html
