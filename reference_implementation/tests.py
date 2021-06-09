@@ -445,6 +445,48 @@ class TestPulse:
         with pytest.raises(ValueError, match="does not exist"):
             parser.parse(data)
 
+    def test_pulse_at_deme_start_time(self):
+        # The dest deme can receive a pulse at its start_time.
+        data = minimal_graph(num_demes=3)
+        data["demes"][1]["start_time"] = 10
+        data["demes"][1]["ancestors"] = ["deme0"]
+        data["pulses"] = [
+            {"source": "deme2", "dest": "deme1", "proportion": 0.5, "time": 10}
+        ]
+        parser.parse(data)
+
+        # There can't be a pulse at the source deme's start_time.
+        data["pulses"] = [
+            {"source": "deme1", "dest": "deme2", "proportion": 0.5, "time": 10}
+        ]
+        with pytest.raises(ValueError, match="does not exist"):
+            parser.parse(data)
+
+    def test_pulse_at_deme_end_time(self):
+        # There can be a pulse at the source deme's end_time.
+        data = minimal_graph(num_demes=2)
+        data["demes"][1]["epochs"][0]["end_time"] = 10
+        data["pulses"] = [
+            {"source": "deme1", "dest": "deme0", "proportion": 0.5, "time": 10}
+        ]
+        parser.parse(data)
+
+        # The dest deme can't receive a pulse at its end_time.
+        data["pulses"] = [
+            {"source": "deme0", "dest": "deme1", "proportion": 0.5, "time": 10}
+        ]
+        with pytest.raises(ValueError, match="does not exist"):
+            parser.parse(data)
+
+    def test_bad_proportions_sum(self):
+        data = minimal_graph(num_demes=3)
+        data["pulses"] = [
+            {"source": "deme1", "dest": "deme0", "proportion": 0.6, "time": 10},
+            {"source": "deme2", "dest": "deme0", "proportion": 0.6, "time": 10},
+        ]
+        with pytest.raises(ValueError, match="sum to more than 1"):
+            parser.parse(data)
+
 
 class TestMigration:
     def test_simple_asymmetric(self):

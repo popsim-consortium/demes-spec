@@ -25,6 +25,8 @@ import numbers
 import copy
 import pprint
 import dataclasses
+import itertools
+import operator
 from typing import Dict, List, Union
 
 
@@ -169,11 +171,8 @@ class Deme:
     def end_time(self):
         return self.epochs[-1].end_time
 
-    def exists_at(self, time, include_end=False):
-        if include_end:
-            return self.start_time >= time >= self.end_time
-        else:
-            return self.start_time >= time > self.end_time
+    def exists_at(self, time):
+        return self.start_time >= time >= self.end_time
 
     def asdict(self) -> dict:
         # It's easier to make our own asdict here to avoid recursion issues
@@ -198,13 +197,15 @@ class Deme:
                 )
             self.start_time = default
         if len(self.ancestors) == 0 and not math.isinf(self.start_time):
-            raise ValueError(f"deme {self.name} has finite start_time, but no ancestors")
+            raise ValueError(
+                f"deme {self.name} has finite start_time, but no ancestors"
+            )
 
         for ancestor in self.ancestors:
-            if not ancestor.exists_at(self.start_time, include_end=True):
+            if not ancestor.exists_at(self.start_time):
                 raise ValueError(
-                    f"Deme {ancestor.name} (end_time={ancestor.end_time}) does not exist "
-                    f"at deme {self.name}'s start_time ({self.start_time})"
+                    f"Deme {ancestor.name} (end_time={ancestor.end_time}) doesn't "
+                    f"exist at deme {self.name}'s start_time ({self.start_time})"
                 )
 
         # The last epoch has a default end_time of 0
@@ -242,7 +243,7 @@ class Deme:
         if self.start_time == math.inf:
             if first_epoch.start_size != first_epoch.end_size:
                 raise ValueError(
-                    "Cannot have varying population size in an infinitely time interval"
+                    "Cannot have varying population size in an infinite time interval"
                 )
 
         # TODO validate the size_function. E.g., if the size_function is constant
@@ -288,9 +289,14 @@ class Pulse:
     def validate(self):
         if self.source == self.dest:
             raise ValueError("Cannot have source deme equal to dest")
-        for deme in [self.source, self.dest]:
-            if not deme.exists_at(self.time, include_end=False):
-                raise ValueError(f"Deme {deme.name} does not exist at time {self.time}")
+        if not (self.source.start_time > self.time >= self.source.end_time):
+            raise ValueError(
+                f"Deme {self.source.name} does not exist at time {self.time}"
+            )
+        if not (self.dest.start_time >= self.time > self.dest.end_time):
+            raise ValueError(
+                f"Deme {self.dest.name} does not exist at time {self.time}"
+            )
 
 
 @dataclasses.dataclass
@@ -451,6 +457,17 @@ class Graph:
             pulse.validate()
         for migration in self.migrations:
             migration.validate()
+
+        # A deme can't receive more than 100% of its ancestry from pulses at
+        # any given time.
+        for (dest, time), pulses in itertools.groupby(
+            self.pulses, key=operator.attrgetter("dest", "time")
+        ):
+            if sum(pulse.proportion for pulse in pulses) > 1:
+                raise ValueError(
+                    f"Pulse proportions into {dest.name} at time {time} "
+                    "sum to more than 1"
+                )
 
     def resolve(self):
         # A demes ancestors must be listed before it, so any deme we
