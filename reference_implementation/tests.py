@@ -544,9 +544,7 @@ class TestMigration:
         data["demes"][1]["epochs"] = [{"start_size": 1, "end_time": 50}]
         data["demes"][2]["ancestors"] = ["deme1"]
         data["demes"][2]["start_time"] = 100
-        data["migrations"] = [
-            {"demes": ["deme0", "deme1", "deme2"], "rate": 0.5}
-        ]
+        data["migrations"] = [{"demes": ["deme0", "deme1", "deme2"], "rate": 0.5}]
         parsed = parser.parse(data).asdict()
         assert len(parsed["migrations"]) == 6
         assert {
@@ -708,6 +706,41 @@ class TestMigration:
             {"demes": ["deme0", "deme1"], "rate": 0.5, "start_time": 20, "end_time": 11}
         ]
         with pytest.raises(ValueError, match="time interval"):
+            parser.parse(data)
+
+    def test_bad_migration_competing_migrations(self):
+        data = minimal_graph(num_demes=2)
+        data["migrations"] = [
+            {
+                "demes": ["deme0", "deme1"],
+                "rate": 0.5,
+                "start_time": 20,
+                "end_time": 11,
+            },
+            {"demes": ["deme0", "deme1"], "rate": 0.5, "start_time": 12, "end_time": 1},
+        ]
+        with pytest.raises(ValueError, match="Competing migration definitions"):
+            parser.parse(data)
+
+    def test_bad_migration_rates_sum_to_more_than_1(self):
+        data = minimal_graph(num_demes=3)
+        data["migrations"] = [
+            {
+                "source": "deme0",
+                "dest": "deme2",
+                "rate": 0.6,
+                "start_time": 20,
+                "end_time": 11,
+            },
+            {
+                "source": "deme1",
+                "dest": "deme2",
+                "rate": 0.6,
+                "start_time": 12,
+                "end_time": 1,
+            },
+        ]
+        with pytest.raises(ValueError, match="sum to more than 1"):
             parser.parse(data)
 
 

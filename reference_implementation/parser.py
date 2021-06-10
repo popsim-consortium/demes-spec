@@ -125,6 +125,17 @@ def insert_defaults(data, defaults):
             data[key] = value
 
 
+def times_intersect(interval1, interval2):
+    """
+    Return True if interval1 and interval2 intersect. False otherwise.
+    """
+    start_time1, end_time1 = interval1
+    start_time2, end_time2 = interval2
+    assert start_time1 > end_time1
+    assert start_time2 > end_time2
+    return not (end_time1 >= start_time2 or end_time2 >= start_time1)
+
+
 @dataclasses.dataclass
 class Epoch:
     end_time: Union[float, None]
@@ -354,7 +365,7 @@ class Graph:
             name=name,
             description=description,
             start_time=start_time,
-            ancestors=[self.demes[deme_id] for deme_id in ancestors],
+            ancestors=[self.demes[deme_name] for deme_name in ancestors],
             proportions=proportions,
         )
         if deme.name in self.demes:
@@ -391,8 +402,8 @@ class Graph:
                 )
             )
         else:
-            for j, deme_a in enumerate(demes):
-                for deme_b in demes[j + 1 :]:
+            for j, deme_a in enumerate(demes, 1):
+                for deme_b in demes[j:]:
                     migration_ab = Migration(
                         rate=rate,
                         start_time=start_time,
@@ -459,8 +470,50 @@ class Graph:
                     "sum to more than 1"
                 )
 
+        # Migrations involving the same source and dest can't overlap temporally.
+        for j, migration_a in enumerate(self.migrations, 1):
+            for migration_b in self.migrations[j:]:
+                if (
+                    migration_a.source == migration_b.source
+                    and migration_a.dest == migration_b.dest
+                    and times_intersect(
+                        (migration_a.start_time, migration_a.end_time),
+                        (migration_b.start_time, migration_b.end_time),
+                    )
+                ):
+                    start_time = min(migration_a.end_time, migration_b.end_time)
+                    end_time = max(migration_a.start_time, migration_b.start_time)
+                    raise ValueError(
+                        f"Competing migration definitions for {migration_a.source.name} "
+                        f"and {migration_a.dest.name} during time interval "
+                        f"({start_time}, {end_time}]"
+                    )
+
+        # The rate of migration entering a deme cannot be more than 1 in any
+        # given interval of time.
+        time_boundaries = set()
+        time_boundaries.update(migration.start_time for migration in self.migrations)
+        time_boundaries.update(migration.end_time for migration in self.migrations)
+        time_boundaries.discard(math.inf)
+        end_times = sorted(time_boundaries, reverse=True)
+        start_times = [math.inf] + end_times[:-1]
+        ingress_rates = {deme_name: [0.0] * len(end_times) for deme_name in self.demes}
+        for j, (start_time, end_time) in enumerate(zip(start_times, end_times)):
+            for migration in self.migrations:
+                if times_intersect(
+                    (start_time, end_time), (migration.start_time, migration.end_time)
+                ):
+                    rate = ingress_rates[migration.dest.name][j] + migration.rate
+                    if rate > 1:
+                        raise ValueError(
+                            f"Migration rates into {migration.dest.name} sum to "
+                            "more than 1 during the time inverval "
+                            f"({start_time}, {end_time}]"
+                        )
+                    ingress_rates[migration.dest.name][j] = rate
+
     def resolve(self):
-        # A demes ancestors must be listed before it, so any deme we
+        # A deme's ancestors must be listed before it, so any deme we
         # visit must always be visited after its ancestors.
         for deme in self.demes.values():
             deme.resolve()
