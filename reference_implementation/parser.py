@@ -304,44 +304,6 @@ class Migration:
     rate: Union[float, None]
     start_time: Union[float, None]
     end_time: Union[float, None]
-
-    def _resolve(self, demes):
-        if self.start_time is None:
-            self.start_time = min(deme.start_time for deme in demes)
-        if self.end_time is None:
-            self.end_time = max(deme.end_time for deme in demes)
-
-    def _validate(self, demes):
-        if self.start_time <= self.end_time:
-            raise ValueError("start_time must be > end_time")
-        if len(set([deme.name for deme in demes])) != len(demes):
-            raise ValueError("Cannot migrate from a deme to itself")
-        for deme in demes:
-            if self.start_time > deme.start_time or self.end_time < deme.end_time:
-                raise ValueError(
-                    "Migration time interval must be within the each deme's "
-                    "time interval"
-                )
-
-
-@dataclasses.dataclass
-class SymmetricMigration(Migration):
-    demes: List[Deme]
-
-    def asdict(self) -> dict:
-        d = dataclasses.asdict(self)
-        d["demes"] = [deme.name for deme in self.demes]
-        return d
-
-    def resolve(self):
-        self._resolve(self.demes)
-
-    def validate(self):
-        self._validate(self.demes)
-
-
-@dataclasses.dataclass
-class AsymmetricMigration(Migration):
     source: Deme
     dest: Deme
 
@@ -352,10 +314,22 @@ class AsymmetricMigration(Migration):
         return d
 
     def resolve(self):
-        self._resolve([self.source, self.dest])
+        if self.start_time is None:
+            self.start_time = min(self.source.start_time, self.dest.start_time)
+        if self.end_time is None:
+            self.end_time = max(self.source.end_time, self.dest.end_time)
 
     def validate(self):
-        self._validate([self.source, self.dest])
+        if self.start_time <= self.end_time:
+            raise ValueError("start_time must be > end_time")
+        if self.source.name == self.dest.name:
+            raise ValueError("Cannot migrate from a deme to itself")
+        for deme in [self.source, self.dest]:
+            if self.start_time > deme.start_time or self.end_time < deme.end_time:
+                raise ValueError(
+                    "Migration time interval must be within the each deme's "
+                    "time interval"
+                )
 
 
 @dataclasses.dataclass
@@ -398,28 +372,44 @@ class Graph:
         dest: Union[str, None],
         demes: Union[List[str], None],
     ) -> Migration:
-        migration: Migration
-        if source is not None and dest is not None:
-            migration = AsymmetricMigration(
-                rate=rate,
-                start_time=start_time,
-                end_time=end_time,
-                source=self.demes[source],
-                dest=self.demes[dest],
-            )
-            if demes is not None:
-                raise ValueError("Cannot specify both demes and source/dest")
-        elif demes is not None:
-            migration = SymmetricMigration(
-                rate=rate,
-                start_time=start_time,
-                end_time=end_time,
-                demes=[self.demes[deme_id] for deme_id in demes],
+        migrations: List[Migration] = []
+        if not (
+            # symmetric
+            (demes is not None and source is None and dest is None)
+            # asymmetric
+            or (demes is None and source is not None and dest is not None)
+        ):
+            raise ValueError("Must specify either source and dest, or demes")
+        if source is not None:
+            migrations.append(
+                Migration(
+                    rate=rate,
+                    start_time=start_time,
+                    end_time=end_time,
+                    source=self.demes[source],
+                    dest=self.demes[dest],
+                )
             )
         else:
-            raise ValueError("Must specify either source and dest, or demes")
-        self.migrations.append(migration)
-        return migration
+            for j, deme_a in enumerate(demes):
+                for deme_b in demes[j + 1 :]:
+                    migration_ab = Migration(
+                        rate=rate,
+                        start_time=start_time,
+                        end_time=end_time,
+                        source=self.demes[deme_a],
+                        dest=self.demes[deme_b],
+                    )
+                    migration_ba = Migration(
+                        rate=rate,
+                        start_time=start_time,
+                        end_time=end_time,
+                        source=self.demes[deme_b],
+                        dest=self.demes[deme_a],
+                    )
+                    migrations.extend([migration_ab, migration_ba])
+        self.migrations.extend(migrations)
+        return migrations
 
     def add_pulse(self, source: str, dest: str, time: float, proportion: float):
         pulse = Pulse(

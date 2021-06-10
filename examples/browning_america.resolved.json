@@ -159,37 +159,57 @@
       "rate": 0.00015,
       "start_time": 2040,
       "end_time": 920,
-      "demes": [
-        "AFR",
-        "OOA"
-      ]
+      "source": "AFR",
+      "dest": "OOA"
+    },
+    {
+      "rate": 0.00015,
+      "start_time": 2040,
+      "end_time": 920,
+      "source": "OOA",
+      "dest": "AFR"
     },
     {
       "rate": 2.5e-05,
       "start_time": 920,
       "end_time": 0,
-      "demes": [
-        "AFR",
-        "EUR"
-      ]
+      "source": "AFR",
+      "dest": "EUR"
+    },
+    {
+      "rate": 2.5e-05,
+      "start_time": 920,
+      "end_time": 0,
+      "source": "EUR",
+      "dest": "AFR"
     },
     {
       "rate": 7.8e-06,
       "start_time": 920,
       "end_time": 0,
-      "demes": [
-        "AFR",
-        "EAS"
-      ]
+      "source": "AFR",
+      "dest": "EAS"
+    },
+    {
+      "rate": 7.8e-06,
+      "start_time": 920,
+      "end_time": 0,
+      "source": "EAS",
+      "dest": "AFR"
     },
     {
       "rate": 3.11e-05,
       "start_time": 920,
       "end_time": 0,
-      "demes": [
-        "EUR",
-        "EAS"
-      ]
+      "source": "EUR",
+      "dest": "EAS"
+    },
+    {
+      "rate": 3.11e-05,
+      "start_time": 920,
+      "end_time": 0,
+      "source": "EAS",
+      "dest": "EUR"
     }
   ],
   "pulses": []

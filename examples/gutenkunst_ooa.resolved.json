@@ -134,37 +134,57 @@
       "rate": 0.00025,
       "start_time": 140000.0,
       "end_time": 21200.0,
-      "demes": [
-        "YRI",
-        "OOA"
-      ]
+      "source": "YRI",
+      "dest": "OOA"
+    },
+    {
+      "rate": 0.00025,
+      "start_time": 140000.0,
+      "end_time": 21200.0,
+      "source": "OOA",
+      "dest": "YRI"
     },
     {
       "rate": 3e-05,
       "start_time": 21200.0,
       "end_time": 0,
-      "demes": [
-        "YRI",
-        "CEU"
-      ]
+      "source": "YRI",
+      "dest": "CEU"
+    },
+    {
+      "rate": 3e-05,
+      "start_time": 21200.0,
+      "end_time": 0,
+      "source": "CEU",
+      "dest": "YRI"
     },
     {
       "rate": 1.9e-05,
       "start_time": 21200.0,
       "end_time": 0,
-      "demes": [
-        "YRI",
-        "CHB"
-      ]
+      "source": "YRI",
+      "dest": "CHB"
+    },
+    {
+      "rate": 1.9e-05,
+      "start_time": 21200.0,
+      "end_time": 0,
+      "source": "CHB",
+      "dest": "YRI"
     },
     {
       "rate": 9.6e-05,
       "start_time": 21200.0,
       "end_time": 0,
-      "demes": [
-        "CEU",
-        "CHB"
-      ]
+      "source": "CEU",
+      "dest": "CHB"
+    },
+    {
+      "rate": 9.6e-05,
+      "start_time": 21200.0,
+      "end_time": 0,
+      "source": "CHB",
+      "dest": "CEU"
     }
   ],
   "pulses": []

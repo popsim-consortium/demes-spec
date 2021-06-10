@@ -61,19 +61,29 @@
       "rate": 0.1,
       "start_time": Infinity,
       "end_time": 0,
-      "demes": [
-        "deme1",
-        "deme2"
-      ]
+      "source": "deme1",
+      "dest": "deme2"
     },
     {
       "rate": 0.1,
       "start_time": Infinity,
       "end_time": 0,
-      "demes": [
-        "deme2",
-        "deme3"
-      ]
+      "source": "deme2",
+      "dest": "deme1"
+    },
+    {
+      "rate": 0.1,
+      "start_time": Infinity,
+      "end_time": 0,
+      "source": "deme2",
+      "dest": "deme3"
+    },
+    {
+      "rate": 0.1,
+      "start_time": Infinity,
+      "end_time": 0,
+      "source": "deme3",
+      "dest": "deme2"
     }
   ],
   "pulses": []

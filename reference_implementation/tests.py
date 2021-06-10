@@ -523,7 +523,74 @@ class TestMigration:
             {"demes": ["deme0", "deme1"], "rate": 0.5, "start_time": 2, "end_time": 1}
         ]
         parsed = parser.parse(data).asdict()
-        assert data["migrations"] == parsed["migrations"]
+        assert len(parsed["migrations"]) == 2
+        assert {
+            "source": "deme0",
+            "dest": "deme1",
+            "rate": 0.5,
+            "start_time": 2,
+            "end_time": 1,
+        } in parsed["migrations"]
+        assert {
+            "source": "deme1",
+            "dest": "deme0",
+            "rate": 0.5,
+            "start_time": 2,
+            "end_time": 1,
+        } in parsed["migrations"]
+
+    def test_pairwise_resolution_for_symmetric(self):
+        data = minimal_graph(num_demes=3)
+        data["demes"][1]["epochs"] = [{"start_size": 1, "end_time": 50}]
+        data["demes"][2]["ancestors"] = ["deme1"]
+        data["demes"][2]["start_time"] = 100
+        data["migrations"] = [
+            {"demes": ["deme0", "deme1", "deme2"], "rate": 0.5}
+        ]
+        parsed = parser.parse(data).asdict()
+        assert len(parsed["migrations"]) == 6
+        assert {
+            "source": "deme0",
+            "dest": "deme1",
+            "rate": 0.5,
+            "start_time": math.inf,
+            "end_time": 50,
+        } in parsed["migrations"]
+        assert {
+            "source": "deme1",
+            "dest": "deme0",
+            "rate": 0.5,
+            "start_time": math.inf,
+            "end_time": 50,
+        } in parsed["migrations"]
+        assert {
+            "source": "deme0",
+            "dest": "deme2",
+            "rate": 0.5,
+            "start_time": 100,
+            "end_time": 0,
+        } in parsed["migrations"]
+        assert {
+            "source": "deme2",
+            "dest": "deme0",
+            "rate": 0.5,
+            "start_time": 100,
+            "end_time": 0,
+        } in parsed["migrations"]
+        assert {
+            "source": "deme1",
+            "dest": "deme2",
+            "rate": 0.5,
+            "start_time": 100,
+            "end_time": 50,
+        } in parsed["migrations"]
+        assert {
+            "source": "deme2",
+            "dest": "deme1",
+            "rate": 0.5,
+            "start_time": 100,
+            "end_time": 50,
+        } in parsed["migrations"]
 
     def test_symmetric_and_asymmetric(self):
         data = minimal_graph(num_demes=2)
@@ -535,7 +602,29 @@ class TestMigration:
                 "rate": 0.5,
             }
         ]
-        with pytest.raises(ValueError, match="both demes and source"):
+        with pytest.raises(ValueError, match="either source and dest, or demes"):
+            parser.parse(data)
+
+        data = minimal_graph(num_demes=2)
+        data["migrations"] = [
+            {
+                "dest": "deme1",
+                "demes": ["deme0", "deme1"],
+                "rate": 0.5,
+            }
+        ]
+        with pytest.raises(ValueError, match="either source and dest, or demes"):
+            parser.parse(data)
+
+        data = minimal_graph(num_demes=2)
+        data["migrations"] = [
+            {
+                "source": "deme0",
+                "demes": ["deme0", "deme1"],
+                "rate": 0.5,
+            }
+        ]
+        with pytest.raises(ValueError, match="either source and dest, or demes"):
             parser.parse(data)
 
     def test_neither_symmetric_or_asymmetric(self):
@@ -692,15 +781,36 @@ class TestDefaults:
             {"start_time": 1, "end_time": 0, "rate": 0.5},
         ]
         graph = parser.parse(data)
-        assert len(graph.migrations) == 2
-        for migration in graph.migrations:
-            assert migration.asdict()["demes"] == ["deme0", "deme1"]
-        assert graph.migrations[0].rate == 1
-        assert graph.migrations[0].start_time == 2
-        assert graph.migrations[0].end_time == 1
-        assert graph.migrations[1].rate == 0.5
-        assert graph.migrations[1].start_time == 1
-        assert graph.migrations[1].end_time == 0
+        parsed = graph.asdict()
+        assert len(parsed["migrations"]) == 4
+        assert {
+            "source": "deme0",
+            "dest": "deme1",
+            "start_time": 2,
+            "end_time": 1,
+            "rate": 1,
+        } in parsed["migrations"]
+        assert {
+            "source": "deme1",
+            "dest": "deme0",
+            "start_time": 2,
+            "end_time": 1,
+            "rate": 1,
+        } in parsed["migrations"]
+        assert {
+            "source": "deme0",
+            "dest": "deme1",
+            "start_time": 1,
+            "end_time": 0,
+            "rate": 0.5,
+        } in parsed["migrations"]
+        assert {
+            "source": "deme1",
+            "dest": "deme0",
+            "start_time": 1,
+            "end_time": 0,
+            "rate": 0.5,
+        } in parsed["migrations"]
 
     def test_migration_start_time_end_time_rate(self):
         data = minimal_graph(num_demes=3)
@@ -937,4 +1047,3 @@ def test_examples(yaml_path):
 
     graph_copy = parser.parse(json_data)
     assert graph_copy == graph
-

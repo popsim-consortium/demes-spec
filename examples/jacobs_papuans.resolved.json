@@ -299,55 +299,85 @@
       "rate": 0.000179,
       "start_time": 1659.0,
       "end_time": 0,
-      "demes": [
-        "YRI",
-        "Ghost"
-      ]
+      "source": "YRI",
+      "dest": "Ghost"
+    },
+    {
+      "rate": 0.000179,
+      "start_time": 1659.0,
+      "end_time": 0,
+      "source": "Ghost",
+      "dest": "YRI"
     },
     {
       "rate": 0.000572,
       "start_time": 1659.0,
       "end_time": 1293.0,
-      "demes": [
-        "CHB",
-        "Papuan"
-      ]
+      "source": "CHB",
+      "dest": "Papuan"
+    },
+    {
+      "rate": 0.000572,
+      "start_time": 1659.0,
+      "end_time": 1293.0,
+      "source": "Papuan",
+      "dest": "CHB"
     },
     {
       "rate": 5.72e-05,
       "start_time": 1293.0,
       "end_time": 0,
-      "demes": [
-        "CHB",
-        "Papuan"
-      ]
+      "source": "CHB",
+      "dest": "Papuan"
+    },
+    {
+      "rate": 5.72e-05,
+      "start_time": 1293.0,
+      "end_time": 0,
+      "source": "Papuan",
+      "dest": "CHB"
     },
     {
       "rate": 0.000442,
       "start_time": 1659.0,
       "end_time": 1293.0,
-      "demes": [
-        "CHB",
-        "Ghost"
-      ]
+      "source": "CHB",
+      "dest": "Ghost"
+    },
+    {
+      "rate": 0.000442,
+      "start_time": 1659.0,
+      "end_time": 1293.0,
+      "source": "Ghost",
+      "dest": "CHB"
     },
     {
       "rate": 3.14e-05,
       "start_time": 1293.0,
       "end_time": 0,
-      "demes": [
-        "CEU",
-        "CHB"
-      ]
+      "source": "CEU",
+      "dest": "CHB"
+    },
+    {
+      "rate": 3.14e-05,
+      "start_time": 1293.0,
+      "end_time": 0,
+      "source": "CHB",
+      "dest": "CEU"
     },
     {
       "rate": 0.000442,
       "start_time": 1293.0,
       "end_time": 0,
-      "demes": [
-        "CEU",
-        "Ghost"
-      ]
+      "source": "CEU",
+      "dest": "Ghost"
+    },
+    {
+      "rate": 0.000442,
+      "start_time": 1293.0,
+      "end_time": 0,
+      "source": "Ghost",
+      "dest": "CEU"
     }
   ],
   "pulses": [

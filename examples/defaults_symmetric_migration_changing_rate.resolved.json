@@ -44,19 +44,29 @@
       "rate": 1,
       "start_time": 2,
       "end_time": 1,
-      "demes": [
-        "deme1",
-        "deme0"
-      ]
+      "source": "deme1",
+      "dest": "deme0"
+    },
+    {
+      "rate": 1,
+      "start_time": 2,
+      "end_time": 1,
+      "source": "deme0",
+      "dest": "deme1"
     },
     {
       "rate": 0.5,
       "start_time": 1,
       "end_time": 0,
-      "demes": [
-        "deme1",
-        "deme0"
-      ]
+      "source": "deme1",
+      "dest": "deme0"
+    },
+    {
+      "rate": 0.5,
+      "start_time": 1,
+      "end_time": 0,
+      "source": "deme0",
+      "dest": "deme1"
     }
   ],
   "pulses": []
