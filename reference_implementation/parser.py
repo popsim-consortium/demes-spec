@@ -29,6 +29,8 @@ import itertools
 import operator
 from typing import Dict, List, Union
 
+# Numerical wiggle room.
+EPSILON = 1e-6
 
 # Validator functions. These are used as arguments to the pop_x functions and
 # check properties of the values.
@@ -140,15 +142,33 @@ def insert_defaults(data, defaults):
             data[key] = value
 
 
-def times_intersect(interval1, interval2):
+@dataclasses.dataclass
+class Interval:
     """
-    Return True if interval1 and interval2 intersect. False otherwise.
+    A half-open time interval (start_time, end_time].
     """
-    start_time1, end_time1 = interval1
-    start_time2, end_time2 = interval2
-    assert start_time1 > end_time1
-    assert start_time2 > end_time2
-    return not (end_time1 >= start_time2 or end_time2 >= start_time1)
+    start_time: float
+    end_time: float
+
+    def __init__(self, start_time, end_time):
+        assert start_time > end_time
+        self.start_time = start_time
+        self.end_time = end_time
+
+    def intersects(self, other):
+        """True if self and other intersect, False otherwise."""
+        assert isinstance(other, self.__class__)
+        return not (
+            self.end_time >= other.start_time or other.end_time >= self.start_time
+        )
+
+    def is_subinterval(self, other):
+        """True if self is completely contained within other, False otherwise."""
+        assert isinstance(other, self.__class__)
+        return (self.start_time <= other.start_time and self.end_time >= other.end_time)
+
+    def __contains__(self, time):
+        return self.start_time > time >= self.end_time
 
 
 @dataclasses.dataclass
@@ -215,8 +235,9 @@ class Deme:
     def end_time(self):
         return self.epochs[-1].end_time
 
-    def exists_at(self, time):
-        return self.start_time > time >= self.end_time
+    @property
+    def time_interval(self):
+        return Interval(self.start_time, self.end_time)
 
     def asdict(self) -> dict:
         # It's easier to make our own asdict here to avoid recursion issues
@@ -246,9 +267,9 @@ class Deme:
             )
 
         for ancestor in self.ancestors:
-            if not ancestor.exists_at(self.start_time):
+            if self.start_time not in ancestor.time_interval:
                 raise ValueError(
-                    f"Deme {ancestor.name} (end_time={ancestor.end_time}) doesn't "
+                    f"Deme {ancestor.name} ({ancestor.time_interval}) doesn't "
                     f"exist at deme {self.name}'s start_time ({self.start_time})"
                 )
 
@@ -334,10 +355,14 @@ class Pulse:
     def validate(self):
         if self.source == self.dest:
             raise ValueError("Cannot have source deme equal to dest")
-        if not (self.source.start_time > self.time >= self.source.end_time):
+        if self.time not in self.source.time_interval:
             raise ValueError(
                 f"Deme {self.source.name} does not exist at time {self.time}"
             )
+        # Time limits for the destination deme are different to the source deme,
+        # because the destination deme is affected immediately after the time
+        # of the pulse. Thus, a pulse can occur at the destination deme's
+        # start_time, but not at the destination deme's end_time.
         if not (self.dest.start_time >= self.time > self.dest.end_time):
             raise ValueError(
                 f"Deme {self.dest.name} does not exist at time {self.time}"
@@ -351,6 +376,10 @@ class Migration:
     end_time: Union[float, None]
     source: Deme
     dest: Deme
+
+    @property
+    def time_interval(self):
+        return Interval(self.start_time, self.end_time)
 
     def asdict(self) -> dict:
         d = dataclasses.asdict(self)
@@ -370,7 +399,7 @@ class Migration:
         if self.source.name == self.dest.name:
             raise ValueError("Cannot migrate from a deme to itself")
         for deme in [self.source, self.dest]:
-            if self.start_time > deme.start_time or self.end_time < deme.end_time:
+            if not self.time_interval.is_subinterval(deme.time_interval):
                 raise ValueError(
                     "Migration time interval must be within the each deme's "
                     "time interval"
@@ -500,7 +529,7 @@ class Graph:
         for (dest, time), pulses in itertools.groupby(
             self.pulses, key=operator.attrgetter("dest", "time")
         ):
-            if sum(pulse.proportion for pulse in pulses) > 1:
+            if sum(pulse.proportion for pulse in pulses) > 1 + EPSILON:
                 raise ValueError(
                     f"Pulse proportions into {dest.name} at time {time} "
                     "sum to more than 1"
@@ -512,10 +541,7 @@ class Graph:
                 if (
                     migration_a.source == migration_b.source
                     and migration_a.dest == migration_b.dest
-                    and times_intersect(
-                        (migration_a.start_time, migration_a.end_time),
-                        (migration_b.start_time, migration_b.end_time),
-                    )
+                    and migration_a.time_interval.intersects(migration_b.time_interval)
                 ):
                     start_time = min(migration_a.end_time, migration_b.end_time)
                     end_time = max(migration_a.start_time, migration_b.start_time)
@@ -535,12 +561,11 @@ class Graph:
         start_times = [math.inf] + end_times[:-1]
         ingress_rates = {deme_name: [0.0] * len(end_times) for deme_name in self.demes}
         for j, (start_time, end_time) in enumerate(zip(start_times, end_times)):
+            current_interval = Interval(start_time, end_time)
             for migration in self.migrations:
-                if times_intersect(
-                    (start_time, end_time), (migration.start_time, migration.end_time)
-                ):
+                if current_interval.intersects(migration.time_interval):
                     rate = ingress_rates[migration.dest.name][j] + migration.rate
-                    if rate > 1:
+                    if rate > 1 + EPSILON:
                         raise ValueError(
                             f"Migration rates into {migration.dest.name} sum to "
                             "more than 1 during the time inverval "
