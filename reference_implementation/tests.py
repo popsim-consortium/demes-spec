@@ -9,6 +9,7 @@ import math
 
 import pytest
 from ruamel.yaml import YAML
+from ruamel.yaml.constructor import ConstructorError
 
 import parser
 
@@ -246,12 +247,18 @@ class TestValidateDeme:
 
     def test_bad_proportions(self):
         data = single_ancestor_graph(1)
-        for bad_proportion in [[], [1, 2]]:
+        for bad_proportion in [[], [0.9, 0.1]]:
             data["demes"][1]["proportions"] = bad_proportion
             with pytest.raises(ValueError, match="same length"):
                 parser.parse(data)
-        for bad_proportion in [[-1], [0.5], [2]]:
+        for bad_proportion in [[0.5]]:
             data["demes"][1]["proportions"] = bad_proportion
+            with pytest.raises(ValueError, match="Sum of proportions"):
+                parser.parse(data)
+
+        data = two_ancestor_graph()
+        for bad_proportion in [[0.6, 0.6]]:
+            data["demes"][2]["proportions"] = bad_proportion
             with pytest.raises(ValueError, match="Sum of proportions"):
                 parser.parse(data)
 
@@ -372,7 +379,7 @@ class TestResolveEpochTimes:
         assert epoch.end_time == 0
         assert epoch.start_size == 10
         assert epoch.end_size == 10
-        assert epoch.size_function == "exponential"
+        assert epoch.size_function == "constant"
         assert epoch.selfing_rate == 0
         assert epoch.cloning_rate == 0
 
@@ -1080,3 +1087,30 @@ def test_examples(yaml_path):
 
     graph_copy = parser.parse(json_data)
     assert graph_copy == graph
+
+
+@pytest.mark.parametrize(
+    "yaml_path", map(str, pathlib.Path("../test-cases/valid").glob("*.yaml"))
+)
+def test_valid_testcases(yaml_path):
+    yaml = YAML(typ="safe")
+    with open(yaml_path) as source:
+        data = yaml.load(source)
+    parser.parse(data)
+
+
+@pytest.mark.parametrize(
+    "yaml_path", map(str, pathlib.Path("../test-cases/invalid").glob("*.yaml"))
+)
+def test_invalid_testcases(yaml_path):
+    yaml = YAML(typ="safe")
+    if yaml_path.endswith("invalid_fields_11.yaml"):
+        # Weird case that's caught in ruamel.
+        with open(yaml_path) as source:
+            with pytest.raises(ConstructorError):
+                data = yaml.load(source)
+    else:
+        with open(yaml_path) as source:
+            data = yaml.load(source)
+        with pytest.raises((ValueError, TypeError, KeyError)):
+            parser.parse(data)

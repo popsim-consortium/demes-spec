@@ -15,7 +15,7 @@
           "end_time": 220000.0,
           "start_size": 7300,
           "end_size": 7300,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -32,7 +32,7 @@
           "end_time": 140000.0,
           "start_size": 12300,
           "end_size": 12300,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -53,7 +53,7 @@
           "end_time": 21200.0,
           "start_size": 2100,
           "end_size": 2100,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -74,7 +74,7 @@
           "end_time": 0,
           "start_size": 12300,
           "end_size": 12300,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }

@@ -15,7 +15,7 @@
           "end_time": 34133.31,
           "start_size": 7156,
           "end_size": 7156,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         },
@@ -63,7 +63,7 @@
           "end_time": 0,
           "start_size": 71560,
           "end_size": 71560,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }

@@ -38,8 +38,12 @@ def is_positive(value):
     return value > 0
 
 
-def is_non_negative(value):
-    return value >= 0
+def is_positive_and_finite(value):
+    return value > 0 and not math.isinf(value)
+
+
+def is_non_negative_and_finite(value):
+    return value >= 0 and not math.isinf(value)
 
 
 def is_fraction(value):
@@ -52,6 +56,14 @@ def is_nonempty(value):
 
 def is_identifier(value):
     return value.isidentifier()
+
+
+def is_list_of_identifiers(value):
+    return all(isinstance(v, str) and is_identifier(v) for v in value)
+
+
+def is_list_of_fractions(value):
+    return all(isinstance(v, numbers.Number) and is_fraction(v) for v in value)
 
 
 def validate_item(name, value, required_type, validator=None):
@@ -86,7 +98,7 @@ def pop_item(data, name, *, required_type, default=NO_DEFAULT, validator=None):
 
 def pop_list(data, name, default=NO_DEFAULT, required_type=None, validator=None):
     value = pop_item(data, name, default=default, required_type=list)
-    if required_type is not None and default is not None:
+    if required_type is not None and value is not None:
         for item in value:
             validate_item(name, item, required_type, validator)
     return value
@@ -112,11 +124,14 @@ def check_empty(data):
 
 
 def check_defaults(defaults, allowed_fields):
-    for key in defaults.keys():
+    for key, value in defaults.items():
         if key not in allowed_fields:
             raise ValueError(
-                f"Only fields {allowed_fields} can be specified in the defaults"
+                f"Only fields {list(allowed_fields.keys())} can be specified "
+                "in the defaults"
             )
+        required_type, validator = allowed_fields[key]
+        validate_item(key, value, required_type, validator)
 
 
 def insert_defaults(data, defaults):
@@ -147,6 +162,24 @@ class Epoch:
 
     def asdict(self) -> dict:
         return dataclasses.asdict(self)
+
+    def resolve(self):
+        if self.size_function is None:
+            if self.start_size == self.end_size:
+                self.size_function = "constant"
+            else:
+                self.size_function = "exponential"
+
+    def validate(self):
+        if self.cloning_rate + self.selfing_rate > 1:
+            raise ValueError("must have cloning_rate + selfing_rate <= 1")
+        if self.size_function not in ("constant", "exponential", "linear"):
+            raise ValueError(f"unknown size_function '{self.size_function}'")
+        if self.size_function == "constant" and self.start_size != self.end_size:
+            raise ValueError(
+                "size_function is constant but "
+                f"start_size ({self.start_size}) != end_size ({self.end_size})"
+            )
 
 
 @dataclasses.dataclass
@@ -183,7 +216,7 @@ class Deme:
         return self.epochs[-1].end_time
 
     def exists_at(self, time):
-        return self.start_time >= time >= self.end_time
+        return self.start_time > time >= self.end_time
 
     def asdict(self) -> dict:
         # It's easier to make our own asdict here to avoid recursion issues
@@ -257,11 +290,6 @@ class Deme:
                     "Cannot have varying population size in an infinite time interval"
                 )
 
-        # TODO validate the size_function. E.g., if the size_function is constant
-        # and the values aren't the same then it should be an error.
-        # Or, just check if it's "exponential". See
-        # https://github.com/popsim-consortium/demes-spec/issues/34
-
     def __resolve_proportions(self):
         if self.proportions is None:
             if len(self.ancestors) == 0:
@@ -275,6 +303,8 @@ class Deme:
         self.__resolve_times()
         self.__resolve_sizes()
         self.__resolve_proportions()
+        for epoch in self.epochs:
+            epoch.resolve()
 
     def validate(self):
         if len(self.proportions) != len(self.ancestors):
@@ -282,6 +312,10 @@ class Deme:
         if len(self.ancestors) > 0:
             if not math.isclose(sum(self.proportions), 1):
                 raise ValueError("Sum of proportions must be approximately 1")
+        if len(set(anc.name for anc in self.ancestors)) != len(self.ancestors):
+            raise ValueError("ancestors list contains duplicates")
+        for epoch in self.epochs:
+            epoch.validate()
 
 
 @dataclasses.dataclass
@@ -402,6 +436,8 @@ class Graph:
                 )
             )
         else:
+            if len(demes) < 2:
+                raise ValueError("Must specify two or more deme names")
             for j, deme_a in enumerate(demes, 1):
                 for deme_b in demes[j:]:
                     migration_ab = Migration(
@@ -547,18 +583,36 @@ def parse(data: dict) -> Graph:
         description=pop_string(data, "description", None),
         time_units=pop_string(data, "time_units", None),
         doi=pop_list(data, "doi", [], str, is_nonempty),
-        generation_time=pop_number(data, "generation_time", None, is_positive),
+        generation_time=pop_number(
+            data, "generation_time", None, is_positive_and_finite
+        ),
     )
     check_defaults(
-        deme_defaults, ["description", "start_time", "ancestors", "proportions"]
+        deme_defaults,
+        dict(
+            description=(str, None),
+            start_time=(numbers.Number, is_positive),
+            ancestors=(list, is_list_of_identifiers),
+            proportions=(list, is_list_of_fractions),
+        ),
     )
+
+    allowed_epoch_defaults = dict(
+        end_time=(numbers.Number, is_non_negative_and_finite),
+        start_size=(numbers.Number, is_positive_and_finite),
+        end_size=(numbers.Number, is_positive_and_finite),
+        selfing_rate=(numbers.Number, is_fraction),
+        cloning_rate=(numbers.Number, is_fraction),
+        size_function=(str, None),
+    )
+    check_defaults(global_epoch_defaults, allowed_epoch_defaults)
 
     for deme_data in pop_list(data, "demes"):
         insert_defaults(deme_data, deme_defaults)
         deme = graph.add_deme(
             name=pop_string(deme_data, "name", validator=is_identifier),
             description=pop_string(deme_data, "description", None),
-            start_time=pop_number(deme_data, "start_time", None),
+            start_time=pop_number(deme_data, "start_time", None, is_positive),
             ancestors=pop_list(deme_data, "ancestors", [], str, is_identifier),
             proportions=pop_list(
                 deme_data, "proportions", None, numbers.Number, is_fraction
@@ -568,44 +622,56 @@ def parse(data: dict) -> Graph:
         local_defaults = pop_object(deme_data, "defaults", {})
         local_epoch_defaults = pop_object(local_defaults, "epoch", {})
         check_empty(local_defaults)
+        check_defaults(local_epoch_defaults, allowed_epoch_defaults)
         epoch_defaults = global_epoch_defaults.copy()
         epoch_defaults.update(local_epoch_defaults)
+        check_defaults(epoch_defaults, allowed_epoch_defaults)
 
-        check_defaults(
-            epoch_defaults,
-            [
-                "end_time",
-                "start_size",
-                "end_size",
-                "selfing_rate",
-                "cloning_rate",
-                "size_function",
-            ],
-        )
         # There is always at least one epoch defined with the default values.
         for epoch_data in pop_list(deme_data, "epochs", [{}]):
             insert_defaults(epoch_data, epoch_defaults)
             deme.add_epoch(
-                end_time=pop_number(epoch_data, "end_time", None, is_non_negative),
-                start_size=pop_number(epoch_data, "start_size", None, is_positive),
-                end_size=pop_number(epoch_data, "end_size", None, is_positive),
+                end_time=pop_number(
+                    epoch_data, "end_time", None, is_non_negative_and_finite
+                ),
+                start_size=pop_number(
+                    epoch_data, "start_size", None, is_positive_and_finite
+                ),
+                end_size=pop_number(
+                    epoch_data, "end_size", None, is_positive_and_finite
+                ),
                 selfing_rate=pop_number(epoch_data, "selfing_rate", 0, is_fraction),
                 cloning_rate=pop_number(epoch_data, "cloning_rate", 0, is_fraction),
-                size_function=pop_string(epoch_data, "size_function", "exponential"),
+                size_function=pop_string(epoch_data, "size_function", None),
             )
             check_empty(epoch_data)
         check_empty(deme_data)
 
+        if len(deme.epochs) == 0:
+            raise ValueError(f"no epochs for deme {deme.name}")
+
+    if len(graph.demes) == 0:
+        raise ValueError("the graph must have one or more demes")
+
     check_defaults(
         migration_defaults,
-        ["rate", "start_time", "end_time", "source", "dest", "demes"],
+        dict(
+            rate=(numbers.Number, is_fraction),
+            start_time=(numbers.Number, is_positive),
+            end_time=(numbers.Number, is_non_negative_and_finite),
+            source=(str, is_identifier),
+            dest=(str, is_identifier),
+            demes=(list, is_list_of_identifiers),
+        ),
     )
     for migration_data in pop_list(data, "migrations", []):
         insert_defaults(migration_data, migration_defaults)
         graph.add_migration(
             rate=pop_number(migration_data, "rate", validator=is_fraction),
             start_time=pop_number(migration_data, "start_time", None, is_positive),
-            end_time=pop_number(migration_data, "end_time", None, is_non_negative),
+            end_time=pop_number(
+                migration_data, "end_time", None, is_non_negative_and_finite
+            ),
             source=pop_string(migration_data, "source", None, is_nonempty),
             dest=pop_string(migration_data, "dest", None, is_nonempty),
             demes=pop_list(
@@ -618,13 +684,21 @@ def parse(data: dict) -> Graph:
         )
         check_empty(migration_data)
 
-    check_defaults(pulse_defaults, ["source", "dest", "time", "proportion"])
+    check_defaults(
+        pulse_defaults,
+        dict(
+            source=(str, is_identifier),
+            dest=(str, is_identifier),
+            time=(numbers.Number, is_positive_and_finite),
+            proportion=(numbers.Number, is_fraction),
+        ),
+    )
     for pulse_data in pop_list(data, "pulses", []):
         insert_defaults(pulse_data, pulse_defaults)
         graph.add_pulse(
             source=pop_string(pulse_data, "source", validator=is_identifier),
             dest=pop_string(pulse_data, "dest", validator=is_identifier),
-            time=pop_number(pulse_data, "time", validator=is_non_negative),
+            time=pop_number(pulse_data, "time", validator=is_positive_and_finite),
             proportion=pop_number(pulse_data, "proportion", validator=is_fraction),
         )
         check_empty(pulse_data)

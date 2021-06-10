@@ -13,7 +13,7 @@
           "end_time": 0,
           "start_size": 1,
           "end_size": 1,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -30,7 +30,7 @@
           "end_time": 0,
           "start_size": 1,
           "end_size": 1,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }

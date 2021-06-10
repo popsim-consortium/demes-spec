@@ -16,7 +16,7 @@
           "end_time": 20225.0,
           "start_size": 32671.0,
           "end_size": 32671.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         },
@@ -24,7 +24,7 @@
           "end_time": 2218.0,
           "start_size": 41563.0,
           "end_size": 41563.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         },
@@ -32,7 +32,7 @@
           "end_time": 0,
           "start_size": 48433.0,
           "end_size": 48433.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -49,7 +49,7 @@
           "end_time": 15090.0,
           "start_size": 13249.0,
           "end_size": 13249.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         },
@@ -57,7 +57,7 @@
           "end_time": 12500.0,
           "start_size": 100.0,
           "end_size": 100.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         },
@@ -65,7 +65,7 @@
           "end_time": 9750.0,
           "start_size": 100.0,
           "end_size": 100.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         },
@@ -73,7 +73,7 @@
           "end_time": 0,
           "start_size": 5083.0,
           "end_size": 5083.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -94,7 +94,7 @@
           "end_time": 3375.0,
           "start_size": 13249.0,
           "end_size": 13249.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         },
@@ -102,7 +102,7 @@
           "end_time": 0,
           "start_size": 826.0,
           "end_size": 826.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -123,7 +123,7 @@
           "end_time": 0,
           "start_size": 13249.0,
           "end_size": 13249.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -144,7 +144,7 @@
           "end_time": 0,
           "start_size": 13249.0,
           "end_size": 13249.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -165,7 +165,7 @@
           "end_time": 0,
           "start_size": 13249.0,
           "end_size": 13249.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -186,7 +186,7 @@
           "end_time": 2119.0,
           "start_size": 1394.0,
           "end_size": 1394.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         },
@@ -194,7 +194,7 @@
           "end_time": 0,
           "start_size": 8516.0,
           "end_size": 8516.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -215,7 +215,7 @@
           "end_time": 1685.0,
           "start_size": 243.0,
           "end_size": 243.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         },
@@ -223,7 +223,7 @@
           "end_time": 0,
           "start_size": 8834.0,
           "end_size": 8834.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -244,7 +244,7 @@
           "end_time": 1659.0,
           "start_size": 2231.0,
           "end_size": 2231.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         },
@@ -252,7 +252,7 @@
           "end_time": 1293.0,
           "start_size": 12971.0,
           "end_size": 12971.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         },
@@ -260,7 +260,7 @@
           "end_time": 0,
           "start_size": 9025.0,
           "end_size": 9025.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -281,7 +281,7 @@
           "end_time": 0,
           "start_size": 6962.0,
           "end_size": 6962.0,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
