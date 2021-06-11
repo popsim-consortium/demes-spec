@@ -13,7 +13,7 @@
           "end_time": 0,
           "start_size": 1000,
           "end_size": 1000,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -30,7 +30,7 @@
           "end_time": 0,
           "start_size": 100,
           "end_size": 100,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -51,7 +51,7 @@
           "end_time": 0,
           "start_size": 200,
           "end_size": 200,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -76,19 +76,29 @@
       "rate": 1e-05,
       "start_time": 1000,
       "end_time": 0,
-      "demes": [
-        "ancestral",
-        "offshoot2"
-      ]
+      "source": "ancestral",
+      "dest": "offshoot2"
+    },
+    {
+      "rate": 1e-05,
+      "start_time": 1000,
+      "end_time": 0,
+      "source": "offshoot2",
+      "dest": "ancestral"
     },
     {
       "rate": 2e-05,
       "start_time": 500,
       "end_time": 0,
-      "demes": [
-        "offshoot1",
-        "offshoot2"
-      ]
+      "source": "offshoot1",
+      "dest": "offshoot2"
+    },
+    {
+      "rate": 2e-05,
+      "start_time": 500,
+      "end_time": 0,
+      "source": "offshoot2",
+      "dest": "offshoot1"
     }
   ],
   "pulses": [

@@ -9,6 +9,7 @@ import math
 
 import pytest
 from ruamel.yaml import YAML
+from ruamel.yaml.constructor import ConstructorError
 
 import parser
 
@@ -246,12 +247,18 @@ class TestValidateDeme:
 
     def test_bad_proportions(self):
         data = single_ancestor_graph(1)
-        for bad_proportion in [[], [1, 2]]:
+        for bad_proportion in [[], [0.9, 0.1]]:
             data["demes"][1]["proportions"] = bad_proportion
             with pytest.raises(ValueError, match="same length"):
                 parser.parse(data)
-        for bad_proportion in [[-1], [0.5], [2]]:
+        for bad_proportion in [[0.5]]:
             data["demes"][1]["proportions"] = bad_proportion
+            with pytest.raises(ValueError, match="Sum of proportions"):
+                parser.parse(data)
+
+        data = two_ancestor_graph()
+        for bad_proportion in [[0.6, 0.6]]:
+            data["demes"][2]["proportions"] = bad_proportion
             with pytest.raises(ValueError, match="Sum of proportions"):
                 parser.parse(data)
 
@@ -372,7 +379,7 @@ class TestResolveEpochTimes:
         assert epoch.end_time == 0
         assert epoch.start_size == 10
         assert epoch.end_size == 10
-        assert epoch.size_function == "exponential"
+        assert epoch.size_function == "constant"
         assert epoch.selfing_rate == 0
         assert epoch.cloning_rate == 0
 
@@ -445,6 +452,48 @@ class TestPulse:
         with pytest.raises(ValueError, match="does not exist"):
             parser.parse(data)
 
+    def test_pulse_at_deme_start_time(self):
+        # The dest deme can receive a pulse at its start_time.
+        data = minimal_graph(num_demes=3)
+        data["demes"][1]["start_time"] = 10
+        data["demes"][1]["ancestors"] = ["deme0"]
+        data["pulses"] = [
+            {"source": "deme2", "dest": "deme1", "proportion": 0.5, "time": 10}
+        ]
+        parser.parse(data)
+
+        # There can't be a pulse at the source deme's start_time.
+        data["pulses"] = [
+            {"source": "deme1", "dest": "deme2", "proportion": 0.5, "time": 10}
+        ]
+        with pytest.raises(ValueError, match="does not exist"):
+            parser.parse(data)
+
+    def test_pulse_at_deme_end_time(self):
+        # There can be a pulse at the source deme's end_time.
+        data = minimal_graph(num_demes=2)
+        data["demes"][1]["epochs"][0]["end_time"] = 10
+        data["pulses"] = [
+            {"source": "deme1", "dest": "deme0", "proportion": 0.5, "time": 10}
+        ]
+        parser.parse(data)
+
+        # The dest deme can't receive a pulse at its end_time.
+        data["pulses"] = [
+            {"source": "deme0", "dest": "deme1", "proportion": 0.5, "time": 10}
+        ]
+        with pytest.raises(ValueError, match="does not exist"):
+            parser.parse(data)
+
+    def test_bad_proportions_sum(self):
+        data = minimal_graph(num_demes=3)
+        data["pulses"] = [
+            {"source": "deme1", "dest": "deme0", "proportion": 0.6, "time": 10},
+            {"source": "deme2", "dest": "deme0", "proportion": 0.6, "time": 10},
+        ]
+        with pytest.raises(ValueError, match="sum to more than 1"):
+            parser.parse(data)
+
 
 class TestMigration:
     def test_simple_asymmetric(self):
@@ -481,7 +530,72 @@ class TestMigration:
             {"demes": ["deme0", "deme1"], "rate": 0.5, "start_time": 2, "end_time": 1}
         ]
         parsed = parser.parse(data).asdict()
-        assert data["migrations"] == parsed["migrations"]
+        assert len(parsed["migrations"]) == 2
+        assert {
+            "source": "deme0",
+            "dest": "deme1",
+            "rate": 0.5,
+            "start_time": 2,
+            "end_time": 1,
+        } in parsed["migrations"]
+        assert {
+            "source": "deme1",
+            "dest": "deme0",
+            "rate": 0.5,
+            "start_time": 2,
+            "end_time": 1,
+        } in parsed["migrations"]
+
+    def test_pairwise_resolution_for_symmetric(self):
+        data = minimal_graph(num_demes=3)
+        data["demes"][1]["epochs"] = [{"start_size": 1, "end_time": 50}]
+        data["demes"][2]["ancestors"] = ["deme1"]
+        data["demes"][2]["start_time"] = 100
+        data["migrations"] = [{"demes": ["deme0", "deme1", "deme2"], "rate": 0.5}]
+        parsed = parser.parse(data).asdict()
+        assert len(parsed["migrations"]) == 6
+        assert {
+            "source": "deme0",
+            "dest": "deme1",
+            "rate": 0.5,
+            "start_time": math.inf,
+            "end_time": 50,
+        } in parsed["migrations"]
+        assert {
+            "source": "deme1",
+            "dest": "deme0",
+            "rate": 0.5,
+            "start_time": math.inf,
+            "end_time": 50,
+        } in parsed["migrations"]
+        assert {
+            "source": "deme0",
+            "dest": "deme2",
+            "rate": 0.5,
+            "start_time": 100,
+            "end_time": 0,
+        } in parsed["migrations"]
+        assert {
+            "source": "deme2",
+            "dest": "deme0",
+            "rate": 0.5,
+            "start_time": 100,
+            "end_time": 0,
+        } in parsed["migrations"]
+        assert {
+            "source": "deme1",
+            "dest": "deme2",
+            "rate": 0.5,
+            "start_time": 100,
+            "end_time": 50,
+        } in parsed["migrations"]
+        assert {
+            "source": "deme2",
+            "dest": "deme1",
+            "rate": 0.5,
+            "start_time": 100,
+            "end_time": 50,
+        } in parsed["migrations"]
 
     def test_symmetric_and_asymmetric(self):
         data = minimal_graph(num_demes=2)
@@ -493,7 +607,29 @@ class TestMigration:
                 "rate": 0.5,
             }
         ]
-        with pytest.raises(ValueError, match="both demes and source"):
+        with pytest.raises(ValueError, match="either source and dest, or demes"):
+            parser.parse(data)
+
+        data = minimal_graph(num_demes=2)
+        data["migrations"] = [
+            {
+                "dest": "deme1",
+                "demes": ["deme0", "deme1"],
+                "rate": 0.5,
+            }
+        ]
+        with pytest.raises(ValueError, match="either source and dest, or demes"):
+            parser.parse(data)
+
+        data = minimal_graph(num_demes=2)
+        data["migrations"] = [
+            {
+                "source": "deme0",
+                "demes": ["deme0", "deme1"],
+                "rate": 0.5,
+            }
+        ]
+        with pytest.raises(ValueError, match="either source and dest, or demes"):
             parser.parse(data)
 
     def test_neither_symmetric_or_asymmetric(self):
@@ -579,6 +715,41 @@ class TestMigration:
         with pytest.raises(ValueError, match="time interval"):
             parser.parse(data)
 
+    def test_bad_migration_competing_migrations(self):
+        data = minimal_graph(num_demes=2)
+        data["migrations"] = [
+            {
+                "demes": ["deme0", "deme1"],
+                "rate": 0.5,
+                "start_time": 20,
+                "end_time": 11,
+            },
+            {"demes": ["deme0", "deme1"], "rate": 0.5, "start_time": 12, "end_time": 1},
+        ]
+        with pytest.raises(ValueError, match="Competing migration definitions"):
+            parser.parse(data)
+
+    def test_bad_migration_rates_sum_to_more_than_1(self):
+        data = minimal_graph(num_demes=3)
+        data["migrations"] = [
+            {
+                "source": "deme0",
+                "dest": "deme2",
+                "rate": 0.6,
+                "start_time": 20,
+                "end_time": 11,
+            },
+            {
+                "source": "deme1",
+                "dest": "deme2",
+                "rate": 0.6,
+                "start_time": 12,
+                "end_time": 1,
+            },
+        ]
+        with pytest.raises(ValueError, match="sum to more than 1"):
+            parser.parse(data)
+
 
 class TestResolveEpochSizes:
     def test_single_epoch(self):
@@ -650,15 +821,36 @@ class TestDefaults:
             {"start_time": 1, "end_time": 0, "rate": 0.5},
         ]
         graph = parser.parse(data)
-        assert len(graph.migrations) == 2
-        for migration in graph.migrations:
-            assert migration.asdict()["demes"] == ["deme0", "deme1"]
-        assert graph.migrations[0].rate == 1
-        assert graph.migrations[0].start_time == 2
-        assert graph.migrations[0].end_time == 1
-        assert graph.migrations[1].rate == 0.5
-        assert graph.migrations[1].start_time == 1
-        assert graph.migrations[1].end_time == 0
+        parsed = graph.asdict()
+        assert len(parsed["migrations"]) == 4
+        assert {
+            "source": "deme0",
+            "dest": "deme1",
+            "start_time": 2,
+            "end_time": 1,
+            "rate": 1,
+        } in parsed["migrations"]
+        assert {
+            "source": "deme1",
+            "dest": "deme0",
+            "start_time": 2,
+            "end_time": 1,
+            "rate": 1,
+        } in parsed["migrations"]
+        assert {
+            "source": "deme0",
+            "dest": "deme1",
+            "start_time": 1,
+            "end_time": 0,
+            "rate": 0.5,
+        } in parsed["migrations"]
+        assert {
+            "source": "deme1",
+            "dest": "deme0",
+            "start_time": 1,
+            "end_time": 0,
+            "rate": 0.5,
+        } in parsed["migrations"]
 
     def test_migration_start_time_end_time_rate(self):
         data = minimal_graph(num_demes=3)
@@ -896,3 +1088,29 @@ def test_examples(yaml_path):
     graph_copy = parser.parse(json_data)
     assert graph_copy == graph
 
+
+@pytest.mark.parametrize(
+    "yaml_path", map(str, pathlib.Path("../test-cases/valid").glob("*.yaml"))
+)
+def test_valid_testcases(yaml_path):
+    yaml = YAML(typ="safe")
+    with open(yaml_path) as source:
+        data = yaml.load(source)
+    parser.parse(data)
+
+
+@pytest.mark.parametrize(
+    "yaml_path", map(str, pathlib.Path("../test-cases/invalid").glob("*.yaml"))
+)
+def test_invalid_testcases(yaml_path):
+    yaml = YAML(typ="safe")
+    if yaml_path.endswith("invalid_fields_11.yaml"):
+        # Weird case that's caught in ruamel.
+        with open(yaml_path) as source:
+            with pytest.raises(ConstructorError):
+                data = yaml.load(source)
+    else:
+        with open(yaml_path) as source:
+            data = yaml.load(source)
+        with pytest.raises((ValueError, TypeError, KeyError)):
+            parser.parse(data)

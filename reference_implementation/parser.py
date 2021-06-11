@@ -25,8 +25,12 @@ import numbers
 import copy
 import pprint
 import dataclasses
+import itertools
+import operator
 from typing import Dict, List, Union
 
+# Numerical wiggle room.
+EPSILON = 1e-6
 
 # Validator functions. These are used as arguments to the pop_x functions and
 # check properties of the values.
@@ -36,8 +40,12 @@ def is_positive(value):
     return value > 0
 
 
-def is_non_negative(value):
-    return value >= 0
+def is_positive_and_finite(value):
+    return value > 0 and not math.isinf(value)
+
+
+def is_non_negative_and_finite(value):
+    return value >= 0 and not math.isinf(value)
 
 
 def is_fraction(value):
@@ -50,6 +58,14 @@ def is_nonempty(value):
 
 def is_identifier(value):
     return value.isidentifier()
+
+
+def is_list_of_identifiers(value):
+    return all(isinstance(v, str) and is_identifier(v) for v in value)
+
+
+def is_list_of_fractions(value):
+    return all(isinstance(v, numbers.Number) and is_fraction(v) for v in value)
 
 
 def validate_item(name, value, required_type, validator=None):
@@ -84,7 +100,7 @@ def pop_item(data, name, *, required_type, default=NO_DEFAULT, validator=None):
 
 def pop_list(data, name, default=NO_DEFAULT, required_type=None, validator=None):
     value = pop_item(data, name, default=default, required_type=list)
-    if required_type is not None and default is not None:
+    if required_type is not None and value is not None:
         for item in value:
             validate_item(name, item, required_type, validator)
     return value
@@ -110,17 +126,49 @@ def check_empty(data):
 
 
 def check_defaults(defaults, allowed_fields):
-    for key in defaults.keys():
+    for key, value in defaults.items():
         if key not in allowed_fields:
             raise ValueError(
-                f"Only fields {allowed_fields} can be specified in the defaults"
+                f"Only fields {list(allowed_fields.keys())} can be specified "
+                "in the defaults"
             )
+        required_type, validator = allowed_fields[key]
+        validate_item(key, value, required_type, validator)
 
 
 def insert_defaults(data, defaults):
     for key, value in defaults.items():
         if key not in data:
             data[key] = value
+
+
+@dataclasses.dataclass
+class Interval:
+    """
+    A half-open time interval (start_time, end_time].
+    """
+    start_time: float
+    end_time: float
+
+    def __init__(self, start_time, end_time):
+        assert start_time > end_time
+        self.start_time = start_time
+        self.end_time = end_time
+
+    def intersects(self, other):
+        """True if self and other intersect, False otherwise."""
+        assert isinstance(other, self.__class__)
+        return not (
+            self.end_time >= other.start_time or other.end_time >= self.start_time
+        )
+
+    def is_subinterval(self, other):
+        """True if self is completely contained within other, False otherwise."""
+        assert isinstance(other, self.__class__)
+        return (self.start_time <= other.start_time and self.end_time >= other.end_time)
+
+    def __contains__(self, time):
+        return self.start_time > time >= self.end_time
 
 
 @dataclasses.dataclass
@@ -134,6 +182,24 @@ class Epoch:
 
     def asdict(self) -> dict:
         return dataclasses.asdict(self)
+
+    def resolve(self):
+        if self.size_function is None:
+            if self.start_size == self.end_size:
+                self.size_function = "constant"
+            else:
+                self.size_function = "exponential"
+
+    def validate(self):
+        if self.cloning_rate + self.selfing_rate > 1:
+            raise ValueError("must have cloning_rate + selfing_rate <= 1")
+        if self.size_function not in ("constant", "exponential", "linear"):
+            raise ValueError(f"unknown size_function '{self.size_function}'")
+        if self.size_function == "constant" and self.start_size != self.end_size:
+            raise ValueError(
+                "size_function is constant but "
+                f"start_size ({self.start_size}) != end_size ({self.end_size})"
+            )
 
 
 @dataclasses.dataclass
@@ -169,11 +235,9 @@ class Deme:
     def end_time(self):
         return self.epochs[-1].end_time
 
-    def exists_at(self, time, include_end=False):
-        if include_end:
-            return self.start_time >= time >= self.end_time
-        else:
-            return self.start_time >= time > self.end_time
+    @property
+    def time_interval(self):
+        return Interval(self.start_time, self.end_time)
 
     def asdict(self) -> dict:
         # It's easier to make our own asdict here to avoid recursion issues
@@ -198,13 +262,15 @@ class Deme:
                 )
             self.start_time = default
         if len(self.ancestors) == 0 and not math.isinf(self.start_time):
-            raise ValueError(f"deme {self.name} has finite start_time, but no ancestors")
+            raise ValueError(
+                f"deme {self.name} has finite start_time, but no ancestors"
+            )
 
         for ancestor in self.ancestors:
-            if not ancestor.exists_at(self.start_time, include_end=True):
+            if self.start_time not in ancestor.time_interval:
                 raise ValueError(
-                    f"Deme {ancestor.name} (end_time={ancestor.end_time}) does not exist "
-                    f"at deme {self.name}'s start_time ({self.start_time})"
+                    f"Deme {ancestor.name} ({ancestor.time_interval}) doesn't "
+                    f"exist at deme {self.name}'s start_time ({self.start_time})"
                 )
 
         # The last epoch has a default end_time of 0
@@ -242,13 +308,8 @@ class Deme:
         if self.start_time == math.inf:
             if first_epoch.start_size != first_epoch.end_size:
                 raise ValueError(
-                    "Cannot have varying population size in an infinitely time interval"
+                    "Cannot have varying population size in an infinite time interval"
                 )
-
-        # TODO validate the size_function. E.g., if the size_function is constant
-        # and the values aren't the same then it should be an error.
-        # Or, just check if it's "exponential". See
-        # https://github.com/popsim-consortium/demes-spec/issues/34
 
     def __resolve_proportions(self):
         if self.proportions is None:
@@ -263,6 +324,8 @@ class Deme:
         self.__resolve_times()
         self.__resolve_sizes()
         self.__resolve_proportions()
+        for epoch in self.epochs:
+            epoch.resolve()
 
     def validate(self):
         if len(self.proportions) != len(self.ancestors):
@@ -270,6 +333,10 @@ class Deme:
         if len(self.ancestors) > 0:
             if not math.isclose(sum(self.proportions), 1):
                 raise ValueError("Sum of proportions must be approximately 1")
+        if len(set(anc.name for anc in self.ancestors)) != len(self.ancestors):
+            raise ValueError("ancestors list contains duplicates")
+        for epoch in self.epochs:
+            epoch.validate()
 
 
 @dataclasses.dataclass
@@ -288,9 +355,18 @@ class Pulse:
     def validate(self):
         if self.source == self.dest:
             raise ValueError("Cannot have source deme equal to dest")
-        for deme in [self.source, self.dest]:
-            if not deme.exists_at(self.time, include_end=False):
-                raise ValueError(f"Deme {deme.name} does not exist at time {self.time}")
+        if self.time not in self.source.time_interval:
+            raise ValueError(
+                f"Deme {self.source.name} does not exist at time {self.time}"
+            )
+        # Time limits for the destination deme are different to the source deme,
+        # because the destination deme is affected immediately after the time
+        # of the pulse. Thus, a pulse can occur at the destination deme's
+        # start_time, but not at the destination deme's end_time.
+        if not (self.dest.start_time >= self.time > self.dest.end_time):
+            raise ValueError(
+                f"Deme {self.dest.name} does not exist at time {self.time}"
+            )
 
 
 @dataclasses.dataclass
@@ -298,46 +374,12 @@ class Migration:
     rate: Union[float, None]
     start_time: Union[float, None]
     end_time: Union[float, None]
-
-    def _resolve(self, demes):
-        if self.start_time is None:
-            self.start_time = min(deme.start_time for deme in demes)
-        if self.end_time is None:
-            self.end_time = max(deme.end_time for deme in demes)
-
-    def _validate(self, demes):
-        if self.start_time <= self.end_time:
-            raise ValueError("start_time must be > end_time")
-        if len(set([deme.name for deme in demes])) != len(demes):
-            raise ValueError("Cannot migrate from a deme to itself")
-        for deme in demes:
-            if self.start_time > deme.start_time or self.end_time < deme.end_time:
-                raise ValueError(
-                    "Migration time interval must be within the each deme's "
-                    "time interval"
-                )
-
-
-@dataclasses.dataclass
-class SymmetricMigration(Migration):
-    demes: List[Deme]
-
-    def asdict(self) -> dict:
-        d = dataclasses.asdict(self)
-        d["demes"] = [deme.name for deme in self.demes]
-        return d
-
-    def resolve(self):
-        self._resolve(self.demes)
-
-    def validate(self):
-        self._validate(self.demes)
-
-
-@dataclasses.dataclass
-class AsymmetricMigration(Migration):
     source: Deme
     dest: Deme
+
+    @property
+    def time_interval(self):
+        return Interval(self.start_time, self.end_time)
 
     def asdict(self) -> dict:
         d = dataclasses.asdict(self)
@@ -346,10 +388,22 @@ class AsymmetricMigration(Migration):
         return d
 
     def resolve(self):
-        self._resolve([self.source, self.dest])
+        if self.start_time is None:
+            self.start_time = min(self.source.start_time, self.dest.start_time)
+        if self.end_time is None:
+            self.end_time = max(self.source.end_time, self.dest.end_time)
 
     def validate(self):
-        self._validate([self.source, self.dest])
+        if self.start_time <= self.end_time:
+            raise ValueError("start_time must be > end_time")
+        if self.source.name == self.dest.name:
+            raise ValueError("Cannot migrate from a deme to itself")
+        for deme in [self.source, self.dest]:
+            if not self.time_interval.is_subinterval(deme.time_interval):
+                raise ValueError(
+                    "Migration time interval must be within the each deme's "
+                    "time interval"
+                )
 
 
 @dataclasses.dataclass
@@ -374,7 +428,7 @@ class Graph:
             name=name,
             description=description,
             start_time=start_time,
-            ancestors=[self.demes[deme_id] for deme_id in ancestors],
+            ancestors=[self.demes[deme_name] for deme_name in ancestors],
             proportions=proportions,
         )
         if deme.name in self.demes:
@@ -392,28 +446,46 @@ class Graph:
         dest: Union[str, None],
         demes: Union[List[str], None],
     ) -> Migration:
-        migration: Migration
-        if source is not None and dest is not None:
-            migration = AsymmetricMigration(
-                rate=rate,
-                start_time=start_time,
-                end_time=end_time,
-                source=self.demes[source],
-                dest=self.demes[dest],
-            )
-            if demes is not None:
-                raise ValueError("Cannot specify both demes and source/dest")
-        elif demes is not None:
-            migration = SymmetricMigration(
-                rate=rate,
-                start_time=start_time,
-                end_time=end_time,
-                demes=[self.demes[deme_id] for deme_id in demes],
+        migrations: List[Migration] = []
+        if not (
+            # symmetric
+            (demes is not None and source is None and dest is None)
+            # asymmetric
+            or (demes is None and source is not None and dest is not None)
+        ):
+            raise ValueError("Must specify either source and dest, or demes")
+        if source is not None:
+            migrations.append(
+                Migration(
+                    rate=rate,
+                    start_time=start_time,
+                    end_time=end_time,
+                    source=self.demes[source],
+                    dest=self.demes[dest],
+                )
             )
         else:
-            raise ValueError("Must specify either source and dest, or demes")
-        self.migrations.append(migration)
-        return migration
+            if len(demes) < 2:
+                raise ValueError("Must specify two or more deme names")
+            for j, deme_a in enumerate(demes, 1):
+                for deme_b in demes[j:]:
+                    migration_ab = Migration(
+                        rate=rate,
+                        start_time=start_time,
+                        end_time=end_time,
+                        source=self.demes[deme_a],
+                        dest=self.demes[deme_b],
+                    )
+                    migration_ba = Migration(
+                        rate=rate,
+                        start_time=start_time,
+                        end_time=end_time,
+                        source=self.demes[deme_b],
+                        dest=self.demes[deme_a],
+                    )
+                    migrations.extend([migration_ab, migration_ba])
+        self.migrations.extend(migrations)
+        return migrations
 
     def add_pulse(self, source: str, dest: str, time: float, proportion: float):
         pulse = Pulse(
@@ -452,8 +524,57 @@ class Graph:
         for migration in self.migrations:
             migration.validate()
 
+        # A deme can't receive more than 100% of its ancestry from pulses at
+        # any given time.
+        for (dest, time), pulses in itertools.groupby(
+            self.pulses, key=operator.attrgetter("dest", "time")
+        ):
+            if sum(pulse.proportion for pulse in pulses) > 1 + EPSILON:
+                raise ValueError(
+                    f"Pulse proportions into {dest.name} at time {time} "
+                    "sum to more than 1"
+                )
+
+        # Migrations involving the same source and dest can't overlap temporally.
+        for j, migration_a in enumerate(self.migrations, 1):
+            for migration_b in self.migrations[j:]:
+                if (
+                    migration_a.source == migration_b.source
+                    and migration_a.dest == migration_b.dest
+                    and migration_a.time_interval.intersects(migration_b.time_interval)
+                ):
+                    start_time = min(migration_a.end_time, migration_b.end_time)
+                    end_time = max(migration_a.start_time, migration_b.start_time)
+                    raise ValueError(
+                        f"Competing migration definitions for {migration_a.source.name} "
+                        f"and {migration_a.dest.name} during time interval "
+                        f"({start_time}, {end_time}]"
+                    )
+
+        # The rate of migration entering a deme cannot be more than 1 in any
+        # given interval of time.
+        time_boundaries = set()
+        time_boundaries.update(migration.start_time for migration in self.migrations)
+        time_boundaries.update(migration.end_time for migration in self.migrations)
+        time_boundaries.discard(math.inf)
+        end_times = sorted(time_boundaries, reverse=True)
+        start_times = [math.inf] + end_times[:-1]
+        ingress_rates = {deme_name: [0.0] * len(end_times) for deme_name in self.demes}
+        for j, (start_time, end_time) in enumerate(zip(start_times, end_times)):
+            current_interval = Interval(start_time, end_time)
+            for migration in self.migrations:
+                if current_interval.intersects(migration.time_interval):
+                    rate = ingress_rates[migration.dest.name][j] + migration.rate
+                    if rate > 1 + EPSILON:
+                        raise ValueError(
+                            f"Migration rates into {migration.dest.name} sum to "
+                            "more than 1 during the time inverval "
+                            f"({start_time}, {end_time}]"
+                        )
+                    ingress_rates[migration.dest.name][j] = rate
+
     def resolve(self):
-        # A demes ancestors must be listed before it, so any deme we
+        # A deme's ancestors must be listed before it, so any deme we
         # visit must always be visited after its ancestors.
         for deme in self.demes.values():
             deme.resolve()
@@ -487,18 +608,36 @@ def parse(data: dict) -> Graph:
         description=pop_string(data, "description", None),
         time_units=pop_string(data, "time_units", None),
         doi=pop_list(data, "doi", [], str, is_nonempty),
-        generation_time=pop_number(data, "generation_time", None, is_positive),
+        generation_time=pop_number(
+            data, "generation_time", None, is_positive_and_finite
+        ),
     )
     check_defaults(
-        deme_defaults, ["description", "start_time", "ancestors", "proportions"]
+        deme_defaults,
+        dict(
+            description=(str, None),
+            start_time=(numbers.Number, is_positive),
+            ancestors=(list, is_list_of_identifiers),
+            proportions=(list, is_list_of_fractions),
+        ),
     )
+
+    allowed_epoch_defaults = dict(
+        end_time=(numbers.Number, is_non_negative_and_finite),
+        start_size=(numbers.Number, is_positive_and_finite),
+        end_size=(numbers.Number, is_positive_and_finite),
+        selfing_rate=(numbers.Number, is_fraction),
+        cloning_rate=(numbers.Number, is_fraction),
+        size_function=(str, None),
+    )
+    check_defaults(global_epoch_defaults, allowed_epoch_defaults)
 
     for deme_data in pop_list(data, "demes"):
         insert_defaults(deme_data, deme_defaults)
         deme = graph.add_deme(
             name=pop_string(deme_data, "name", validator=is_identifier),
             description=pop_string(deme_data, "description", None),
-            start_time=pop_number(deme_data, "start_time", None),
+            start_time=pop_number(deme_data, "start_time", None, is_positive),
             ancestors=pop_list(deme_data, "ancestors", [], str, is_identifier),
             proportions=pop_list(
                 deme_data, "proportions", None, numbers.Number, is_fraction
@@ -508,44 +647,56 @@ def parse(data: dict) -> Graph:
         local_defaults = pop_object(deme_data, "defaults", {})
         local_epoch_defaults = pop_object(local_defaults, "epoch", {})
         check_empty(local_defaults)
+        check_defaults(local_epoch_defaults, allowed_epoch_defaults)
         epoch_defaults = global_epoch_defaults.copy()
         epoch_defaults.update(local_epoch_defaults)
+        check_defaults(epoch_defaults, allowed_epoch_defaults)
 
-        check_defaults(
-            epoch_defaults,
-            [
-                "end_time",
-                "start_size",
-                "end_size",
-                "selfing_rate",
-                "cloning_rate",
-                "size_function",
-            ],
-        )
         # There is always at least one epoch defined with the default values.
         for epoch_data in pop_list(deme_data, "epochs", [{}]):
             insert_defaults(epoch_data, epoch_defaults)
             deme.add_epoch(
-                end_time=pop_number(epoch_data, "end_time", None, is_non_negative),
-                start_size=pop_number(epoch_data, "start_size", None, is_positive),
-                end_size=pop_number(epoch_data, "end_size", None, is_positive),
+                end_time=pop_number(
+                    epoch_data, "end_time", None, is_non_negative_and_finite
+                ),
+                start_size=pop_number(
+                    epoch_data, "start_size", None, is_positive_and_finite
+                ),
+                end_size=pop_number(
+                    epoch_data, "end_size", None, is_positive_and_finite
+                ),
                 selfing_rate=pop_number(epoch_data, "selfing_rate", 0, is_fraction),
                 cloning_rate=pop_number(epoch_data, "cloning_rate", 0, is_fraction),
-                size_function=pop_string(epoch_data, "size_function", "exponential"),
+                size_function=pop_string(epoch_data, "size_function", None),
             )
             check_empty(epoch_data)
         check_empty(deme_data)
 
+        if len(deme.epochs) == 0:
+            raise ValueError(f"no epochs for deme {deme.name}")
+
+    if len(graph.demes) == 0:
+        raise ValueError("the graph must have one or more demes")
+
     check_defaults(
         migration_defaults,
-        ["rate", "start_time", "end_time", "source", "dest", "demes"],
+        dict(
+            rate=(numbers.Number, is_fraction),
+            start_time=(numbers.Number, is_positive),
+            end_time=(numbers.Number, is_non_negative_and_finite),
+            source=(str, is_identifier),
+            dest=(str, is_identifier),
+            demes=(list, is_list_of_identifiers),
+        ),
     )
     for migration_data in pop_list(data, "migrations", []):
         insert_defaults(migration_data, migration_defaults)
         graph.add_migration(
             rate=pop_number(migration_data, "rate", validator=is_fraction),
             start_time=pop_number(migration_data, "start_time", None, is_positive),
-            end_time=pop_number(migration_data, "end_time", None, is_non_negative),
+            end_time=pop_number(
+                migration_data, "end_time", None, is_non_negative_and_finite
+            ),
             source=pop_string(migration_data, "source", None, is_nonempty),
             dest=pop_string(migration_data, "dest", None, is_nonempty),
             demes=pop_list(
@@ -558,13 +709,21 @@ def parse(data: dict) -> Graph:
         )
         check_empty(migration_data)
 
-    check_defaults(pulse_defaults, ["source", "dest", "time", "proportion"])
+    check_defaults(
+        pulse_defaults,
+        dict(
+            source=(str, is_identifier),
+            dest=(str, is_identifier),
+            time=(numbers.Number, is_positive_and_finite),
+            proportion=(numbers.Number, is_fraction),
+        ),
+    )
     for pulse_data in pop_list(data, "pulses", []):
         insert_defaults(pulse_data, pulse_defaults)
         graph.add_pulse(
             source=pop_string(pulse_data, "source", validator=is_identifier),
             dest=pop_string(pulse_data, "dest", validator=is_identifier),
-            time=pop_number(pulse_data, "time", validator=is_non_negative),
+            time=pop_number(pulse_data, "time", validator=is_positive_and_finite),
             proportion=pop_number(pulse_data, "proportion", validator=is_fraction),
         )
         check_empty(pulse_data)

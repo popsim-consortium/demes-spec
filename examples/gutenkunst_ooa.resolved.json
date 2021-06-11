@@ -15,7 +15,7 @@
           "end_time": 220000.0,
           "start_size": 7300,
           "end_size": 7300,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -32,7 +32,7 @@
           "end_time": 140000.0,
           "start_size": 12300,
           "end_size": 12300,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -53,7 +53,7 @@
           "end_time": 21200.0,
           "start_size": 2100,
           "end_size": 2100,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -74,7 +74,7 @@
           "end_time": 0,
           "start_size": 12300,
           "end_size": 12300,
-          "size_function": "exponential",
+          "size_function": "constant",
           "selfing_rate": 0,
           "cloning_rate": 0
         }
@@ -134,37 +134,57 @@
       "rate": 0.00025,
       "start_time": 140000.0,
       "end_time": 21200.0,
-      "demes": [
-        "YRI",
-        "OOA"
-      ]
+      "source": "YRI",
+      "dest": "OOA"
+    },
+    {
+      "rate": 0.00025,
+      "start_time": 140000.0,
+      "end_time": 21200.0,
+      "source": "OOA",
+      "dest": "YRI"
     },
     {
       "rate": 3e-05,
       "start_time": 21200.0,
       "end_time": 0,
-      "demes": [
-        "YRI",
-        "CEU"
-      ]
+      "source": "YRI",
+      "dest": "CEU"
+    },
+    {
+      "rate": 3e-05,
+      "start_time": 21200.0,
+      "end_time": 0,
+      "source": "CEU",
+      "dest": "YRI"
     },
     {
       "rate": 1.9e-05,
       "start_time": 21200.0,
       "end_time": 0,
-      "demes": [
-        "YRI",
-        "CHB"
-      ]
+      "source": "YRI",
+      "dest": "CHB"
+    },
+    {
+      "rate": 1.9e-05,
+      "start_time": 21200.0,
+      "end_time": 0,
+      "source": "CHB",
+      "dest": "YRI"
     },
     {
       "rate": 9.6e-05,
       "start_time": 21200.0,
       "end_time": 0,
-      "demes": [
-        "CEU",
-        "CHB"
-      ]
+      "source": "CEU",
+      "dest": "CHB"
+    },
+    {
+      "rate": 9.6e-05,
+      "start_time": 21200.0,
+      "end_time": 0,
+      "source": "CHB",
+      "dest": "CEU"
     }
   ],
   "pulses": []

@@ -21,7 +21,11 @@ jobs:
         run: |
           cd reference_implementation
           # Require 100% test coverage for reference implementation.
-          python -m pytest --cov=parser --cov-fail-under=100 tests.py
+          python -m pytest \
+            --cov=parser \
+            --cov-report=term-missing \
+            --cov-fail-under=100 \
+            tests.py
       - name: Tests for schema
         run: |
           python -m pytest tests.py
