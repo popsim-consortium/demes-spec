@@ -25,3 +25,37 @@ this is unfortunately tied to specific software.
 
 We believe these problems are fixable.
 
+
+## Software support
+
+The following software provides support for Demes.
+If you'd like to add your software to this list, please open a
+[Pull Request](https://github.com/popsim-consortium/demes-spec/edit/main/docs/introduction.md).
+
+### Software directly related to Demes
+
+ - [demes-c](https://github.com/grahamgower/demes-c) -
+   A C library for loading Demes models using libyaml.
+ - [demes-python](https://github.com/popsim-consortium/demes-python/) -
+   A Python library for loading, saving, and working with Demes models.
+   Includes an `ms` converter.
+ - [demesdraw](https://github.com/grahamgower/demesdraw) -
+   A Python library for drawing Demes models (as seen in the
+   {ref}`tutorial <sec_tutorial>`).
+
+### Software accepting the Demes format as input/output
+
+ - [fwdpy11](https://github.com/molpopgen/fwdpy11) -
+   A Python package for forward-time population genetic simulation.
+ - [GADMA](https://github.com/ctlab/GADMA) -
+   Genetic Algorithm for Demographic Model Analysis.
+   GADMA implements methods for automatic inference of the joint demographic
+   history of multiple populations from genetic data.
+ - [moments](https://bitbucket.org/simongravel/moments/) -
+   Moment-based solution of the diffusion equation in genetics,
+   for inference of demographic history and selection.
+ - [msprime](https://github.com/tskit-dev/msprime/) -
+   A population genetics simulator of ancestry and DNA sequence evolution
+   based on tskit.
+ - [demes-slim](https://github.com/grahamgower/demes-slim) -
+   A SLiM/Eidos library for loading a Demes model into SLiM.
