@@ -1,4 +1,6 @@
-- file: introduction
+format: jb-article
+root: introduction
+sections:
 - file: tutorial
 - file: gallery
 - file: reference

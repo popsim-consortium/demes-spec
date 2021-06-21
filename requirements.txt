@@ -1,4 +1,4 @@
-jupyter-book==0.10.1
+jupyter-book==0.11.1
 sphinx-jsonschema==1.16.6
 sphinx==3.3.1
 sphinx_rtd_theme==0.5.0
@@ -6,5 +6,5 @@ pytest==6.1.2
 pytest-cov==2.10.1
 jsonschema==3.2.0
 ruamel.yaml==0.16.12
-demes==0.1.0
-demesdraw==0.1.0
+demes==0.1.2
+demesdraw==0.1.2
