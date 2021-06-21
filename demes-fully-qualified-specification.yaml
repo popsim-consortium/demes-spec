@@ -1,5 +1,5 @@
 $schema: http://json-schema.org/draft-07/schema#
-title: Demes graph
+title: Fully qualified Demes graph
 type: object
 additionalProperties: false
 properties:
@@ -9,7 +9,6 @@ properties:
     type: array
     items:
       type: string
-    default: []
 
   time_units:
     type: string
@@ -19,33 +18,6 @@ properties:
     type: ["number", "null"]
     exclusiveMinimum: 0
     exclusiveMaximum: .inf
-    default: null
-
-  defaults:
-    type: object
-    default: {}
-    additionalProperties: false
-    properties:
-      epoch:
-        $ref: '#/definitions/epoch'
-      migration:
-        $ref: '#/definitions/migration'
-      pulse:
-        $ref: '#/definitions/pulse'
-      deme:
-        properties:
-          description:
-            type: "string"
-          ancestors:
-            type: array
-            items:
-              $ref: '#/definitions/name'
-          proportions:
-            type: array
-            items:
-              $ref: '#/definitions/proportion'
-          start_time:
-            $ref: '#/definitions/start_time'
 
   demes:
     type: array
@@ -57,17 +29,20 @@ properties:
     type: array
     items:
       $ref: '#/definitions/pulse'
-    default: []
 
   migrations:
     type: array
     items:
       $ref: '#/definitions/migration'
-    default: []
 
 required:
+- description
+- doi
 - time_units
 - demes
+- generation_time
+- pulses
+- migrations
 
 definitions:
   name:
@@ -111,11 +86,17 @@ definitions:
       size_function:
         # TODO: make this an enumeration
         type: string
-        default: exponential
       cloning_rate:
         $ref: '#/definitions/rate'
       selfing_rate:
         $ref: '#/definitions/rate'
+    required:
+    - end_time
+    - start_size
+    - end_size
+    - size_function
+    - cloning_rate
+    - selfing_rate
 
   deme:
     type: object
@@ -125,12 +106,10 @@ definitions:
         $ref: '#/definitions/name'
       description:
         type: ["string", "null"]
-        default: null
       ancestors:
         type: array
         items:
           $ref: '#/definitions/name'
-        default: []
       proportions:
         type: array
         items:
@@ -139,19 +118,16 @@ definitions:
         $ref: '#/definitions/start_time'
       epochs:
         type: array
-        default: []
-        minItems: 0
+        minItems: 1
         items:
           $ref: '#/definitions/epoch'
-      defaults:
-        type: object
-        default: {}
-        additionalProperties: false
-        properties:
-          epoch:
-            $ref: '#/definitions/epoch'
     required:
     - name
+    - description
+    - ancestors
+    - proportions
+    - start_time
+    - epochs
 
   pulse:
     type: object
@@ -167,23 +143,51 @@ definitions:
         exclusiveMaximum: .inf
       proportion:
         $ref: '#/definitions/proportion'
+    required:
+    - source
+    - dest
+    - time
+    - proportion
 
   migration:
-    type: object
-    additionalProperties: false
-    properties:
-      demes:
-        type: array
-        items:
+    oneOf:
+    - type: object
+      # Asymmetric
+      additionalProperties: false
+      properties:
+        source:
           $ref: '#/definitions/name'
-        minItems: 2
-      source:
-        $ref: '#/definitions/name'
-      dest:
-        $ref: '#/definitions/name'
-      start_time:
-        $ref: '#/definitions/start_time'
-      end_time:
-        $ref: '#/definitions/end_time'
-      rate:
-        $ref: '#/definitions/rate'
+        dest:
+          $ref: '#/definitions/name'
+        start_time:
+          $ref: '#/definitions/start_time'
+        end_time:
+          $ref: '#/definitions/end_time'
+        rate:
+          $ref: '#/definitions/rate'
+      required:
+      - source
+      - dest
+      - start_time
+      - end_time
+      - rate
+    - type: object
+      additionalProperties: false
+      # Symmetric
+      properties:
+        demes:
+          type: array
+          items:
+            $ref: '#/definitions/name'
+          minItems: 2
+        start_time:
+          $ref: '#/definitions/start_time'
+        end_time:
+          $ref: '#/definitions/end_time'
+        rate:
+          $ref: '#/definitions/rate'
+      required:
+      - demes
+      - start_time
+      - end_time
+      - rate
