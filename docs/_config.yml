@@ -27,11 +27,14 @@ html:
   extra_footer: demes-spec 0.9
 
 sphinx:
-    extra_extensions:
-    - sphinx.ext.todo
-    - sphinx.ext.intersphinx
-    - sphinx-jsonschema
 
-    config:
-      todo_include_todos: true
-      nitpicky: true
+  extra_extensions:
+  - sphinx.ext.todo
+  - sphinx.ext.intersphinx
+
+  config:
+    todo_include_todos: true
+    nitpicky: true
+    myst_enable_extensions:
+    - colon_fence
+    - deflist

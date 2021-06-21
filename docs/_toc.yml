@@ -3,4 +3,4 @@ root: introduction
 sections:
 - file: tutorial
 - file: gallery
-- file: reference
+- file: specification
