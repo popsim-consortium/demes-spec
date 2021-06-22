@@ -7,6 +7,7 @@ import pathlib
 import json
 import math
 
+import jsonschema
 import pytest
 from ruamel.yaml import YAML
 from ruamel.yaml.constructor import ConstructorError
@@ -1089,14 +1090,42 @@ def test_examples(yaml_path):
     assert graph_copy == graph
 
 
-@pytest.mark.parametrize(
-    "yaml_path", map(str, pathlib.Path("../test-cases/valid").glob("*.yaml"))
-)
-def test_valid_testcases(yaml_path):
-    yaml = YAML(typ="safe")
-    with open(yaml_path) as source:
-        data = yaml.load(source)
-    parser.parse(data)
+
+class TestValidCases:
+
+    def parse_file(self, yaml_path):
+        yaml = YAML(typ="safe")
+        with open(yaml_path) as source:
+            data = yaml.load(source)
+        return parser.parse(data).asdict()
+
+    @pytest.mark.parametrize(
+        "yaml_path", map(str, pathlib.Path("../test-cases/valid").glob("*.yaml"))
+    )
+    def test_resolve_equal(self, yaml_path):
+        resolved = self.parse_file(yaml_path)
+        # Reparsing the fully resolved model should give identical output.
+        assert resolved == parser.parse(resolved).asdict()
+
+    @pytest.mark.parametrize(
+        "yaml_path", map(str, pathlib.Path("../test-cases/valid").glob("*.yaml"))
+    )
+    def test_validates_base_schema(self, yaml_path):
+        resolved = self.parse_file(yaml_path)
+        yaml = YAML(typ="safe")
+        with open("../demes-specification.yaml") as source:
+            schema = yaml.load(source)
+        jsonschema.validate(instance=resolved, schema=schema)
+
+    @pytest.mark.parametrize(
+        "yaml_path", map(str, pathlib.Path("../test-cases/valid").glob("*.yaml"))
+    )
+    def test_validates_fully_qualified_schema(self, yaml_path):
+        resolved = self.parse_file(yaml_path)
+        yaml = YAML(typ="safe")
+        with open("../demes-fully-qualified-specification.yaml") as source:
+            schema = yaml.load(source)
+        jsonschema.validate(instance=resolved, schema=schema)
 
 
 @pytest.mark.parametrize(
