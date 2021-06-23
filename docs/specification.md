@@ -7,8 +7,21 @@
 
 Demes is a specification for describing population genetic models
 of demographic history. This specification precisely defines the
-data model and the required behaviour of implementations.
+population genetics model and its assumptions, along with
+the data model used for interchange and the required behaviour
+of implementations.
 
+% There are four separate elements to this specification:
+
+%1. The {ref}`sec_spec_popgen_assumptions` describing the
+%underlying model of populations and their interactions.
+%2. The {ref}`sec_spec_mdm` which
+%programs such as simulators take as input.
+%3. The {ref}`sec_, designed for human
+%editing and ease of understanding.
+%4. Parser implementations that take the non-redundant data
+%model as input and output the fully qualified data model.
+%
 
 ## Note to Readers
 
@@ -16,7 +29,20 @@ To provide feedback on this specification, please use the
 [issue tracker](https://github.com/popsim-consortium/demes-spec/issues).
 
 
+(sec_spec_terminology)=
+
 ## Conventions and Terminology
+
+The term "Demes" in this document is to be interpreted as a
+reference to this specification. A {ref}`sec_spec_popgen_deme`
+refers to a set of individuals that can be modelled by a fixed
+set of parameters; to avoid confusion with name of the specification
+we will usually use the term "population", in the understanding that
+the terms are equivalent for the purposes of this document.
+
+:::{todo}
+Define the human and machine data models. And link to assumptions.
+:::
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
@@ -31,13 +57,79 @@ The term "JSON Schema" in this document is to be interpreted as defined
 in the JSON Schema
 [core specification](https://json-schema.org/draft/2020-12/json-schema-core.html).
 
-(sec_spec_defaults)=
 
-## Defaults
+(sec_spec_popgen)=
+## Population genetics model
 
-We specify defaults to do stuff.
+In this section we define the underlying population genetics assumptions
+made in Demes and the key concepts involved.
+The goal is to provide a basic shared vocabulary that
+is precise enough to make interchange of models defined in the standard
+meaningful, but to avoid being overly proscriptive so that the
+format is flexible enough to encompass a wide range of different methods.
+Issues relating to the data model and interchange and dealt with
+in later sections.
 
-## Definitions
+(sec_spec_popgen_deme)=
+
+### Deme
+
+A "deme" is collection of individuals whose dynamics can be described
+by a fixed set of parameters. As explained in the {ref}`sec_spec_terminology`
+section, we will usually the term "population" to refer to a deme
+to avoid confusion.
+
+:::{todo}
+Define the model! What are the dynamics? Include definition of selfing and
+cloning.  https://github.com/popsim-consortium/demes-spec/issues/43
+:::
+
+(sec_spec_popgen_time)=
+### Time
+
+Time is measured forwards, and in units of time-ago. Can be either
+in years or generations. Can either discrete or continuous.
+
+:::{todo}
+Refine: https://github.com/popsim-consortium/demes-spec/issues/60
+:::
+
+(sec_spec_popgen_population_size)=
+
+### Population size
+
+:::{todo}
+Refine: https://github.com/popsim-consortium/demes-spec/issues/72
+:::
+
+(sec_spec_popgen_population_epoch)=
+### Epoch
+
+An interval of time over which the parameters describing the dynamics of a
+given {ref}`population<sec_spec_popgen_deme>` are fixed.
+
+(sec_spec_popgen_population_migration)=
+### Migration
+
+:::{todo}
+Define assumptions about migration.
+:::
+
+(sec_spec_mdm)=
+## Machine Data Model
+
+The Demes Machine Data Model (MDM) is a formal representation of the
+{ref}`sec_spec_popgen` as a JSON document. The HDM is designed to be
+used as input by programs such as population genetics simulators,
+and explicitly includes all necessary details. The structure of JSON
+documents conforming to the specification is formally defined
+using JSON Schema, and the detailed requirements for each of the
+elements in this data model are defined in this section.
+
+:::{todo}
+Link to fully qualified schema.
+:::
+
 
 (sec_spec_defs_common)=
 
@@ -49,15 +141,16 @@ start_time
 end_time
 : The youngest time of a time interval (numerical lower bound).
 
+### MDM documents
 
-(sec_spec_defs_demes_graph)=
+The top-level MDM document describes the overall Demes model,
+which consists of a set of populations and details about how
+individuals migrate between them.
 
-### Demes graph
-
-A ``demes`` model is a graph in which each deme is a vertex, and graph edges
-indicate ancestor/descendant relationships. Additional relationships between
-demes are described using `pulses` for instantaneous migrations, and
-`migrations` for continuous migration over a time interval.
+:::{todo}
+Update this with links to the PopGen section to define the
+actual concepts.
+:::
 
 description
 : A concise description of the demographic model.
@@ -86,11 +179,6 @@ pulses
 migrations
 : The list of {ref}`migrations <sec_spec_defs_migration>`  occurring
   continuously over a time interval.
-
-defaults
-: The default values for omitted properties in Demes. See the
-  {ref}`sec_spec_defaults` for details.
-
 
 (sec_spec_defs_deme)=
 
@@ -262,7 +350,47 @@ end_time
 rate
 : The rate of migration per generation.
 
-## Schema
+
+### Schema
+
+The schema listed here is definitive in terms of types and the
+structure of the JSON documents that are considered to be
+valid instances of the MDM
+
+```{eval-rst}
+.. literalinclude:: ../demes-fully-qualified-specification.yaml
+    :language: yaml
+```
+
+(sec_spec_hdm)=
+## Human Data Model
+
+The Demes Human Data Model (HDM) is an extension of the {ref}`sec_spec_mdm`
+that is designed for human readability. The HDM provides default values
+for many parameters, removes redundant information in the MDM via rules described
+in this section and also provides a default value replacement mechanism.
+JSON documents conforming to the HDM are intended to be processed by a parser,
+which outputs the corresponding MDM document.
+
+:::{todo}
+Link to HDM schema.
+:::
+
+(sec_spec_hdm_defaults)=
+### Defaults
+
+Repeated values such as shared population sizes represent a significant opportunity
+for error in human-generated models. The HDM provides the default value
+propagation mechanism to avoid this repetition.
+
+:::{todo}
+Describe the process of hierarchical default value replacement.
+:::
+
+(sec_spec_defs_demes_graph)=
+
+
+### Schema
 
 The schema listed here is definitive in terms of types and the
 structure of the JSON documents that are considered to be
