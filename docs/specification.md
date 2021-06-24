@@ -11,17 +11,18 @@ population genetics model and its assumptions, along with
 the data model used for interchange and the required behaviour
 of implementations.
 
-% There are four separate elements to this specification:
+:::{admonition}Who is this specification for?
+This specification is intended to provide a detailed and definitive resource
+for the following groups:
 
-%1. The {ref}`sec_spec_popgen_assumptions` describing the
-%underlying model of populations and their interactions.
-%2. The {ref}`sec_spec_mdm` which
-%programs such as simulators take as input.
-%3. The {ref}`sec_, designed for human
-%editing and ease of understanding.
-%4. Parser implementations that take the non-redundant data
-%model as input and output the fully qualified data model.
-%
+- Those implementing support for Demes as an input or output format in their programs
+- Those implementing a Demes parser
+
+As such, this specification contains a lot of detail that is not
+interesting to most users.
+If your wish to learn how to understand and create your own
+Demes models, please see the {ref}`sec_tutorial` instead.
+:::
 
 ## Note to Readers
 
@@ -118,22 +119,27 @@ Define assumptions about migration.
 (sec_spec_mdm)=
 ## Machine Data Model
 
+:::{warning}
+The structure of the documentation here is still in flux - it's not clear
+how to split things up in terms of explaining what something is, and
+also what the formal restrictions on its value are, particularly
+in terms of the HDM and MDM split.
+:::
+
 The Demes Machine Data Model (MDM) is a formal representation of the
 {ref}`sec_spec_popgen` as a JSON document. The HDM is designed to be
 used as input by programs such as population genetics simulators,
 and explicitly includes all necessary details. The structure of JSON
 documents conforming to the specification is formally defined
-using JSON Schema, and the detailed requirements for each of the
+in the {ref}`sec_spec_mdm_schema`, and the detailed requirements for each of the
 elements in this data model are defined in this section.
-
-:::{todo}
-Link to fully qualified schema.
-:::
-
 
 (sec_spec_defs_common)=
 
 ### Common concepts
+
+This section provides details on properties that occur in multiple
+contexts.
 
 start_time
 : The oldest time of a time interval (numerical upper bound).
@@ -143,14 +149,14 @@ end_time
 
 ### MDM documents
 
-The top-level MDM document describes the overall Demes model,
-which consists of a set of populations and details about how
-individuals migrate between them.
+The top-level MDM document describes a single instance of a Demes model.
+Please see the {ref}`sec_spec_popgen` section for details about the
+population genetics assumptions underlying these model descriptions.
 
-:::{todo}
-Update this with links to the PopGen section to define the
-actual concepts.
-:::
+Each MDM document contains the following list of properties. All
+properties MUST be specified, and additional properties MUST NOT be
+included in these documents. Please see the {ref}`sec_spec_mdm_schema`
+for definitive details on the types and structure of these properties.
 
 description
 : A concise description of the demographic model.
@@ -169,32 +175,32 @@ generation_time
   the ``generation_time`` MUST be specified.
 
 demes
-: The list of {ref}`sec_spec_defs_deme`s. At least one deme MUST
-  be specified.
+: The list of demes in the model. At least one deme MUST be specified.
+  Please see the section {ref}`below <sec_spec_mdm_deme>` for the
+  required properties of these objects.
 
 pulses
-: The list of instantaneous {ref}`pulses of migration <sec_spec_defs_pulse>`
-  between demes.
+: The list of pulses in the model.
+  Please see the section {ref}`below <sec_spec_mdm_pulse>` for the
+  required properties of these objects.
 
 migrations
-: The list of {ref}`migrations <sec_spec_defs_migration>`  occurring
-  continuously over a time interval.
+: The list of migrations in the model.
+  Please see the section {ref}`below <sec_spec_mdm_migration>` for the
+  required properties of these objects.
 
-(sec_spec_defs_deme)=
+(sec_spec_mdm_deme)=
 
 ### Deme
 
-A collection of individuals that are exchangeable at any fixed time.
 The deme may be a descendant of one or more demes in the graph, and may
 be an ancestor to others. The deme exists over the half-open time interval
 ``(start_time, end_time]``, and it may continue to exist after
 contributing ancestry to a descendant deme. The deme's ``end_time`` is
 defined as the ``end_time`` of the deme's last epoch.
 
-
 name
-: A string identifier for a deme, which MUST be unique
-  among all demes in a model.
+: A string identifier for a deme, which MUST be unique among all demes in a document.
   Must be a valid
   [python identifier](https://docs.python.org/3/reference/lexical_analysis.html#identifiers)
 
@@ -228,35 +234,12 @@ start_time
   be within the half-open interval ``(deme.start_time, deme.end_time]``
   for each deme in ``ancestors``.
 
-  If not specified, the deme's ``start_time`` shall be obtained
-  according to the following rules (the first matching rule shall
-  be used).
-
-   - If the deme has one ancestor, and the ancestor has an
-     ``end_time > 0``, the ancestor's ``end_time`` value shall be
-     used.
-   - If the deme has no ancestors, the ``start_time`` shall be
-     infinitely far into the past. I.e. the ``start_time`` shall
-     have the value ``infinity``.
-
-  If the ``start_time`` has not been defined after following the
-  rules above, an error shall be raised. E.g. an error shall be
-  raised for the following conditions.
-
-   - If the deme has multiple ancestors,
-     and the deme's ``start_time`` is not specified.
-   - If the deme has one ancestor with an ``end_time == 0``,
-     and the deme's ``start_time`` is not specified.
-   - If the deme has zero ancestors and a finite ``start_time``.
 
 epochs
-: The list of {ref}`epochs <sec_spec_defs_epoch>` for this deme.
+: The list of epochs for this deme. There MUST be at least one epoch.
+  Please see the section {ref}`below <sec_spec_mdm_epoch>` for details.
 
-defaults
-: The default values for omitted properties in epochs.
-
-
-(sec_spec_defs_epoch)=
+(sec_spec_mdm_epoch)=
 
 ### Epoch
 
@@ -285,7 +268,7 @@ selfing_rate
 : DEFINE ME
 
 
-(sec_spec_defs_pulse)=
+(sec_spec_mdm_pulse)=
 
 ### Pulse
 
@@ -310,7 +293,7 @@ proportion
   immediately after the ``time`` of migration.
 
 
-(sec_spec_defs_migration)=
+(sec_spec_mdm_migration)=
 
 ### Migration
 
@@ -351,6 +334,8 @@ rate
 : The rate of migration per generation.
 
 
+(sec_spec_mdm_schema)=
+
 ### Schema
 
 The schema listed here is definitive in terms of types and the
@@ -372,9 +357,9 @@ in this section and also provides a default value replacement mechanism.
 JSON documents conforming to the HDM are intended to be processed by a parser,
 which outputs the corresponding MDM document.
 
-:::{todo}
-Link to HDM schema.
-:::
+This section defines the structure of HDM documents, the rules by
+which they are transformed into MDM documents, and the error conditions
+that should be detected by parsers.
 
 (sec_spec_hdm_defaults)=
 ### Defaults
@@ -387,8 +372,46 @@ propagation mechanism to avoid this repetition.
 Describe the process of hierarchical default value replacement.
 :::
 
-(sec_spec_defs_demes_graph)=
 
+### Resolution
+
+:::{todo}
+Tidy this up - just putting text in here for the moment that's
+pulled from other parts of the document.
+:::
+
+start_time
+: The most ancient time at which the deme exists, in ``time_units``
+  before the present. Demes with no ancestors are root demes and must
+  have an infinite ``start_time``. Otherwise, the ``start_time`` must
+  correspond with the interval of existence
+  for each of the deme's ``ancestors``. I.e. the ``start_time`` must
+  be within the half-open interval ``(deme.start_time, deme.end_time]``
+  for each deme in ``ancestors``.
+
+  If not specified, the deme's ``start_time`` shall be obtained
+  according to the following rules (the first matching rule shall
+  be used).
+
+   - If the deme has one ancestor, and the ancestor has an
+     ``end_time > 0``, the ancestor's ``end_time`` value shall be
+     used.
+   - If the deme has no ancestors, the ``start_time`` shall be
+     infinitely far into the past. I.e. the ``start_time`` shall
+     have the value ``infinity``.
+
+  If the ``start_time`` has not been defined after following the
+  rules above, an error shall be raised. E.g. an error shall be
+  raised for the following conditions.
+
+   - If the deme has multiple ancestors,
+     and the deme's ``start_time`` is not specified.
+   - If the deme has one ancestor with an ``end_time == 0``,
+     and the deme's ``start_time`` is not specified.
+   - If the deme has zero ancestors and a finite ``start_time``.
+
+
+(sec_spec_hdm_schema)=
 
 ### Schema
 
