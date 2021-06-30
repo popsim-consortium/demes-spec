@@ -62,59 +62,92 @@ in the JSON Schema
 (sec_spec_popgen)=
 ## Population genetics model
 
-In this section we define the underlying population genetics assumptions
-made in Demes and the key concepts involved.
-The goal is to provide a basic shared vocabulary that
-is precise enough to make interchange of models defined in the standard
-meaningful, but to avoid being overly proscriptive so that the
-format is flexible enough to encompass a wide range of different methods.
-Issues relating to the data model and interchange and dealt with
-in later sections.
+In this section we define the underlying population genetics assumptions made
+in Demes and the key concepts involved. The goal is to provide a basic shared
+vocabulary that is precise enough to make interchange of models defined in the
+standard meaningful, but to avoid being overly proscriptive so that the format
+is flexible enough to encompass a wide range of different methods. Issues
+relating to the data model and interchange and dealt with in later sections.
 
-(sec_spec_popgen_deme)=
-
-### Deme
-
-A "deme" is collection of individuals whose dynamics can be described
-by a fixed set of parameters. As explained in the {ref}`sec_spec_terminology`
-section, we will usually the term "population" to refer to a deme
-to avoid confusion.
-
-:::{todo}
-Define the model! What are the dynamics? Include definition of selfing and
-cloning.  https://github.com/popsim-consortium/demes-spec/issues/43
-:::
+In Demes, demographic models consist of one or more interacting populations (or
+"demes", to avoid confusion with the name of the specification itself).
+Populations are defined as a collection of exchangeable individuals that exist
+for a specified period of time, following a well-defined set of rules regarding
+population sizes, mating systems, etc. Ancestor/descendant relationships
+between populations can be defined, as well as continuous or instantaneous
+migration between coexisting populations.
 
 (sec_spec_popgen_time)=
 ### Time
 
-Time is measured forwards, and in units of time-ago. Can be either
-in years or generations. Can either discrete or continuous.
+Population and event times are written as units in the past, so that time zero
+corresponds to the final generation or "now", and event times in the past are
+values greater than zero with larger values for events that occur in the more
+distant past. While a natural specification for time units is in generations,
+other time units are allowed, such as years. In the case that the time units
+are not given in generations, the generation time must also be specified so
+that times can be converted into generations. In general, as time flows from
+the past to the present, populations, epochs, and migration events should be
+specified in their order of appearance, so that their times are in descending
+order.
 
-:::{todo}
-Refine: https://github.com/popsim-consortium/demes-spec/issues/60
+(sec_spec_popgen_deme)=
+### Demes, ancestors, and descendants
+
+Models include one or more populations that have sizes greater than zero for
+the duration of their existences, and population sizes are given as the number
+of individuals. A population must exist for some duration of time greater than
+zero, so that its start time must be larger than its end time. It may have one
+or more ancestors, which are other populations that exist at the population's
+start time. If one ancestor is specified, the first generation is constructed
+by randomly sampling parents from the ancestral population to contribute to
+offspring in the newly generated population. If more than one ancestor is
+specified, the proportions of ancestry from each contributing population must
+be provided, and those proportions must sum to one. In this case, parents are
+chosen randomly from each ancestral population with probability given by those
+proportions. If no ancestors are specified, the population is assumed to have
+start time equal to infinity, as individuals are not assumed to spontaneously
+spring into existence.
+
+(sec_spec_popgen_epochs)=
+### Epochs, population sizes, and mating systems
+
+Within populations, population sizes and mating systems are specified within
+epochs. Epochs are non-overlapping intervals of time that cover the entire
+existence interval of the population. Each epoch specifies the population size
+over that interval, which can be a constant value or function defined by start
+and end sizes that must remain positive.  If an epoch has a start time of
+infinity, the population size for that epoch must be constant. Epochs can also
+specify parameters for nonrandom mating, such as selfing or cloning rates,
+which give the probability that offspring are generated from one generation to
+the next by self-fertilization or cloning of an individual. Selfing and cloning
+rates take values between zero and one, and their sum must be less than one.
+
+:::{warning}Selfing and cloning rate definitions may change.
+See related issues
+[here](https://github.com/popsim-consortium/demes-spec/issues/33) and
+[here](https://github.com/popsim-consortium/demes-spec/issues/43).
 :::
 
-(sec_spec_popgen_population_size)=
+(sec_spec_popgen_migration)=
+### Migrations
 
-### Population size
-
-:::{todo}
-Refine: https://github.com/popsim-consortium/demes-spec/issues/72
-:::
-
-(sec_spec_popgen_population_epoch)=
-### Epoch
-
-An interval of time over which the parameters describing the dynamics of a
-given {ref}`population<sec_spec_popgen_deme>` are fixed.
-
-(sec_spec_popgen_population_migration)=
-### Migration
-
-:::{todo}
-Define assumptions about migration.
-:::
+Finally, individuals in a population may have parents from a different
+population through migrations. These can be defined as continuous migration
+rates over time intervals for which populations coexist or through
+instantaneous (or pulse) migration events at a given time. Continuous migration
+rates are defined as the probability that parents in the "destination"
+population are chosen from the "source" population.  Migration rates are thus
+per generation and must be less than one. Furthermore, if more than one source
+population have continuous migration into the same destination population, the
+sum of those migration rates must also be less than one, as rates define
+probabilities. The probability that parents come from the same population is
+just one minus the sum of incoming migration rates. On the other hand, pulse
+migration events specify the instantaneous replacement of a given fraction of
+individuals in a destination population by individuals with parents from
+a source population.  The fraction must be between zero and one, and if more
+than one pulse occurs at the same time, those replacement events are applied
+sequentially in the order that they are specified in the model.
 
 (sec_spec_mdm)=
 ## Machine Data Model
