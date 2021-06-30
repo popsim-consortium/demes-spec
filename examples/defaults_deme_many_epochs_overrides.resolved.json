@@ -6,7 +6,7 @@
   "demes": [
     {
       "name": "ancestral",
-      "description": null,
+      "description": "",
       "start_time": Infinity,
       "epochs": [
         {
@@ -23,7 +23,7 @@
     },
     {
       "name": "deme0",
-      "description": null,
+      "description": "",
       "start_time": 100,
       "epochs": [
         {
@@ -68,7 +68,7 @@
     },
     {
       "name": "deme1",
-      "description": null,
+      "description": "",
       "start_time": 100,
       "epochs": [
         {
@@ -113,7 +113,7 @@
     },
     {
       "name": "deme2",
-      "description": null,
+      "description": "",
       "start_time": 100,
       "epochs": [
         {

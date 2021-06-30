@@ -4,7 +4,7 @@ type: object
 additionalProperties: false
 properties:
   description:
-    type: ["string", "null"]
+    type: "string"
   doi:
     type: array
     items:
@@ -105,7 +105,7 @@ definitions:
       name:
         $ref: '#/definitions/name'
       description:
-        type: ["string", "null"]
+        type: "string"
       ancestors:
         type: array
         items:

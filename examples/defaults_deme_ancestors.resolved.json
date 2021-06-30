@@ -6,7 +6,7 @@
   "demes": [
     {
       "name": "deme0",
-      "description": null,
+      "description": "",
       "start_time": Infinity,
       "epochs": [
         {
@@ -23,7 +23,7 @@
     },
     {
       "name": "deme1",
-      "description": null,
+      "description": "",
       "start_time": Infinity,
       "epochs": [
         {
@@ -40,7 +40,7 @@
     },
     {
       "name": "deme2",
-      "description": null,
+      "description": "",
       "start_time": 1,
       "epochs": [
         {
@@ -63,7 +63,7 @@
     },
     {
       "name": "deme3",
-      "description": null,
+      "description": "",
       "start_time": 1,
       "epochs": [
         {

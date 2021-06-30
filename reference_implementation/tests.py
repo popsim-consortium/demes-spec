@@ -227,12 +227,6 @@ class TestValidateDeme:
         with pytest.raises(TypeError):
             parser.parse(data)
 
-    def test_null_description(self):
-        data = minimal_graph()
-        data["demes"][0]["description"] = None
-        graph = parser.parse(data)
-        assert graph.description is None
-
     def test_duplicate_deme_ids(self):
         data = minimal_graph(num_demes=2)
         data["demes"][0]["name"] = data["demes"][1]["name"]

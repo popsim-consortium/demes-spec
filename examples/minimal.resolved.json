@@ -2,11 +2,11 @@
   "time_units": "generations",
   "generation_time": 1,
   "doi": [],
-  "description": null,
+  "description": "",
   "demes": [
     {
       "name": "a",
-      "description": null,
+      "description": "",
       "start_time": Infinity,
       "epochs": [
         {
