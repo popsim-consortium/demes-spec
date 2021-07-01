@@ -87,9 +87,6 @@ NO_DEFAULT = object()
 def pop_item(data, name, *, required_type, default=NO_DEFAULT, validator=None):
     if name in data:
         value = data.pop(name)
-        if value is None and default is None:
-            # This is treated the same as not specifying the value
-            return value
         validate_item(name, value, required_type, validator)
     else:
         if default is NO_DEFAULT:
@@ -147,6 +144,7 @@ class Interval:
     """
     A half-open time interval (start_time, end_time].
     """
+
     start_time: float
     end_time: float
 
@@ -165,7 +163,7 @@ class Interval:
     def is_subinterval(self, other):
         """True if self is completely contained within other, False otherwise."""
         assert isinstance(other, self.__class__)
-        return (self.start_time <= other.start_time and self.end_time >= other.end_time)
+        return self.start_time <= other.start_time and self.end_time >= other.end_time
 
     def __contains__(self, time):
         return self.start_time > time >= self.end_time
@@ -206,7 +204,7 @@ class Epoch:
 class Deme:
     name: str
     start_time: Union[None, float]
-    description: Union[str, None]
+    description: str
     ancestors: List[Deme]
     proportions: Union[List[float], None]
     epochs: List[Epoch] = dataclasses.field(default_factory=list)
@@ -411,7 +409,7 @@ class Graph:
     time_units: str
     generation_time: Union[float, None]
     doi: List[str]
-    description: Union[str, None]
+    description: str
     demes: Dict[str, Deme] = dataclasses.field(default_factory=dict)
     migrations: List[Migration] = dataclasses.field(default_factory=list)
     pulses: List[Pulse] = dataclasses.field(default_factory=list)
@@ -419,7 +417,7 @@ class Graph:
     def add_deme(
         self,
         name: str,
-        description: Union[str, None],
+        description: str,
         start_time: Union[float, None],
         ancestors: List[str],
         proportions: Union[List[float], None],
@@ -605,7 +603,7 @@ def parse(data: dict) -> Graph:
     check_empty(defaults)
 
     graph = Graph(
-        description=pop_string(data, "description", None),
+        description=pop_string(data, "description", ""),
         time_units=pop_string(data, "time_units", None),
         doi=pop_list(data, "doi", [], str, is_nonempty),
         generation_time=pop_number(
@@ -636,7 +634,7 @@ def parse(data: dict) -> Graph:
         insert_defaults(deme_data, deme_defaults)
         deme = graph.add_deme(
             name=pop_string(deme_data, "name", validator=is_identifier),
-            description=pop_string(deme_data, "description", None),
+            description=pop_string(deme_data, "description", ""),
             start_time=pop_number(deme_data, "start_time", None, is_positive),
             ancestors=pop_list(deme_data, "ancestors", [], str, is_identifier),
             proportions=pop_list(

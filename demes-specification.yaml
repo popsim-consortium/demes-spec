@@ -4,7 +4,8 @@ type: object
 additionalProperties: false
 properties:
   description:
-    type: ["string", "null"]
+    type: "string"
+    default: ""
   doi:
     type: array
     items:
@@ -16,10 +17,9 @@ properties:
     # TODO: shouldn't this be an enum?
 
   generation_time:
-    type: ["number", "null"]
+    type: "number"
     exclusiveMinimum: 0
     exclusiveMaximum: .inf
-    default: null
 
   defaults:
     type: object
@@ -124,8 +124,8 @@ definitions:
       name:
         $ref: '#/definitions/name'
       description:
-        type: ["string", "null"]
-        default: null
+        type: "string"
+        default: ""
       ancestors:
         type: array
         items:

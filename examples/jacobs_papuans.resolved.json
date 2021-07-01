@@ -9,7 +9,7 @@
   "demes": [
     {
       "name": "YRI",
-      "description": null,
+      "description": "",
       "start_time": Infinity,
       "epochs": [
         {
@@ -42,7 +42,7 @@
     },
     {
       "name": "DenA",
-      "description": null,
+      "description": "",
       "start_time": 20225.0,
       "epochs": [
         {
@@ -87,7 +87,7 @@
     },
     {
       "name": "NeaA",
-      "description": null,
+      "description": "",
       "start_time": 15090.0,
       "epochs": [
         {
@@ -116,7 +116,7 @@
     },
     {
       "name": "Den2",
-      "description": null,
+      "description": "",
       "start_time": 12500.0,
       "epochs": [
         {
@@ -137,7 +137,7 @@
     },
     {
       "name": "Den1",
-      "description": null,
+      "description": "",
       "start_time": 9750.0,
       "epochs": [
         {
@@ -158,7 +158,7 @@
     },
     {
       "name": "Nea1",
-      "description": null,
+      "description": "",
       "start_time": 3375.0,
       "epochs": [
         {
@@ -179,7 +179,7 @@
     },
     {
       "name": "Ghost",
-      "description": null,
+      "description": "",
       "start_time": 2218.0,
       "epochs": [
         {
@@ -208,7 +208,7 @@
     },
     {
       "name": "Papuan",
-      "description": null,
+      "description": "",
       "start_time": 1784.0,
       "epochs": [
         {
@@ -237,7 +237,7 @@
     },
     {
       "name": "CHB",
-      "description": null,
+      "description": "",
       "start_time": 1758.0,
       "epochs": [
         {
@@ -274,7 +274,7 @@
     },
     {
       "name": "CEU",
-      "description": null,
+      "description": "",
       "start_time": 1293.0,
       "epochs": [
         {
