@@ -15,7 +15,7 @@ properties:
     # TODO: shouldn't this be an enum?
 
   generation_time:
-    type: ["number", "null"]
+    type: "number"
     exclusiveMinimum: 0
 
   demes:
