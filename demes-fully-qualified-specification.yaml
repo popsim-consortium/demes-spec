@@ -17,7 +17,6 @@ properties:
   generation_time:
     type: ["number", "null"]
     exclusiveMinimum: 0
-    exclusiveMaximum: .inf
 
   demes:
     type: array
@@ -61,17 +60,16 @@ definitions:
   size:
     type: number
     exclusiveMinimum: 0
-    exclusiveMaximum: .inf
 
   start_time:
-    type: number
-    exclusiveMinimum: 0
-    maximum: .inf
+    oneOf:
+      - type: number
+        exclusiveMinimum: 0
+      - const: "Infinity"
 
   end_time:
     type: number
     minimum: 0
-    exclusiveMaximum: .inf
 
   epoch:
     type: object
@@ -140,7 +138,6 @@ definitions:
       time:
         type: number
         exclusiveMinimum: 0
-        exclusiveMaximum: .inf
       proportion:
         $ref: '#/definitions/proportion'
     required:
