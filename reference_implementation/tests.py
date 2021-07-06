@@ -1084,9 +1084,7 @@ def test_examples(yaml_path):
     assert graph_copy == graph
 
 
-
 class TestValidCases:
-
     def parse_file(self, yaml_path):
         yaml = YAML(typ="safe")
         with open(yaml_path) as source:
