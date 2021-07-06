@@ -504,6 +504,7 @@ class Graph:
         d["demes"] = [deme.asdict() for deme in self.demes.values()]
         d["migrations"] = [migration.asdict() for migration in self.migrations]
         d["pulses"] = [pulse.asdict() for pulse in self.pulses]
+        stringify_infinities(d)
         return d
 
     def validate(self):
@@ -580,6 +581,64 @@ class Graph:
             migration.resolve()
 
 
+INFINITY_STR = "Infinity"
+
+
+def unstringify_infinities(data: dict) -> None:
+    """
+    Modifies the data dict so the string "Infinity" is converted to float.
+    Note that none of the fields have been checked for validity at this point,
+    so there could be non-dict or non-list fields lurking anywhere (which we
+    will catch later).
+    """
+    if not isinstance(data, dict):
+        return
+
+    defaults = data.get("defaults")
+    if defaults is not None and isinstance(defaults, dict):
+        deme_defaults = defaults.get("deme")
+        if deme_defaults is not None and isinstance(deme_defaults, dict):
+            start_time = deme_defaults.get("start_time")
+            if start_time == INFINITY_STR:
+                deme_defaults["start_time"] = float(start_time)
+        migration_defaults = defaults.get("migration")
+        if migration_defaults is not None and isinstance(migration_defaults, dict):
+            start_time = migration_defaults.get("start_time")
+            if start_time == INFINITY_STR:
+                migration_defaults["start_time"] = float(start_time)
+
+    demes = data.get("demes")
+    if demes is not None and isinstance(demes, list):
+        for deme in demes:
+            if isinstance(deme, dict):
+                start_time = deme.get("start_time")
+                if start_time == INFINITY_STR:
+                    deme["start_time"] = float(start_time)
+
+    migrations = data.get("migrations")
+    if migrations is not None and isinstance(migrations, list):
+        for migration in migrations:
+            if isinstance(migration, dict):
+                start_time = migration.get("start_time")
+                if start_time == INFINITY_STR:
+                    migration["start_time"] = float(start_time)
+
+
+def stringify_infinities(data: dict) -> None:
+    """
+    Modifies the data dict so infinite values are set to the string "Infinity".
+    This is needed for JSON output, because the JSON spec explicitly does not
+    provide an encoding for infinity.
+    """
+    assert "defaults" not in data
+    for deme in data["demes"]:
+        if "start_time" in deme and math.isinf(deme["start_time"]):
+            deme["start_time"] = INFINITY_STR
+    for migration in data.get("migrations", []):
+        if "start_time" in migration and math.isinf(migration["start_time"]):
+            migration["start_time"] = INFINITY_STR
+
+
 def parse(data: dict) -> Graph:
     # Parsing is done by popping items out of the input data dictionary and
     # creating the appropriate Python objects. We ensure that extra items
@@ -593,6 +652,7 @@ def parse(data: dict) -> Graph:
     # the fully-qualified graph to ensure that relationships between the
     # entities have been specified correctly.
     data = copy.deepcopy(data)
+    unstringify_infinities(data)
 
     defaults = pop_object(data, "defaults", {})
     deme_defaults = pop_object(defaults, "deme", {})

@@ -9,7 +9,7 @@
     {
       "name": "generic",
       "description": "",
-      "start_time": Infinity,
+      "start_time": "Infinity",
       "epochs": [
         {
           "end_time": 34133.31,

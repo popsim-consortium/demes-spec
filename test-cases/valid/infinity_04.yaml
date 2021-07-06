@@ -1,0 +1,7 @@
+time_units: generations
+defaults:
+  deme: {start_time: "Infinity"}
+demes:
+  - name: A
+    epochs:
+      - start_size: 100

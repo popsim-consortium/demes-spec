@@ -59,6 +59,20 @@ in the JSON Schema
 [core specification](https://json-schema.org/draft/2020-12/json-schema-core.html).
 
 
+(sec_spec_infinity)=
+### Infinity
+
+JSON does not define an encoding for infinite-valued numbers.
+However, infinite values are used in Demes for start times.
+When **writing** a Demes model to a format that does not permit infinity,
+such as JSON, the string "Infinity" must be used to encode infinity.
+When writing to formats that do support infinity, such as YAML, the native
+encoding for infinity should be used instead (`.inf` in YAML).
+When **reading** a Demes model, the string "Infinity" must be decoded to mean
+an infinite-valued number. When reading from formats that do support infinity,
+the format's native encoding for infinite-valued numbers must also be
+supported.
+
 (sec_spec_popgen)=
 ## Population genetics model
 

@@ -10,7 +10,7 @@
     {
       "name": "YRI",
       "description": "",
-      "start_time": Infinity,
+      "start_time": "Infinity",
       "epochs": [
         {
           "end_time": 20225.0,

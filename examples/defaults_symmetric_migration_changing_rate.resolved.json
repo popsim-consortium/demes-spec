@@ -7,7 +7,7 @@
     {
       "name": "deme0",
       "description": "",
-      "start_time": Infinity,
+      "start_time": "Infinity",
       "epochs": [
         {
           "end_time": 0,
@@ -24,7 +24,7 @@
     {
       "name": "deme1",
       "description": "",
-      "start_time": Infinity,
+      "start_time": "Infinity",
       "epochs": [
         {
           "end_time": 0,

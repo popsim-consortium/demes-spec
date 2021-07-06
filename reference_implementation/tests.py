@@ -514,7 +514,7 @@ class TestMigration:
                 "source": "deme0",
                 "dest": "deme1",
                 "rate": 0,
-                "start_time": math.inf,
+                "start_time": "Infinity",
                 "end_time": 0,
             }
         ]
@@ -553,14 +553,14 @@ class TestMigration:
             "source": "deme0",
             "dest": "deme1",
             "rate": 0.5,
-            "start_time": math.inf,
+            "start_time": "Infinity",
             "end_time": 50,
         } in parsed["migrations"]
         assert {
             "source": "deme1",
             "dest": "deme0",
             "rate": 0.5,
-            "start_time": math.inf,
+            "start_time": "Infinity",
             "end_time": 50,
         } in parsed["migrations"]
         assert {
