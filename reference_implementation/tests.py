@@ -306,6 +306,12 @@ class TestValidateDeme:
         with pytest.raises(ValueError):
             parser.parse(data)
 
+    def test_start_time_type(self):
+        data = single_ancestor_graph()
+        data["demes"][1]["start_time"] = "1000"
+        with pytest.raises(TypeError):
+            parser.parse(data)
+
 
 class TestValidateEpoch:
     def test_end_time(self):
@@ -403,7 +409,7 @@ class TestPulse:
         data["pulses"] = [
             {"source": "deme0", "dest": "deme1", "proportion": 0.5, "time": 1}
         ]
-        parsed = parser.parse(data).asdict()
+        parsed = parser.parse(data).as_json_dict()
         assert data["pulses"] == parsed["pulses"]
 
     def test_all_missing(self):
@@ -502,13 +508,13 @@ class TestMigration:
                 "end_time": 1,
             }
         ]
-        parsed = parser.parse(data).asdict()
+        parsed = parser.parse(data).as_json_dict()
         assert data["migrations"] == parsed["migrations"]
 
     def test_simple_asymmetric_default_times(self):
         data = minimal_graph(num_demes=2)
         data["migrations"] = [{"source": "deme0", "dest": "deme1", "rate": 0}]
-        parsed = parser.parse(data).asdict()
+        parsed = parser.parse(data).as_json_dict()
         assert parsed["migrations"] == [
             {
                 "source": "deme0",
@@ -524,7 +530,7 @@ class TestMigration:
         data["migrations"] = [
             {"demes": ["deme0", "deme1"], "rate": 0.5, "start_time": 2, "end_time": 1}
         ]
-        parsed = parser.parse(data).asdict()
+        parsed = parser.parse(data).as_json_dict()
         assert len(parsed["migrations"]) == 2
         assert {
             "source": "deme0",
@@ -547,7 +553,7 @@ class TestMigration:
         data["demes"][2]["ancestors"] = ["deme1"]
         data["demes"][2]["start_time"] = 100
         data["migrations"] = [{"demes": ["deme0", "deme1", "deme2"], "rate": 0.5}]
-        parsed = parser.parse(data).asdict()
+        parsed = parser.parse(data).as_json_dict()
         assert len(parsed["migrations"]) == 6
         assert {
             "source": "deme0",
@@ -666,7 +672,7 @@ class TestMigration:
             {"demes": ["deme0", "deme1"], "rate": 0.5, "start_time": -1, "end_time": 1}
         ]
         with pytest.raises(ValueError):
-            parser.parse(data).asdict()
+            parser.parse(data).as_json_dict()
 
     def test_bad_end_time_value(self):
         data = minimal_graph(num_demes=2)
@@ -674,7 +680,7 @@ class TestMigration:
             {"demes": ["deme0", "deme1"], "rate": 0.5, "start_time": 2, "end_time": -1}
         ]
         with pytest.raises(ValueError):
-            parser.parse(data).asdict()
+            parser.parse(data).as_json_dict()
 
     def test_bad_end_time_interval(self):
         data = minimal_graph(num_demes=2)
@@ -682,7 +688,7 @@ class TestMigration:
             {"demes": ["deme0", "deme1"], "rate": 0.5, "start_time": 1, "end_time": 100}
         ]
         with pytest.raises(ValueError, match="start_time must be > end_time"):
-            parser.parse(data).asdict()
+            parser.parse(data).as_json_dict()
 
     def test_bad_time_asymmetric(self):
         data = minimal_graph(num_demes=2)
@@ -753,12 +759,12 @@ class TestResolveEpochSizes:
         with pytest.raises(ValueError):
             parser.parse(data)
         data["demes"][0]["epochs"][0] = {"start_size": 100}
-        resolved = parser.parse(data).asdict()
+        resolved = parser.parse(data).as_json_dict()
         assert resolved["demes"][0]["epochs"][0]["start_size"] == 100
         assert resolved["demes"][0]["epochs"][0]["end_size"] == 100
 
         data["demes"][0]["epochs"][0] = {"end_size": 200}
-        resolved = parser.parse(data).asdict()
+        resolved = parser.parse(data).as_json_dict()
         assert resolved["demes"][0]["epochs"][0]["start_size"] == 200
         assert resolved["demes"][0]["epochs"][0]["end_size"] == 200
 
@@ -769,7 +775,7 @@ class TestResolveEpochSizes:
             {"end_size": 2, "end_time": 50},
         ]
 
-        resolved = parser.parse(data).asdict()
+        resolved = parser.parse(data).as_json_dict()
         assert resolved["demes"][0]["epochs"][0]["start_size"] == 1
         assert resolved["demes"][0]["epochs"][0]["end_size"] == 1
         assert resolved["demes"][0]["epochs"][1]["start_size"] == 1
@@ -782,7 +788,7 @@ class TestResolveEpochSizes:
             {"end_time": 50},
             {},
         ]
-        resolved = parser.parse(data).asdict()
+        resolved = parser.parse(data).as_json_dict()
         for j in range(3):
             assert resolved["demes"][0]["epochs"][j]["start_size"] == 1
             assert resolved["demes"][0]["epochs"][j]["end_size"] == 1
@@ -816,7 +822,7 @@ class TestDefaults:
             {"start_time": 1, "end_time": 0, "rate": 0.5},
         ]
         graph = parser.parse(data)
-        parsed = graph.asdict()
+        parsed = graph.as_json_dict()
         assert len(parsed["migrations"]) == 4
         assert {
             "source": "deme0",
@@ -891,7 +897,7 @@ class TestDefaults:
         data["demes"][0]["ancestors"] = []
         data["demes"][1]["description"] = "not default"
         data["demes"][1]["start_time"] = 2
-        parsed = parser.parse(data).asdict()
+        parsed = parser.parse(data).as_json_dict()
         assert parsed["demes"][1]["description"] == "not default"
         assert parsed["demes"][1]["start_time"] == 2
         assert parsed["demes"][2]["description"] == "default"
@@ -910,7 +916,7 @@ class TestDefaults:
             data["demes"][j]["start_time"] = math.inf
             data["demes"][j]["ancestors"] = []
             data["demes"][j]["proportions"] = []
-        parsed = parser.parse(data).asdict()
+        parsed = parser.parse(data).as_json_dict()
         assert len(parsed["demes"]) == 4
         assert parsed["demes"][0]["ancestors"] == []
         assert parsed["demes"][1]["ancestors"] == []
@@ -1071,7 +1077,7 @@ def test_examples(yaml_path):
     with open(yaml_path) as source:
         data = yaml.load(source)
     graph = parser.parse(data)
-    graph_data = graph.asdict()
+    graph_data = graph.as_json_dict()
 
     yaml_path = pathlib.Path(yaml_path)
     json_path = yaml_path.parent / yaml_path.with_suffix(".resolved.json")
@@ -1089,7 +1095,7 @@ class TestValidCases:
         yaml = YAML(typ="safe")
         with open(yaml_path) as source:
             data = yaml.load(source)
-        return parser.parse(data).asdict()
+        return parser.parse(data).as_json_dict()
 
     @pytest.mark.parametrize(
         "yaml_path", map(str, pathlib.Path("../test-cases/valid").glob("*.yaml"))
@@ -1097,7 +1103,7 @@ class TestValidCases:
     def test_resolve_equal(self, yaml_path):
         resolved = self.parse_file(yaml_path)
         # Reparsing the fully resolved model should give identical output.
-        assert resolved == parser.parse(resolved).asdict()
+        assert resolved == parser.parse(resolved).as_json_dict()
 
     @pytest.mark.parametrize(
         "yaml_path", map(str, pathlib.Path("../test-cases/valid").glob("*.yaml"))

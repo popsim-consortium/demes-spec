@@ -32,12 +32,24 @@ from typing import Dict, List, Union
 # Numerical wiggle room.
 EPSILON = 1e-6
 
+# JSON does not provide a way to encode IEEE infinity values, which we
+# require to describe start_time values. To work around this we use the
+# string "Infinity" to represent IEEE positive infinity.
+JSON_INFINITY_STR = "Infinity"
+
+
+def encode_inf(value):
+    if math.isinf(value):
+        return JSON_INFINITY_STR
+    return value
+
+
 # Validator functions. These are used as arguments to the pop_x functions and
 # check properties of the values.
 
 
-def is_positive(value):
-    return value > 0
+def is_positive_or_json_infinity(value):
+    return value == JSON_INFINITY_STR or value > 0
 
 
 def is_positive_and_finite(value):
@@ -111,10 +123,25 @@ def pop_string(data, name, default=NO_DEFAULT, validator=None):
     return pop_item(data, name, default=default, required_type=str, validator=validator)
 
 
-def pop_number(data, name, default=NO_DEFAULT, validator=None):
-    return pop_item(
-        data, name, default=default, required_type=numbers.Number, validator=validator
+def pop_number(data, name, default=NO_DEFAULT, validator=None, allow_inf=False):
+    # If infinite values are allowed for this number, the string "Infinity"
+    # is also accepted, and so str is an accepted type. There is a small loophole
+    # here in which string numbers like "1000" will be accepted by the type
+    # checking machinery, but the is_positive_or_json_infinity validator
+    # will catch this and raise a TypeError when it tries to compare with 0.
+    if allow_inf:
+        assert validator is is_positive_or_json_infinity
+    required_type = (numbers.Number, str) if allow_inf else numbers.Number
+    value = pop_item(
+        data,
+        name,
+        default=default,
+        required_type=required_type,
+        validator=validator,
     )
+    if value == JSON_INFINITY_STR:
+        return math.inf
+    return value
 
 
 def check_empty(data):
@@ -178,7 +205,7 @@ class Epoch:
     selfing_rate: float
     cloning_rate: float
 
-    def asdict(self) -> dict:
+    def as_json_dict(self) -> dict:
         return dataclasses.asdict(self)
 
     def resolve(self):
@@ -237,14 +264,12 @@ class Deme:
     def time_interval(self):
         return Interval(self.start_time, self.end_time)
 
-    def asdict(self) -> dict:
-        # It's easier to make our own asdict here to avoid recursion issues
-        # with dataclasses.asdict through the ancestors list
+    def as_json_dict(self) -> dict:
         return {
             "name": self.name,
             "description": self.description,
-            "start_time": self.start_time,
-            "epochs": [epoch.asdict() for epoch in self.epochs],
+            "start_time": encode_inf(self.start_time),
+            "epochs": [epoch.as_json_dict() for epoch in self.epochs],
             "proportions": self.proportions,
             "ancestors": [deme.name for deme in self.ancestors],
         }
@@ -344,7 +369,7 @@ class Pulse:
     time: float
     proportion: float
 
-    def asdict(self) -> dict:
+    def as_json_dict(self) -> dict:
         d = dataclasses.asdict(self)
         d["source"] = self.source.name
         d["dest"] = self.dest.name
@@ -379,8 +404,9 @@ class Migration:
     def time_interval(self):
         return Interval(self.start_time, self.end_time)
 
-    def asdict(self) -> dict:
+    def as_json_dict(self) -> dict:
         d = dataclasses.asdict(self)
+        d["start_time"] = encode_inf(self.start_time)
         d["source"] = self.source.name
         d["dest"] = self.dest.name
         return d
@@ -496,15 +522,14 @@ class Graph:
         return pulse
 
     def __str__(self):
-        data = self.asdict()
+        data = self.as_json_dict()
         return pprint.pformat(data, indent=2)
 
-    def asdict(self):
+    def as_json_dict(self):
         d = dataclasses.asdict(self)
-        d["demes"] = [deme.asdict() for deme in self.demes.values()]
-        d["migrations"] = [migration.asdict() for migration in self.migrations]
-        d["pulses"] = [pulse.asdict() for pulse in self.pulses]
-        stringify_infinities(d)
+        d["demes"] = [deme.as_json_dict() for deme in self.demes.values()]
+        d["migrations"] = [migration.as_json_dict() for migration in self.migrations]
+        d["pulses"] = [pulse.as_json_dict() for pulse in self.pulses]
         return d
 
     def validate(self):
@@ -581,64 +606,6 @@ class Graph:
             migration.resolve()
 
 
-INFINITY_STR = "Infinity"
-
-
-def unstringify_infinities(data: dict) -> None:
-    """
-    Modifies the data dict so the string "Infinity" is converted to float.
-    Note that none of the fields have been checked for validity at this point,
-    so there could be non-dict or non-list fields lurking anywhere (which we
-    will catch later).
-    """
-    if not isinstance(data, dict):
-        return
-
-    defaults = data.get("defaults")
-    if defaults is not None and isinstance(defaults, dict):
-        deme_defaults = defaults.get("deme")
-        if deme_defaults is not None and isinstance(deme_defaults, dict):
-            start_time = deme_defaults.get("start_time")
-            if start_time == INFINITY_STR:
-                deme_defaults["start_time"] = float(start_time)
-        migration_defaults = defaults.get("migration")
-        if migration_defaults is not None and isinstance(migration_defaults, dict):
-            start_time = migration_defaults.get("start_time")
-            if start_time == INFINITY_STR:
-                migration_defaults["start_time"] = float(start_time)
-
-    demes = data.get("demes")
-    if demes is not None and isinstance(demes, list):
-        for deme in demes:
-            if isinstance(deme, dict):
-                start_time = deme.get("start_time")
-                if start_time == INFINITY_STR:
-                    deme["start_time"] = float(start_time)
-
-    migrations = data.get("migrations")
-    if migrations is not None and isinstance(migrations, list):
-        for migration in migrations:
-            if isinstance(migration, dict):
-                start_time = migration.get("start_time")
-                if start_time == INFINITY_STR:
-                    migration["start_time"] = float(start_time)
-
-
-def stringify_infinities(data: dict) -> None:
-    """
-    Modifies the data dict so infinite values are set to the string "Infinity".
-    This is needed for JSON output, because the JSON spec explicitly does not
-    provide an encoding for infinity.
-    """
-    assert "defaults" not in data
-    for deme in data["demes"]:
-        if "start_time" in deme and math.isinf(deme["start_time"]):
-            deme["start_time"] = INFINITY_STR
-    for migration in data.get("migrations", []):
-        if "start_time" in migration and math.isinf(migration["start_time"]):
-            migration["start_time"] = INFINITY_STR
-
-
 def parse(data: dict) -> Graph:
     # Parsing is done by popping items out of the input data dictionary and
     # creating the appropriate Python objects. We ensure that extra items
@@ -652,7 +619,6 @@ def parse(data: dict) -> Graph:
     # the fully-qualified graph to ensure that relationships between the
     # entities have been specified correctly.
     data = copy.deepcopy(data)
-    unstringify_infinities(data)
 
     defaults = pop_object(data, "defaults", {})
     deme_defaults = pop_object(defaults, "deme", {})
@@ -674,7 +640,7 @@ def parse(data: dict) -> Graph:
         deme_defaults,
         dict(
             description=(str, None),
-            start_time=(numbers.Number, is_positive),
+            start_time=((str, numbers.Number), is_positive_or_json_infinity),
             ancestors=(list, is_list_of_identifiers),
             proportions=(list, is_list_of_fractions),
         ),
@@ -695,7 +661,13 @@ def parse(data: dict) -> Graph:
         deme = graph.add_deme(
             name=pop_string(deme_data, "name", validator=is_identifier),
             description=pop_string(deme_data, "description", ""),
-            start_time=pop_number(deme_data, "start_time", None, is_positive),
+            start_time=pop_number(
+                deme_data,
+                "start_time",
+                None,
+                is_positive_or_json_infinity,
+                allow_inf=True,
+            ),
             ancestors=pop_list(deme_data, "ancestors", [], str, is_identifier),
             proportions=pop_list(
                 deme_data, "proportions", None, numbers.Number, is_fraction
@@ -740,7 +712,7 @@ def parse(data: dict) -> Graph:
         migration_defaults,
         dict(
             rate=(numbers.Number, is_fraction),
-            start_time=(numbers.Number, is_positive),
+            start_time=((numbers.Number, str), is_positive_or_json_infinity),
             end_time=(numbers.Number, is_non_negative_and_finite),
             source=(str, is_identifier),
             dest=(str, is_identifier),
@@ -751,7 +723,13 @@ def parse(data: dict) -> Graph:
         insert_defaults(migration_data, migration_defaults)
         graph.add_migration(
             rate=pop_number(migration_data, "rate", validator=is_fraction),
-            start_time=pop_number(migration_data, "start_time", None, is_positive),
+            start_time=pop_number(
+                migration_data,
+                "start_time",
+                None,
+                is_positive_or_json_infinity,
+                allow_inf=True,
+            ),
             end_time=pop_number(
                 migration_data, "end_time", None, is_non_negative_and_finite
             ),
