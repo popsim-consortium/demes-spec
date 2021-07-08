@@ -7,7 +7,7 @@
     {
       "name": "our_population",
       "description": "Bottleneck population using epochs",
-      "start_time": Infinity,
+      "start_time": "Infinity",
       "epochs": [
         {
           "end_time": 500,

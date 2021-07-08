@@ -7,7 +7,7 @@
     {
       "name": "deme1",
       "description": "",
-      "start_time": Infinity,
+      "start_time": "Infinity",
       "epochs": [
         {
           "end_time": 0,
@@ -24,7 +24,7 @@
     {
       "name": "deme2",
       "description": "",
-      "start_time": Infinity,
+      "start_time": "Infinity",
       "epochs": [
         {
           "end_time": 0,
@@ -41,7 +41,7 @@
     {
       "name": "deme3",
       "description": "",
-      "start_time": Infinity,
+      "start_time": "Infinity",
       "epochs": [
         {
           "end_time": 0,
@@ -59,28 +59,28 @@
   "migrations": [
     {
       "rate": 0.1,
-      "start_time": Infinity,
+      "start_time": "Infinity",
       "end_time": 0,
       "source": "deme1",
       "dest": "deme2"
     },
     {
       "rate": 0.1,
-      "start_time": Infinity,
+      "start_time": "Infinity",
       "end_time": 0,
       "source": "deme2",
       "dest": "deme1"
     },
     {
       "rate": 0.1,
-      "start_time": Infinity,
+      "start_time": "Infinity",
       "end_time": 0,
       "source": "deme2",
       "dest": "deme3"
     },
     {
       "rate": 0.1,
-      "start_time": Infinity,
+      "start_time": "Infinity",
       "end_time": 0,
       "source": "deme3",
       "dest": "deme2"

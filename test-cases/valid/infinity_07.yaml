@@ -1,0 +1,14 @@
+time_units: generations
+defaults:
+  migration: {start_time: .inf}
+demes:
+  - name: A
+    epochs:
+      - start_size: 100
+  - name: B
+    epochs:
+      - start_size: 100
+migrations:
+  - source: A
+    dest: B
+    rate: 1e-4

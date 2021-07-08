@@ -7,7 +7,7 @@
     {
       "name": "ancestral",
       "description": "Main population",
-      "start_time": Infinity,
+      "start_time": "Infinity",
       "epochs": [
         {
           "end_time": 0,
