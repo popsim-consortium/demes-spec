@@ -134,7 +134,7 @@ and end sizes that must remain positive.  If an epoch has a start time of
 infinity, the population size for that epoch must be constant. Epochs can also
 specify parameters for nonrandom mating, such as selfing or cloning rates,
 which give the probability that offspring are generated from one generation to
-the next by self-fertilization or cloning of an individual. Selfing and cloning
+the next by self-fertilisation or cloning of an individual. Selfing and cloning
 rates take values between zero and one, and their sum must be less than one.
 
 :::{warning}Selfing and cloning rate definitions may change.
