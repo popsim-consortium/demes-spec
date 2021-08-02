@@ -67,7 +67,7 @@ Don't worry if you've never heard of YAML before, as the details of YAML
 aren't particularly important.
 The example below gives an indication of what a Demes file looks like,
 but we'll explain each component gradually using additional examples.
-For now, select the "Drawing" tab to see a diagramatic overview
+For now, select the "Drawing" tab to see a diagrammatic overview
 of the demographic model.
 
 ```{code-cell}
@@ -583,7 +583,7 @@ glue("example_18", ax.figure, display=False)
 
 {{ example.replace("LABEL", "18") }}
 
-The epoch defaults can be overriden by providing an explicit value inside
+The epoch defaults can be overridden by providing an explicit value inside
 the desired epoch.
 
 ```{code-cell}

@@ -91,7 +91,7 @@ def validate_item(name, value, required_type, validator=None):
         raise ValueError(f"Attribute '{name}' is not {validator_name}")
 
 
-# We need to use this trick because None is a meaninful input value for these
+# We need to use this trick because None is a meaningful input value for these
 # pop_x functions.
 NO_DEFAULT = object()
 
