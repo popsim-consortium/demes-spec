@@ -11,7 +11,7 @@ population genetics model and its assumptions, along with
 the data model used for interchange and the required behaviour
 of implementations.
 
-:::{admonition}Who is this specification for?
+:::{admonition} Who is this specification for?
 This specification is intended to provide a detailed and definitive resource
 for the following groups:
 
@@ -137,7 +137,7 @@ which give the probability that offspring are generated from one generation to
 the next by self-fertilisation or cloning of an individual. Selfing and cloning
 rates take values between zero and one, and their sum must be less than one.
 
-:::{warning}Selfing and cloning rate definitions may change.
+:::{warning} Selfing and cloning rate definitions may change.
 See related issues
 [here](https://github.com/popsim-consortium/demes-spec/issues/33) and
 [here](https://github.com/popsim-consortium/demes-spec/issues/43).
@@ -319,11 +319,11 @@ selfing_rate
 
 ### Pulse
 
-An instantaneous pulse of migration at ``time``, from the ``source`` deme
-into the ``dest`` deme.
+An instantaneous pulse of migration at ``time``, from a list of source demes
+(``sources``) into the ``dest`` deme.
 
-source
-: The deme ID of the migration source.
+sources
+: The list of deme IDs of the migration sources.
 
 dest
 : The deme ID of the migration destination.
@@ -335,9 +335,12 @@ time
   ``(deme.start_time, deme.end_time]`` interval of the ``source``
   deme and the ``dest`` deme.
 
-proportion
-: The proportion of the ``source`` deme's ancestry in the ``dest`` deme
-  immediately after the ``time`` of migration.
+proportions
+: The proportions of ancestry in the ``dest`` deme derived from the demes
+  in ``sources`` immediately after the ``time`` of migration.
+  The ``proportions`` must be ordered to correspond with the order of
+  ``sources``. The proportions must sum to less than or equal to 1
+  (within a reasonable tolerance, e.g. 1e-9).
 
 
 (sec_spec_mdm_migration)=

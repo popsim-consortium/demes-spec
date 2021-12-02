@@ -6,5 +6,5 @@ demes:
 - {name: b}
 - {name: c}
 pulses:
-- {source: b, dest: a, proportion: 0.6, time: 100}
-- {source: c, dest: a, proportion: 0.6, time: 100}
+- {sources: [b], dest: a, proportions: [0.6], time: 100}
+- {sources: [c], dest: a, proportions: [0.6], time: 100}

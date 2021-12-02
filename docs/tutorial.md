@@ -120,7 +120,7 @@ In YAML, infinity is spelled `.inf`, not `inf`.
 ```
 
 ```{note}
-Each Demes model must define at least one deme with an infinte `start_time`.
+Each Demes model must define at least one deme with an infinite `start_time`.
 ```
 
 ### Default values
@@ -498,8 +498,10 @@ glue("example_16", ax.figure, display=False)
 
 To model migration that is limited to a very short period of time,
 we can define one or more `pulses`.
-The `proportion` property of a pulse defines the proportion of the `dest`
-deme that is made up of ancestry from the `source` deme at the instant after
+A pulse has a `proportions` list property and a `sources` list property
+(analogous to the `proportions` and `ancestors` properties of a `deme`).
+Each pulse proportion defines the proportion of the `dest` deme that is
+made up of ancestry from the corresponding source deme at the instant after
 the pulse's `time`.
 
 ```{note}
@@ -534,7 +536,7 @@ the advantages of one approach over the other?
 ```{admonition} Question
 :class: question
 How should one interpret multiple pulses that occur at the same `time`?
-Does it matter whether the `source` and `dest` demes are the same in
+Does it matter whether the `sources` and `dest` demes are the same in
 each pulse?
 ```
 
@@ -546,14 +548,14 @@ Consider the following two pulses into deme `A` at time 100.
 
 ```yaml
 pulses:
-- source: B
+- sources: [B]
   dest: A
   time: 100
-  proportion: 0.1
-- source: C
+  proportions: [0.1]
+- sources: [C]
   dest: A
   time: 100
-  proportion: 0.2
+  proportions: [0.2]
 ```
 
 The second pulse replaces 20% of `A`'s ancestry, including 20% of the ancestry
@@ -561,8 +563,20 @@ that was inherited from `B` in the first pulse.
 So immediately after time 100, `A` has 20% ancestry from `C` but only 8%
 ancestry from `B`.
 As this may be confusing, we recommend avoiding the use of multiple pulses
-in this way, and instead implement the model using multiple ancestors with
-the desired final ancestry proportions.
+in this way, and instead implement the model using multiple `sources` with
+the desired final ancestry `proportions`.
+
+```yaml
+pulses:
+- sources: [B, C]
+  dest: A
+  time: 100
+  proportions: [0.08, 0.2]
+```
+
+More complex models involving multiple simultaneous pulses are possible,
+but we caution that they can be difficult to reason about.
+
 ````
 
 ## Setting defaults

@@ -13,5 +13,5 @@ demes:
   epochs:
   - {end_size: 100, end_time: 4.0, start_size: 100}
 pulses:
-- {source: deme3, dest: deme2, proportion: 0.99, time: 4.0}
+- {sources: [deme3], dest: deme2, proportions: [0.99], time: 4.0}
 migrations: []

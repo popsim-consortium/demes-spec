@@ -4,22 +4,22 @@ time_units: generations
 generation_time: 1
 
 demes:
-  - name: ancestral
-    description: Main population
-    epochs:
-    - start_size: 1000
-  - name: offshoot1
-    description: More recent offshoot population
-    ancestors: [ancestral]
-    start_time: 500
-    epochs:
-    - start_size: 100
-  - name: offshoot2
-    description: More ancient offshoot population
-    ancestors: [ancestral]
-    start_time: 1000
-    epochs:
-     - start_size: 200
+- name: ancestral
+  description: Main population
+  epochs:
+  - start_size: 1000
+- name: offshoot1
+  description: More recent offshoot population
+  ancestors: [ancestral]
+  start_time: 500
+  epochs:
+  - start_size: 100
+- name: offshoot2
+  description: More ancient offshoot population
+  ancestors: [ancestral]
+  start_time: 1000
+  epochs:
+  - start_size: 200
 
 migrations:
 - source: ancestral
@@ -33,7 +33,7 @@ migrations:
   rate: 2e-5
 
 pulses:
-- source: offshoot1
+- sources: [offshoot1]
   dest: ancestral
-  proportion: 0.1
+  proportions: [0.1]
   time: 50

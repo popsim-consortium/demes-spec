@@ -59,16 +59,24 @@
   "migrations": [],
   "pulses": [
     {
-      "source": "deme0",
+      "sources": [
+          "deme0"
+      ],
       "dest": "deme1",
       "time": 1,
-      "proportion": 0.5
+      "proportions": [
+          0.5
+      ]
     },
     {
-      "source": "deme1",
+      "sources": [
+          "deme1"
+      ],
       "dest": "deme2",
       "time": 1,
-      "proportion": 0.5
+      "proportions": [
+          0.5
+      ]
     }
   ]
 }

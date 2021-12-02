@@ -1,10 +1,10 @@
 time_units: generations
 demes:
 - name: a
-  epochs: 
+  epochs:
   - start_size: 1
 - name: b
-  epochs: 
+  epochs:
   - start_size: 1
 pulses:
-- {source: a, dest: b, time: 100, proportion: 0.1, foo: 0.2}
+- {sources: [a], dest: b, time: 100, proportions: [0.1], foo: 0.2}

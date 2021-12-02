@@ -161,10 +161,10 @@ class TestExtraFields:
         data = minimal_graph(2)
         data["pulses"] = [
             {
-                "source": "deme0",
+                "sources": ["deme0"],
                 "dest": "deme1",
                 "time": 1,
-                "proportion": 0.5,
+                "proportions": [0.5],
                 "extra_field": 1234,
             }
         ]
@@ -407,7 +407,20 @@ class TestPulse:
     def test_simple(self):
         data = minimal_graph(num_demes=2)
         data["pulses"] = [
-            {"source": "deme0", "dest": "deme1", "proportion": 0.5, "time": 1}
+            {"sources": ["deme0"], "dest": "deme1", "proportions": [0.5], "time": 1}
+        ]
+        parsed = parser.parse(data).as_json_dict()
+        assert data["pulses"] == parsed["pulses"]
+
+    def test_multiple_sources(self):
+        data = minimal_graph(num_demes=3)
+        data["pulses"] = [
+            {
+                "sources": ["deme0", "deme1"],
+                "dest": "deme2",
+                "proportions": [0.1, 0.1],
+                "time": 1,
+            }
         ]
         parsed = parser.parse(data).as_json_dict()
         assert data["pulses"] == parsed["pulses"]
@@ -422,25 +435,67 @@ class TestPulse:
     def test_bad_proportion(self, proportion):
         data = minimal_graph(num_demes=2)
         data["pulses"] = [
-            {"source": "deme0", "dest": "deme1", "proportion": proportion, "time": 1}
+            {
+                "sources": ["deme0"],
+                "dest": "deme1",
+                "proportions": [proportion],
+                "time": 1,
+            }
         ]
         with pytest.raises(ValueError):
+            parser.parse(data)
+
+    @pytest.mark.parametrize("proportions", [[], [0.1, 0.1]])
+    def test_bad_proportions_length(self, proportions):
+        data = minimal_graph(num_demes=2)
+        data["pulses"] = [
+            {
+                "sources": ["deme0"],
+                "dest": "deme1",
+                "proportions": proportions,
+                "time": 1,
+            }
+        ]
+        with pytest.raises(
+            ValueError, match="Sources and proportions must have same lengths"
+        ):
             parser.parse(data)
 
     def test_bad_deme(self):
         data = minimal_graph(num_demes=2)
         data["pulses"] = [
-            {"source": "deme3", "dest": "deme1", "proportion": 0.5, "time": 1}
+            {"sources": ["deme3"], "dest": "deme1", "proportions": [0.5], "time": 1}
         ]
         with pytest.raises(KeyError):
             parser.parse(data)
 
-    def test_same_deme(self):
+    def test_empty_sources_list(self):
         data = minimal_graph(num_demes=2)
         data["pulses"] = [
-            {"source": "deme0", "dest": "deme0", "proportion": 0.5, "time": 1}
+            {"sources": [], "dest": "deme1", "proportions": [], "time": 1}
+        ]
+        with pytest.raises(ValueError, match="Must have one or more source demes"):
+            parser.parse(data)
+
+    def test_source_deme_equal_to_dest(self):
+        data = minimal_graph(num_demes=2)
+        data["pulses"] = [
+            {"sources": ["deme0"], "dest": "deme0", "proportions": [0.5], "time": 1}
         ]
         with pytest.raises(ValueError, match="source deme equal to dest"):
+            parser.parse(data)
+
+    def test_duplicate_sources(self):
+        data = minimal_graph(num_demes=2)
+        data["pulses"] = [
+            {
+                "sources": ["deme0", "deme0"],
+                "dest": "deme1",
+                "proportions": [0.1, 0.1],
+                "time": 1,
+            }
+        ]
+        with pytest.raises(ValueError, match="Duplicate deme in sources"):
             parser.parse(data)
 
     def test_bad_time(self):
@@ -448,7 +503,7 @@ class TestPulse:
         data["demes"][1]["start_time"] = 10
         data["demes"][1]["ancestors"] = ["deme0"]
         data["pulses"] = [
-            {"source": "deme0", "dest": "deme1", "proportion": 0.5, "time": 20}
+            {"sources": ["deme0"], "dest": "deme1", "proportions": [0.5], "time": 20}
         ]
         with pytest.raises(ValueError, match="does not exist"):
             parser.parse(data)
@@ -459,13 +514,13 @@ class TestPulse:
         data["demes"][1]["start_time"] = 10
         data["demes"][1]["ancestors"] = ["deme0"]
         data["pulses"] = [
-            {"source": "deme2", "dest": "deme1", "proportion": 0.5, "time": 10}
+            {"sources": ["deme2"], "dest": "deme1", "proportions": [0.5], "time": 10}
         ]
         parser.parse(data)
 
         # There can't be a pulse at the source deme's start_time.
         data["pulses"] = [
-            {"source": "deme1", "dest": "deme2", "proportion": 0.5, "time": 10}
+            {"sources": ["deme1"], "dest": "deme2", "proportions": [0.5], "time": 10}
         ]
         with pytest.raises(ValueError, match="does not exist"):
             parser.parse(data)
@@ -475,22 +530,35 @@ class TestPulse:
         data = minimal_graph(num_demes=2)
         data["demes"][1]["epochs"][0]["end_time"] = 10
         data["pulses"] = [
-            {"source": "deme1", "dest": "deme0", "proportion": 0.5, "time": 10}
+            {"sources": ["deme1"], "dest": "deme0", "proportions": [0.5], "time": 10}
         ]
         parser.parse(data)
 
         # The dest deme can't receive a pulse at its end_time.
         data["pulses"] = [
-            {"source": "deme0", "dest": "deme1", "proportion": 0.5, "time": 10}
+            {"sources": ["deme0"], "dest": "deme1", "proportions": [0.5], "time": 10}
         ]
         with pytest.raises(ValueError, match="does not exist"):
             parser.parse(data)
 
-    def test_bad_proportions_sum(self):
+    def test_bad_proportions_sum_1(self):
         data = minimal_graph(num_demes=3)
         data["pulses"] = [
-            {"source": "deme1", "dest": "deme0", "proportion": 0.6, "time": 10},
-            {"source": "deme2", "dest": "deme0", "proportion": 0.6, "time": 10},
+            {"sources": ["deme1"], "dest": "deme0", "proportions": [0.6], "time": 10},
+            {"sources": ["deme2"], "dest": "deme0", "proportions": [0.6], "time": 10},
+        ]
+        with pytest.raises(ValueError, match="sum to more than 1"):
+            parser.parse(data)
+
+    def test_bad_proportions_sum_2(self):
+        data = minimal_graph(num_demes=3)
+        data["pulses"] = [
+            {
+                "sources": ["deme1", "deme2"],
+                "dest": "deme0",
+                "proportions": [0.6, 0.6],
+                "time": 10,
+            },
         ]
         with pytest.raises(ValueError, match="sum to more than 1"):
             parser.parse(data)
@@ -873,19 +941,21 @@ class TestDefaults:
 
     def test_pulse_time_proportion(self):
         data = minimal_graph(num_demes=3)
-        data["defaults"] = {"pulse": {"time": 1, "proportion": 0.5}}
+        data["defaults"] = {"pulse": {"time": 1, "proportions": [0.5]}}
         data["pulses"] = [
-            {"source": "deme0", "dest": "deme1"},
-            {"source": "deme1", "dest": "deme2"},
+            {"sources": ["deme0"], "dest": "deme1"},
+            {"sources": ["deme1"], "dest": "deme2"},
         ]
         graph = parser.parse(data)
         assert len(graph.pulses) == 2
         for pulse in graph.pulses:
             pulse.time == 1
-            pulse.proportion == 0.5
-        assert graph.pulses[0].source.name == "deme0"
+            pulse.proportions == [0.5]
+        assert len(graph.pulses[0].sources) == 1
+        assert graph.pulses[0].sources[0].name == "deme0"
         assert graph.pulses[0].dest.name == "deme1"
-        assert graph.pulses[1].source.name == "deme1"
+        assert len(graph.pulses[1].sources) == 1
+        assert graph.pulses[1].sources[0].name == "deme1"
         assert graph.pulses[1].dest.name == "deme2"
 
     def test_deme_description_start_time(self):
