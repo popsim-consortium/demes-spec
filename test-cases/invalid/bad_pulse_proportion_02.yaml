@@ -7,4 +7,4 @@ demes:
   epochs:
   - {start_size: 1}
 pulses:
-- {source: a, dest: b, proportion: -1e-5, time: 100}
+- {sources: [a], dest: b, proportions: [-1e-5], time: 100}
