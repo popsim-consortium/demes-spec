@@ -382,40 +382,64 @@
   ],
   "pulses": [
     {
-      "source": "Nea1",
+      "sources": [
+          "Nea1"
+      ],
       "dest": "Ghost",
       "time": 1853.0,
-      "proportion": 0.024
+      "proportions": [
+          0.024
+      ]
     },
     {
-      "source": "Den2",
+      "sources": [
+          "Den2"
+      ],
       "dest": "Papuan",
       "time": 1575.8620689655172,
-      "proportion": 0.018
+      "proportions": [
+          0.018
+      ]
     },
     {
-      "source": "Nea1",
+      "sources": [
+          "Nea1"
+      ],
       "dest": "CHB",
       "time": 1566.0,
-      "proportion": 0.011
+      "proportions": [
+          0.011
+      ]
     },
     {
-      "source": "Nea1",
+      "sources": [
+          "Nea1"
+      ],
       "dest": "Papuan",
       "time": 1412.0,
-      "proportion": 0.002
+      "proportions": [
+          0.002
+      ]
     },
     {
-      "source": "Den1",
+      "sources": [
+          "Den1"
+      ],
       "dest": "Papuan",
       "time": 1027.5862068965516,
-      "proportion": 0.022
+      "proportions": [
+          0.022
+      ]
     },
     {
-      "source": "Nea1",
+      "sources": [
+          "Nea1"
+      ],
       "dest": "CHB",
       "time": 883.0,
-      "proportion": 0.002
+      "proportions": [
+          0.002
+      ]
     }
   ]
 }

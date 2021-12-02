@@ -131,20 +131,24 @@ definitions:
     type: object
     additionalProperties: false
     properties:
-      source:
-        $ref: '#/definitions/name'
+      sources:
+        type: array
+        items:
+          $ref: '#/definitions/name'
       dest:
         $ref: '#/definitions/name'
       time:
         type: number
         exclusiveMinimum: 0
-      proportion:
-        $ref: '#/definitions/proportion'
+      proportions:
+        type: array
+        items:
+          $ref: '#/definitions/proportion'
     required:
-    - source
+    - sources
     - dest
     - time
-    - proportion
+    - proportions
 
   migration:
     oneOf:

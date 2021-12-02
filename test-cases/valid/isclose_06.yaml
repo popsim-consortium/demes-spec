@@ -11,5 +11,5 @@ migrations:
 - {rate: 1e-05, source: d2, dest: d1}
 - {rate: 0.0001, source: d1, dest: d2, start_time: 50, end_time: 40}
 pulses:
-- {source: d1, dest: d2, proportion: 0.01, time: 50}
-- {source: d1, dest: d2, proportion: 0.01, time: 100}
+- {sources: [d1], dest: d2, proportions: [0.01], time: 50}
+- {sources: [d1], dest: d2, proportions: [0.01], time: 100}

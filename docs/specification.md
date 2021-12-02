@@ -11,7 +11,7 @@ population genetics model and its assumptions, along with
 the data model used for interchange and the required behaviour
 of implementations.
 
-:::{admonition}Who is this specification for?
+:::{admonition} Who is this specification for?
 This specification is intended to provide a detailed and definitive resource
 for the following groups:
 
@@ -137,7 +137,7 @@ which give the probability that offspring are generated from one generation to
 the next by self-fertilisation or cloning of an individual. Selfing and cloning
 rates take values between zero and one, and their sum must be less than one.
 
-:::{warning}Selfing and cloning rate definitions may change.
+:::{warning} Selfing and cloning rate definitions may change.
 See related issues
 [here](https://github.com/popsim-consortium/demes-spec/issues/33) and
 [here](https://github.com/popsim-consortium/demes-spec/issues/43).

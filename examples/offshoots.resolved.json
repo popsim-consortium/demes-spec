@@ -103,10 +103,14 @@
   ],
   "pulses": [
     {
-      "source": "offshoot1",
+      "sources": [
+          "offshoot1"
+      ],
       "dest": "ancestral",
       "time": 50,
-      "proportion": 0.1
+      "proportionw": [
+          0.1
+      ]
     }
   ]
 }
