@@ -13,7 +13,7 @@ demes:
     epochs:
       - start_size: 2000
 pulses:
-  - source: A
+  - sources: [A]
     dest: B
-    proportion: 0.05
+    proportions: [0.05]
     time: 500
