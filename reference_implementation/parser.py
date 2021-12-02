@@ -364,24 +364,32 @@ class Deme:
 
 @dataclasses.dataclass
 class Pulse:
-    source: Deme
+    sources: List[Deme]
     dest: Deme
     time: float
-    proportion: float
+    proportions: List[float]
 
     def as_json_dict(self) -> dict:
         d = dataclasses.asdict(self)
-        d["source"] = self.source.name
+        d["sources"] = [source.name for source in self.sources]
         d["dest"] = self.dest.name
         return d
 
     def validate(self):
-        if self.source == self.dest:
+        sources_names = set(source.name for source in self.sources)
+        if self.dest.name in sources_names:
             raise ValueError("Cannot have source deme equal to dest")
-        if self.time not in self.source.time_interval:
-            raise ValueError(
-                f"Deme {self.source.name} does not exist at time {self.time}"
-            )
+        if len(sources_names) != len(self.sources):
+            raise ValueError("Duplicate deme in sources")
+        if len(self.sources) == 0:
+            raise ValueError("Must have one or more source demes")
+        if len(self.sources) != len(self.proportions):
+            raise ValueError("Sources and proportions must have same lengths")
+        for source in self.sources:
+            if self.time not in source.time_interval:
+                raise ValueError(
+                    f"Deme {source.name} does not exist at time {self.time}"
+                )
         # Time limits for the destination deme are different to the source deme,
         # because the destination deme is affected immediately after the time
         # of the pulse. Thus, a pulse can occur at the destination deme's
@@ -511,12 +519,14 @@ class Graph:
         self.migrations.extend(migrations)
         return migrations
 
-    def add_pulse(self, source: str, dest: str, time: float, proportion: float):
+    def add_pulse(
+        self, sources: List[str], dest: str, time: float, proportions: List[float]
+    ):
         pulse = Pulse(
-            source=self.demes[source],
+            sources=[self.demes[source] for source in sources],
             dest=self.demes[dest],
             time=time,
-            proportion=proportion,
+            proportions=proportions,
         )
         self.pulses.append(pulse)
         return pulse
@@ -553,7 +563,7 @@ class Graph:
         for (dest, time), pulses in itertools.groupby(
             self.pulses, key=operator.attrgetter("dest", "time")
         ):
-            if sum(pulse.proportion for pulse in pulses) > 1 + EPSILON:
+            if sum(sum(pulse.proportions) for pulse in pulses) > 1 + EPSILON:
                 raise ValueError(
                     f"Pulse proportions into {dest.name} at time {time} "
                     "sum to more than 1"
@@ -748,19 +758,31 @@ def parse(data: dict) -> Graph:
     check_defaults(
         pulse_defaults,
         dict(
-            source=(str, is_identifier),
+            sources=(list, is_list_of_identifiers),
             dest=(str, is_identifier),
             time=(numbers.Number, is_positive_and_finite),
-            proportion=(numbers.Number, is_fraction),
+            proportions=(list, is_list_of_fractions),
         ),
     )
     for pulse_data in pop_list(data, "pulses", []):
         insert_defaults(pulse_data, pulse_defaults)
         graph.add_pulse(
-            source=pop_string(pulse_data, "source", validator=is_identifier),
+            sources=pop_list(
+                pulse_data,
+                "sources",
+                default=[],
+                required_type=str,
+                validator=is_identifier,
+            ),
             dest=pop_string(pulse_data, "dest", validator=is_identifier),
             time=pop_number(pulse_data, "time", validator=is_positive_and_finite),
-            proportion=pop_number(pulse_data, "proportion", validator=is_fraction),
+            proportions=pop_list(
+                pulse_data,
+                "proportions",
+                default=[],
+                required_type=numbers.Number,
+                validator=is_fraction,
+            ),
         )
         check_empty(pulse_data)
 

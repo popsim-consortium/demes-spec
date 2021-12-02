@@ -108,7 +108,7 @@
       ],
       "dest": "ancestral",
       "time": 50,
-      "proportionw": [
+      "proportions": [
           0.1
       ]
     }
