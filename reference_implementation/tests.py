@@ -412,6 +412,19 @@ class TestPulse:
         parsed = parser.parse(data).as_json_dict()
         assert data["pulses"] == parsed["pulses"]
 
+    def test_multiple_sources(self):
+        data = minimal_graph(num_demes=3)
+        data["pulses"] = [
+            {
+                "sources": ["deme0", "deme1"],
+                "dest": "deme2",
+                "proportions": [0.1, 0.1],
+                "time": 1,
+            }
+        ]
+        parsed = parser.parse(data).as_json_dict()
+        assert data["pulses"] == parsed["pulses"]
+
     def test_all_missing(self):
         data = minimal_graph(num_demes=2)
         data["pulses"] = [{}]
@@ -432,6 +445,22 @@ class TestPulse:
         with pytest.raises(ValueError):
             parser.parse(data)
 
+    @pytest.mark.parametrize("proportions", [[], [0.1, 0.1]])
+    def test_bad_proportions_length(self, proportions):
+        data = minimal_graph(num_demes=2)
+        data["pulses"] = [
+            {
+                "sources": ["deme0"],
+                "dest": "deme1",
+                "proportions": proportions,
+                "time": 1,
+            }
+        ]
+        with pytest.raises(
+            ValueError, match="Sources and proportions must have same lengths"
+        ):
+            parser.parse(data)
+
     def test_bad_deme(self):
         data = minimal_graph(num_demes=2)
         data["pulses"] = [
@@ -440,12 +469,33 @@ class TestPulse:
         with pytest.raises(KeyError):
             parser.parse(data)
 
-    def test_same_deme(self):
+    def test_empty_sources_list(self):
+        data = minimal_graph(num_demes=2)
+        data["pulses"] = [
+            {"sources": [], "dest": "deme1", "proportions": [], "time": 1}
+        ]
+        with pytest.raises(ValueError, match="Must have one or more source demes"):
+            parser.parse(data)
+
+    def test_source_deme_equal_to_dest(self):
         data = minimal_graph(num_demes=2)
         data["pulses"] = [
             {"sources": ["deme0"], "dest": "deme0", "proportions": [0.5], "time": 1}
         ]
         with pytest.raises(ValueError, match="source deme equal to dest"):
+            parser.parse(data)
+
+    def test_duplicate_sources(self):
+        data = minimal_graph(num_demes=2)
+        data["pulses"] = [
+            {
+                "sources": ["deme0", "deme0"],
+                "dest": "deme1",
+                "proportions": [0.1, 0.1],
+                "time": 1,
+            }
+        ]
+        with pytest.raises(ValueError, match="Duplicate deme in sources"):
             parser.parse(data)
 
     def test_bad_time(self):
