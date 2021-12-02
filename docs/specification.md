@@ -319,11 +319,11 @@ selfing_rate
 
 ### Pulse
 
-An instantaneous pulse of migration at ``time``, from the ``source`` deme
-into the ``dest`` deme.
+An instantaneous pulse of migration at ``time``, from a list of source demes
+(``sources``) into the ``dest`` deme.
 
-source
-: The deme ID of the migration source.
+sources
+: The list of deme IDs of the migration sources.
 
 dest
 : The deme ID of the migration destination.
@@ -335,9 +335,12 @@ time
   ``(deme.start_time, deme.end_time]`` interval of the ``source``
   deme and the ``dest`` deme.
 
-proportion
-: The proportion of the ``source`` deme's ancestry in the ``dest`` deme
-  immediately after the ``time`` of migration.
+proportions
+: The proportions of ancestry in the ``dest`` deme derived from the demes
+  in ``sources`` immediately after the ``time`` of migration.
+  The ``proportions`` must be ordered to correspond with the order of
+  ``sources``. The proportions must sum to less than or equal to 1
+  (within a reasonable tolerance, e.g. 1e-9).
 
 
 (sec_spec_mdm_migration)=
