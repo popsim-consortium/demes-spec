@@ -3,6 +3,7 @@
   "generation_time": 1,
   "doi": [],
   "description": "Set general migration properties using defaults.",
+  "metadata": {},
   "demes": [
     {
       "name": "deme0",

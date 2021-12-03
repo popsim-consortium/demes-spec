@@ -1,0 +1,14 @@
+time_units: generations
+metadata:
+  one: 1
+  two: "two"
+  three: [3, 3, 3]
+  not_sure: null
+  nested:
+    nested:
+      nested:
+        now_im_done: "nested!"
+demes:
+  - name: a
+    epochs:
+    - start_size: 100

@@ -6,6 +6,7 @@
     "https://doi.org/10.1038/nature18299"
   ],
   "description": "A ten population model of out-of-Africa, including two pulses of\nDenisovan admixture into Papuans, and several pulses of Neandertal\nadmixture into non-Africans.\nMost parameters are from Jacobs et al. (2019), Table S5 and Figure S5.\nThis model is an extension of one from Malaspinas et al. (2016), thus\nsome parameters are inherited from there.\n",
+  "metadata": {},
   "demes": [
     {
       "name": "YRI",
@@ -383,62 +384,62 @@
   "pulses": [
     {
       "sources": [
-          "Nea1"
+        "Nea1"
       ],
       "dest": "Ghost",
       "time": 1853.0,
       "proportions": [
-          0.024
+        0.024
       ]
     },
     {
       "sources": [
-          "Den2"
+        "Den2"
       ],
       "dest": "Papuan",
       "time": 1575.8620689655172,
       "proportions": [
-          0.018
+        0.018
       ]
     },
     {
       "sources": [
-          "Nea1"
+        "Nea1"
       ],
       "dest": "CHB",
       "time": 1566.0,
       "proportions": [
-          0.011
+        0.011
       ]
     },
     {
       "sources": [
-          "Nea1"
+        "Nea1"
       ],
       "dest": "Papuan",
       "time": 1412.0,
       "proportions": [
-          0.002
+        0.002
       ]
     },
     {
       "sources": [
-          "Den1"
+        "Den1"
       ],
       "dest": "Papuan",
       "time": 1027.5862068965516,
       "proportions": [
-          0.022
+        0.022
       ]
     },
     {
       "sources": [
-          "Nea1"
+        "Nea1"
       ],
       "dest": "CHB",
       "time": 883.0,
       "proportions": [
-          0.002
+        0.002
       ]
     }
   ]

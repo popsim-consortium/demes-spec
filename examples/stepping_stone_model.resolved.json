@@ -3,6 +3,7 @@
   "generation_time": 25,
   "doi": [],
   "description": "Stepping stone model illustrating default value propagation.",
+  "metadata": {},
   "demes": [
     {
       "name": "deme1",

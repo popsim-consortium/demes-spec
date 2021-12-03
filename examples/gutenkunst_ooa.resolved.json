@@ -5,6 +5,7 @@
     "https://doi.org/10.1371/journal.pgen.1000695"
   ],
   "description": "The Gutenkunst et al. (2009) OOA model.",
+  "metadata": {},
   "demes": [
     {
       "name": "ancestral",

@@ -3,6 +3,7 @@
   "generation_time": 1,
   "doi": [],
   "description": "An example demography to play around with cloning attributes.",
+  "metadata": {},
   "demes": [
     {
       "name": "root",

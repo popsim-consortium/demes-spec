@@ -20,6 +20,11 @@ properties:
     type: "number"
     exclusiveMinimum: 0
 
+  metadata:
+    type: object
+    default: {}
+    additionalProperties: true
+
   defaults:
     type: object
     default: {}

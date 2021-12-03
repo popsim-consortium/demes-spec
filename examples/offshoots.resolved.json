@@ -3,6 +3,7 @@
   "generation_time": 1,
   "doi": [],
   "description": "An example demography with one main population that is unchanged, that spawns multiple offshoot populations.",
+  "metadata": {},
   "demes": [
     {
       "name": "ancestral",
@@ -104,12 +105,12 @@
   "pulses": [
     {
       "sources": [
-          "offshoot1"
+        "offshoot1"
       ],
       "dest": "ancestral",
       "time": 50,
       "proportions": [
-          0.1
+        0.1
       ]
     }
   ]

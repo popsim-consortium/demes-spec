@@ -3,6 +3,7 @@
   "generation_time": 1,
   "doi": [],
   "description": "Example setting pulse properties using defaults",
+  "metadata": {},
   "demes": [
     {
       "name": "deme0",
@@ -60,22 +61,22 @@
   "pulses": [
     {
       "sources": [
-          "deme0"
+        "deme0"
       ],
       "dest": "deme1",
       "time": 1,
       "proportions": [
-          0.5
+        0.5
       ]
     },
     {
       "sources": [
-          "deme1"
+        "deme1"
       ],
       "dest": "deme2",
       "time": 1,
       "proportions": [
-          0.5
+        0.5
       ]
     }
   ]

@@ -3,6 +3,7 @@
   "generation_time": 1,
   "doi": [],
   "description": "Set epoch defaults using a mixture of local and global defaults.",
+  "metadata": {},
   "demes": [
     {
       "name": "ancestral",

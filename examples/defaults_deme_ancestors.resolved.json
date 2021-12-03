@@ -3,6 +3,7 @@
   "generation_time": 1,
   "doi": [],
   "description": "Setting deme ancestor and proportion values using defaults.",
+  "metadata": {},
   "demes": [
     {
       "name": "deme0",
