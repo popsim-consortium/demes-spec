@@ -13,4 +13,4 @@ if __name__ == "__main__":
     with open(sys.argv[1]) as source:
         data = yaml.load(source)
     graph = parser.parse(data)
-    print(json.dumps(graph.asdict(), indent=2))
+    print(json.dumps(graph.as_json_dict(), indent=2))

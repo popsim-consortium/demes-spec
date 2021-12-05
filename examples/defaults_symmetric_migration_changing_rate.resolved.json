@@ -3,6 +3,7 @@
   "generation_time": 1,
   "doi": [],
   "description": "Set symmetric migration demes using defaults.",
+  "metadata": {},
   "demes": [
     {
       "name": "deme0",

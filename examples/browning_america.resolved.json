@@ -5,6 +5,7 @@
     "https://doi.org/10.1371/journal.pgen.1007385"
   ],
   "description": "The Browning et al. (2011) model of admixture in the Americas.",
+  "metadata": {},
   "demes": [
     {
       "name": "ancestral",

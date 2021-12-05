@@ -444,6 +444,7 @@ class Graph:
     generation_time: Union[float, None]
     doi: List[str]
     description: str
+    metadata: dict
     demes: Dict[str, Deme] = dataclasses.field(default_factory=dict)
     migrations: List[Migration] = dataclasses.field(default_factory=list)
     pulses: List[Pulse] = dataclasses.field(default_factory=list)
@@ -477,7 +478,7 @@ class Graph:
         source: Union[str, None],
         dest: Union[str, None],
         demes: Union[List[str], None],
-    ) -> Migration:
+    ) -> List[Migration]:
         migrations: List[Migration] = []
         if not (
             # symmetric
@@ -487,6 +488,7 @@ class Graph:
         ):
             raise ValueError("Must specify either source and dest, or demes")
         if source is not None:
+            assert dest is not None
             migrations.append(
                 Migration(
                     rate=rate,
@@ -497,6 +499,7 @@ class Graph:
                 )
             )
         else:
+            assert demes is not None
             if len(demes) < 2:
                 raise ValueError("Must specify two or more deme names")
             for j, deme_a in enumerate(demes, 1):
@@ -645,6 +648,7 @@ def parse(data: dict) -> Graph:
         generation_time=pop_number(
             data, "generation_time", None, is_positive_and_finite
         ),
+        metadata=pop_object(data, "metadata", {}),
     )
     check_defaults(
         deme_defaults,

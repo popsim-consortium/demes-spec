@@ -1133,6 +1133,22 @@ class TestDefaults:
                 assert epoch.selfing_rate == 0.1
 
 
+class TestMetadata:
+    def test_toplevel_metadata(self):
+        data = minimal_graph()
+        metadata = dict(foo=1, bar="two", nested=dict(things=dict(baz="baz")))
+        data["metadata"] = metadata
+        graph = parser.parse(data)
+        assert graph.metadata == metadata
+
+    @pytest.mark.parametrize("metadata", [None, 1, "string", [1, 2, 3]])
+    def test_bad_toplevel_metadata(self, metadata):
+        data = minimal_graph()
+        data["metadata"] = metadata
+        with pytest.raises(TypeError):
+            parser.parse(data)
+
+
 class TestGraphUtilities:
     def test_str(self):
         graph = parser.parse(minimal_graph())

@@ -3,6 +3,7 @@
   "generation_time": 1,
   "doi": [],
   "description": "Set epoch defaults using deme-local values.",
+  "metadata": {},
   "demes": [
     {
       "name": "deme0",

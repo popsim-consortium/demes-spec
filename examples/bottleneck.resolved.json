@@ -3,6 +3,7 @@
   "generation_time": 1,
   "doi": [],
   "description": "A single-population bottleneck model.",
+  "metadata": {},
   "demes": [
     {
       "name": "our_population",

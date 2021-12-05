@@ -18,6 +18,10 @@ properties:
     type: "number"
     exclusiveMinimum: 0
 
+  metadata:
+    type: object
+    additionalProperties: true
+
   demes:
     type: array
     minItems: 1
