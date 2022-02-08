@@ -11,6 +11,11 @@ population genetics model and its assumptions, along with
 the data model used for interchange and the required behaviour
 of implementations.
 
+The Demes standard is largely agnostic to the processes that occur
+within populations, and provides a minimal set of parameters that
+can accommodate a wide spectrum of population genetic models.
+
+
 :::{admonition} Who is this specification for?
 This specification is intended to provide a detailed and definitive resource
 for the following groups:
@@ -20,7 +25,7 @@ for the following groups:
 
 As such, this specification contains a lot of detail that is not
 interesting to most users.
-If your wish to learn how to understand and create your own
+If you wish to learn how to understand and create your own
 Demes models, please see the {ref}`sec_tutorial` instead.
 :::
 
@@ -35,7 +40,7 @@ To provide feedback on this specification, please use the
 ## Conventions and Terminology
 
 The term "Demes" in this document is to be interpreted as a
-reference to this specification. A {ref}`sec_spec_popgen_deme`
+reference to this specification. A {ref}`deme<sec_spec_mdm_deme>`
 refers to a set of individuals that can be modelled by a fixed
 set of parameters; to avoid confusion with name of the specification
 we will usually use the term "population", in the understanding that
@@ -73,96 +78,6 @@ an infinite-valued number. When reading from formats that do support infinity,
 the format's native encoding for infinite-valued numbers must also be
 supported.
 
-(sec_spec_popgen)=
-## Population genetics model
-
-In this section we define the underlying population genetics assumptions made
-in Demes and the key concepts involved. The goal is to provide a basic shared
-vocabulary that is precise enough to make interchange of models defined in the
-standard meaningful, but to avoid being overly proscriptive so that the format
-is flexible enough to encompass a wide range of different methods. Issues
-relating to the data model and interchange and dealt with in later sections.
-
-In Demes, demographic models consist of one or more interacting populations (or
-"demes", to avoid confusion with the name of the specification itself).
-Populations are defined as a collection of exchangeable individuals that exist
-for a specified period of time, following a well-defined set of rules regarding
-population sizes, mating systems, etc. Ancestor/descendant relationships
-between populations can be defined, as well as continuous or instantaneous
-migration between coexisting populations.
-
-(sec_spec_popgen_time)=
-### Time
-
-Population and event times are written as units in the past, so that time zero
-corresponds to the final generation or "now", and event times in the past are
-values greater than zero with larger values for events that occur in the more
-distant past. While a natural specification for time units is in generations,
-other time units are allowed, such as years. In the case that the time units
-are not given in generations, the generation time must also be specified so
-that times can be converted into generations. In general, as time flows from
-the past to the present, populations, epochs, and migration events should be
-specified in their order of appearance, so that their times are in descending
-order.
-
-(sec_spec_popgen_deme)=
-### Demes, ancestors, and descendants
-
-Models include one or more populations that have sizes greater than zero for
-the duration of their existences, and population sizes are given as the number
-of individuals. A population must exist for some duration of time greater than
-zero, so that its start time must be larger than its end time. It may have one
-or more ancestors, which are other populations that exist at the population's
-start time. If one ancestor is specified, the first generation is constructed
-by randomly sampling parents from the ancestral population to contribute to
-offspring in the newly generated population. If more than one ancestor is
-specified, the proportions of ancestry from each contributing population must
-be provided, and those proportions must sum to one. In this case, parents are
-chosen randomly from each ancestral population with probability given by those
-proportions. If no ancestors are specified, the population is assumed to have
-start time equal to infinity, as individuals are not assumed to spontaneously
-spring into existence.
-
-(sec_spec_popgen_epochs)=
-### Epochs, population sizes, and mating systems
-
-Within populations, population sizes and mating systems are specified within
-epochs. Epochs are non-overlapping intervals of time that cover the entire
-existence interval of the population. Each epoch specifies the population size
-over that interval, which can be a constant value or function defined by start
-and end sizes that must remain positive.  If an epoch has a start time of
-infinity, the population size for that epoch must be constant. Epochs can also
-specify parameters for nonrandom mating, such as selfing or cloning rates,
-which give the probability that offspring are generated from one generation to
-the next by self-fertilisation or cloning of an individual. Selfing and cloning
-rates take values between zero and one, and their sum must be less than one.
-
-:::{warning} Selfing and cloning rate definitions may change.
-See related issues
-[here](https://github.com/popsim-consortium/demes-spec/issues/33) and
-[here](https://github.com/popsim-consortium/demes-spec/issues/43).
-:::
-
-(sec_spec_popgen_migration)=
-### Migrations
-
-Finally, individuals in a population may have parents from a different
-population through migrations. These can be defined as continuous migration
-rates over time intervals for which populations coexist or through
-instantaneous (or pulse) migration events at a given time. Continuous migration
-rates are defined as the probability that parents in the "destination"
-population are chosen from the "source" population.  Migration rates are thus
-per generation and must be less than one. Furthermore, if more than one source
-population have continuous migration into the same destination population, the
-sum of those migration rates must also be less than one, as rates define
-probabilities. The probability that parents come from the same population is
-just one minus the sum of incoming migration rates. On the other hand, pulse
-migration events specify the instantaneous replacement of a given fraction of
-individuals in a destination population by individuals with parents from
-a source population.  The fraction must be between zero and one, and if more
-than one pulse occurs at the same time, those replacement events are applied
-sequentially in the order that they are specified in the model.
-
 (sec_spec_mdm)=
 ## Machine Data Model
 
@@ -173,13 +88,19 @@ also what the formal restrictions on its value are, particularly
 in terms of the HDM and MDM split.
 :::
 
-The Demes Machine Data Model (MDM) is a formal representation of the
-{ref}`sec_spec_popgen` as a JSON document. The HDM is designed to be
+The Demes Machine Data Model (MDM) is a
+formal representation of the Demes model as
+a JSON document.
+The MDM is designed to be
 used as input by programs such as population genetics simulators,
-and explicitly includes all necessary details. The structure of JSON
+and explicitly includes all necessary details.
+The structure of JSON
 documents conforming to the specification is formally defined
 in the {ref}`sec_spec_mdm_schema`, and the detailed requirements for each of the
 elements in this data model are defined in this section.
+
+The {ref}`sec_spec_hdm` is a closely related specification that is intended
+to be easily human-readable and writable.
 
 (sec_spec_defs_common)=
 
@@ -188,17 +109,43 @@ elements in this data model are defined in this section.
 This section provides details on properties that occur in multiple
 contexts.
 
-start_time
-: The oldest time of a time interval (numerical upper bound).
+(sec_spec_mdm_time)=
+#### Time
 
-end_time
-: The youngest time of a time interval (numerical lower bound).
+Times are specified as units in the past, so that time zero
+corresponds to the final generation or "now", and event times in the past are
+values greater than zero with larger values for events that occur in the more
+distant past.
+By default, time is measured in generations, but other values ("years",
+for example) are allowed.
+When time units
+are not given in generations, the generation time must also be specified so
+that times can be converted into generations. In general, as time flows from
+the past to the present, populations, epochs, and migration events should be
+specified in their order of appearance, so that their times are in descending
+order.
+
+(sec_spec_mdm_population_sizes)=
+#### Population sizes
+
+A fundamental concept is demes is the population size.
+
+:::{todo}
+Things to cover:
+
+- We're counting **individuals** not genomes
+- We usually mean the population size in expectation, but there's
+  no hard requirements. For example, it's up the implementation whether it thinks
+  a population size of 1/3 is meaningful. Clarify with
+  some examples from forward and backward sims.
+- What do proportions mean? Similar point to pop size above. Given forward
+  pointers to sections we mention proportions in.
+- What do we mean by migration of individuals? Forward pointers to sections.
+:::
 
 ### MDM documents
 
 The top-level MDM document describes a single instance of a Demes model.
-Please see the {ref}`sec_spec_popgen` section for details about the
-population genetics assumptions underlying these model descriptions.
 
 Each MDM document contains the following list of properties. All
 properties MUST be specified, and additional properties MUST NOT be
@@ -222,23 +169,39 @@ generation_time
   the ``generation_time`` MUST be specified.
 
 demes
-: The list of demes in the model. At least one deme MUST be specified.
-  Please see the section {ref}`below <sec_spec_mdm_deme>` for the
-  required properties of these objects.
+: The list of {ref}`demes<sec_spec_mdm_deme>` in the model.
+  At least one deme MUST be specified.
 
 pulses
-: The list of pulses in the model.
-  Please see the section {ref}`below <sec_spec_mdm_pulse>` for the
-  required properties of these objects.
+: The list of {ref}`pulses <sec_spec_mdm_pulse>` in the model.
 
 migrations
-: The list of migrations in the model.
-  Please see the section {ref}`below <sec_spec_mdm_migration>` for the
-  required properties of these objects.
+: The list of {ref}`migrations<sec_spec_mdm_migration>` in the model.
 
 (sec_spec_mdm_deme)=
 
 ### Deme
+
+A Deme is a single population (see the {ref}`sec_spec_terminology` for
+clarification of these two terms) that exists for some non-empty
+time interval. A population is defined operationally as some set
+of individuals that can be modelled by a set of fixed parameters
+over a series of {ref}`epochs<sec_spec_mdm_epoch>`.
+Population parameters are defined per epoch, and are defined in the
+{ref}`sec_spec_mdm_epoch` section below.
+
+A population may have one
+or more ancestors, which are other populations that exist at the population's
+start time. If one ancestor is specified, the first generation is constructed
+by randomly sampling parents from the ancestral population to contribute to
+offspring in the newly generated population.
+
+If more than one ancestor is
+specified, the proportions of ancestry from each contributing population must
+be provided, and those proportions must sum to one. In this case, parents are
+chosen randomly from each ancestral population with probability given by those
+proportions. If no ancestors are specified, the population is assumed to have
+start time equal to infinity.
 
 The deme may be a descendant of one or more demes in the graph, and may
 be an ancestor to others. The deme exists over the half-open time interval
@@ -270,10 +233,13 @@ proportions
   there is only one ancestor.
   The ``proportions`` must be ordered to correspond with the
   order of ``ancestors``. The proportions must sum to 1 (within a
-  reasonable tolerance, e.g. 1e-9).
+  reasonable tolerance, e.g. 1e-9). See the
+  {ref}`sec_spec_mdm_population_sizes` section for more details on
+  how these proportions should be interpreted.
 
 start_time
-: The most ancient time at which the deme exists, in ``time_units``
+: The most ancient {ref}`time<sec_spec_mdm_time>`
+  at which the deme exists, in ``time_units``
   before the present. Demes with no ancestors are root demes and must
   have an infinite ``start_time``. Otherwise, the ``start_time`` must
   correspond with the interval of existence
@@ -281,10 +247,9 @@ start_time
   be within the half-open interval ``(deme.start_time, deme.end_time]``
   for each deme in ``ancestors``.
 
-
 epochs
-: The list of epochs for this deme. There MUST be at least one epoch.
-  Please see the section {ref}`below <sec_spec_mdm_epoch>` for details.
+: The list of {ref}`epochs<sec_spec_mdm_epoch>` for this deme.
+  There MUST be at least one epoch.
 
 (sec_spec_mdm_epoch)=
 
@@ -295,8 +260,21 @@ A deme-specific period of time spanning the half-open interval
 apply. The epoch's ``start_time`` is defined as the ``end_time`` of the
 previous epoch, or the deme's ``start_time`` if it is the first epoch.
 
+Each epoch specifies the population size
+over that interval, which can be a constant value or function defined by start
+and end sizes that must remain positive.  If an epoch has a start time of
+infinity, the population size for that epoch must be constant.
+
+Epochs can also
+specify parameters for nonrandom mating, such as selfing or cloning rates,
+which give the probability that offspring are generated from one generation to
+the next by self-fertilisation or cloning of an individual. Selfing and cloning
+rates take values between zero and one, and their sum must be less than one.
+
+
 end_time
-: The most recent time of the epoch, in ``time_units`` before the present.
+: The most recent {ref}`time<sec_spec_mdm_time>` of the epoch,
+  in ``time_units`` before the present.
 
 start_size
 : The population size at the epoch's ``start_time``.
@@ -319,8 +297,16 @@ selfing_rate
 
 ### Pulse
 
+
 An instantaneous pulse of migration at ``time``, from a list of source demes
 (``sources``) into the ``dest`` deme.
+
+Pulse
+migration events specify the instantaneous replacement of a given fraction of
+individuals in a destination population by individuals with parents from
+a source population.  The fraction must be between zero and one, and if more
+than one pulse occurs at the same time, those replacement events are applied
+sequentially in the order that they are specified in the model.
 
 sources
 : The list of deme IDs of the migration sources.
@@ -341,11 +327,24 @@ proportions
   The ``proportions`` must be ordered to correspond with the order of
   ``sources``. The proportions must sum to less than or equal to 1
   (within a reasonable tolerance, e.g. 1e-9).
+  See the
+  {ref}`sec_spec_mdm_population_sizes` section for more details on
+  how proportions should be interpreted.
 
 
 (sec_spec_mdm_migration)=
 
 ### Migration
+
+Continuous migration
+rates are defined as the probability that parents in the "destination"
+population are chosen from the "source" population.  Migration rates are thus
+per generation and must be less than one. Furthermore, if more than one source
+population have continuous migration into the same destination population, the
+sum of those migration rates must also be less than one, as rates define
+probabilities. The probability that parents come from the same population is
+just one minus the sum of incoming migration rates.
+
 
 Continuous migration over the half-open time interval ``(start_time, end_time]``.
 If ``demes`` is specified, then migration shall be symmetric between all
