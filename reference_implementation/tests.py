@@ -541,16 +541,15 @@ class TestPulse:
         with pytest.raises(ValueError, match="does not exist"):
             parser.parse(data)
 
-    def test_bad_proportions_sum_1(self):
+    def test_proportions_sum(self):
         data = minimal_graph(num_demes=3)
         data["pulses"] = [
             {"sources": ["deme1"], "dest": "deme0", "proportions": [0.6], "time": 10},
             {"sources": ["deme2"], "dest": "deme0", "proportions": [0.6], "time": 10},
         ]
-        with pytest.raises(ValueError, match="sum to more than 1"):
-            parser.parse(data)
+        parser.parse(data)
 
-    def test_bad_proportions_sum_2(self):
+    def test_bad_proportions_sum(self):
         data = minimal_graph(num_demes=3)
         data["pulses"] = [
             {

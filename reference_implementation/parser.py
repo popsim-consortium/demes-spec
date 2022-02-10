@@ -399,6 +399,12 @@ class Pulse:
                 f"Deme {self.dest.name} does not exist at time {self.time}"
             )
 
+        if sum(self.proportions) > 1 + EPSILON:
+            raise ValueError(
+                f"Pulse proportions into {self.dest.name} at time {self.time} "
+                "sum to more than 1"
+            )
+
 
 @dataclasses.dataclass
 class Migration:
@@ -560,17 +566,6 @@ class Graph:
             pulse.validate()
         for migration in self.migrations:
             migration.validate()
-
-        # A deme can't receive more than 100% of its ancestry from pulses at
-        # any given time.
-        for (dest, time), pulses in itertools.groupby(
-            self.pulses, key=operator.attrgetter("dest", "time")
-        ):
-            if sum(sum(pulse.proportions) for pulse in pulses) > 1 + EPSILON:
-                raise ValueError(
-                    f"Pulse proportions into {dest.name} at time {time} "
-                    "sum to more than 1"
-                )
 
         # Migrations involving the same source and dest can't overlap temporally.
         for j, migration_a in enumerate(self.migrations, 1):
