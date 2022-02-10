@@ -216,8 +216,6 @@ class Epoch:
                 self.size_function = "exponential"
 
     def validate(self):
-        if self.cloning_rate + self.selfing_rate > 1:
-            raise ValueError("must have cloning_rate + selfing_rate <= 1")
         if self.size_function not in ("constant", "exponential", "linear"):
             raise ValueError(f"unknown size_function '{self.size_function}'")
         if self.size_function == "constant" and self.start_size != self.end_size:
