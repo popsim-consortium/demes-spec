@@ -43,6 +43,7 @@ def test_test_cases_valid(yaml_path):
 
 # Check that the MDM schema is a subschema of the HDM schema by generating
 # random data matching the MDM schema and validating against the HDM schema.
+@hypothesis.settings(suppress_health_check=[hypothesis.HealthCheck.too_slow])
 @hypothesis.given(
     mdm_data=hypothesis_jsonschema.from_schema(
         load_yaml("demes-fully-qualified-specification.yaml")
