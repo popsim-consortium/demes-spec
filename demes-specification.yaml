@@ -175,21 +175,33 @@ definitions:
           $ref: '#/definitions/proportion'
 
   migration:
-    type: object
-    additionalProperties: false
-    properties:
-      demes:
-        type: array
-        items:
+    anyOf:
+    # Asymmetric
+    - type: object
+      additionalProperties: false
+      properties:
+        source:
           $ref: '#/definitions/name'
-        minItems: 2
-      source:
-        $ref: '#/definitions/name'
-      dest:
-        $ref: '#/definitions/name'
-      start_time:
-        $ref: '#/definitions/start_time'
-      end_time:
-        $ref: '#/definitions/end_time'
-      rate:
-        $ref: '#/definitions/rate'
+        dest:
+          $ref: '#/definitions/name'
+        start_time:
+          $ref: '#/definitions/start_time'
+        end_time:
+          $ref: '#/definitions/end_time'
+        rate:
+          $ref: '#/definitions/rate'
+    # Symmetric
+    - type: object
+      additionalProperties: false
+      properties:
+        demes:
+          type: array
+          items:
+            $ref: '#/definitions/name'
+          minItems: 2
+        start_time:
+          $ref: '#/definitions/start_time'
+        end_time:
+          $ref: '#/definitions/end_time'
+        rate:
+          $ref: '#/definitions/rate'

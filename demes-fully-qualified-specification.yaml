@@ -155,44 +155,22 @@ definitions:
     - proportions
 
   migration:
-    oneOf:
-    - type: object
-      # Asymmetric
-      additionalProperties: false
-      properties:
-        source:
-          $ref: '#/definitions/name'
-        dest:
-          $ref: '#/definitions/name'
-        start_time:
-          $ref: '#/definitions/start_time'
-        end_time:
-          $ref: '#/definitions/end_time'
-        rate:
-          $ref: '#/definitions/rate'
-      required:
-      - source
-      - dest
-      - start_time
-      - end_time
-      - rate
-    - type: object
-      additionalProperties: false
-      # Symmetric
-      properties:
-        demes:
-          type: array
-          items:
-            $ref: '#/definitions/name'
-          minItems: 2
-        start_time:
-          $ref: '#/definitions/start_time'
-        end_time:
-          $ref: '#/definitions/end_time'
-        rate:
-          $ref: '#/definitions/rate'
-      required:
-      - demes
-      - start_time
-      - end_time
-      - rate
+    type: object
+    additionalProperties: false
+    properties:
+      source:
+        $ref: '#/definitions/name'
+      dest:
+        $ref: '#/definitions/name'
+      start_time:
+        $ref: '#/definitions/start_time'
+      end_time:
+        $ref: '#/definitions/end_time'
+      rate:
+        $ref: '#/definitions/rate'
+    required:
+    - source
+    - dest
+    - start_time
+    - end_time
+    - rate
