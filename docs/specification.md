@@ -309,10 +309,10 @@ than one pulse occurs at the same time, those replacement events are applied
 sequentially in the order that they are specified in the model.
 
 sources
-: The list of deme IDs of the migration sources.
+: The list of deme names of the migration sources.
 
 dest
-: The deme ID of the migration destination.
+: The deme name of the migration destination.
 
 time
 : The time of migration, in ``time_units`` before the present.
@@ -348,20 +348,20 @@ just one minus the sum of incoming migration rates.
 
 Continuous migration over the half-open time interval ``(start_time, end_time]``.
 If ``demes`` is specified, then migration shall be symmetric between all
-pairs of demes with deme IDs in the array. If ``source`` and ``dest`` are
-specified instead, migration shall be asymmetric from the deme with ID
-``source`` to the deme with ID ``dest``. Either ``demes``, or alternately
+pairs of demes with deme names in the array. If ``source`` and ``dest`` are
+specified instead, migration shall be asymmetric from the deme with name
+``source`` to the deme with name ``dest``. Either ``demes``, or alternately
 both ``source`` and ``dest``, must be specified. If ``demes`` is specified,
 neither ``source`` nor ``dest`` may be specified.
 
 demes
-: The deme IDs of the symmetrically migrating demes.
+: The deme names of the symmetrically migrating demes.
 
 source
-: The deme ID of the asymmetric migration source.
+: The deme name of the asymmetric migration source.
 
 dest
-: The deme ID of the asymmetric migration destination.
+: The deme name of the asymmetric migration destination.
 
 start_time
 : The time at which migration begins, in ``time_units`` before the present.
