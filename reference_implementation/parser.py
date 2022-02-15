@@ -469,7 +469,7 @@ class Graph:
             proportions=proportions,
         )
         if deme.name in self.demes:
-            raise ValueError("Duplicate deme ID")
+            raise ValueError(f"Duplicate deme name '{deme.name}'")
         self.demes[deme.name] = deme
         return deme
 
