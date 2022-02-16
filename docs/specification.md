@@ -392,7 +392,7 @@ structure of the JSON documents that are considered to be
 valid instances of the MDM
 
 ```{eval-rst}
-.. literalinclude:: ../demes-fully-qualified-specification.yaml
+.. literalinclude:: ../schema/mdm-v1.0.yaml
     :language: yaml
 ```
 
@@ -469,6 +469,6 @@ structure of the JSON documents that are considered to be
 valid instances of the Demes standard.
 
 ```{eval-rst}
-.. literalinclude:: ../demes-specification.yaml
+.. literalinclude:: ../schema/hdm-v1.0.yaml
     :language: yaml
 ```

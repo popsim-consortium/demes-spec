@@ -1196,7 +1196,7 @@ class TestValidCases:
     def test_validates_base_schema(self, yaml_path):
         resolved = self.parse_file(yaml_path)
         yaml = YAML(typ="safe")
-        with open("../demes-specification.yaml") as source:
+        with open("../schema/hdm-v1.0.yaml") as source:
             schema = yaml.load(source)
         jsonschema.validate(instance=resolved, schema=schema)
 
@@ -1206,7 +1206,7 @@ class TestValidCases:
     def test_validates_fully_qualified_schema(self, yaml_path):
         resolved = self.parse_file(yaml_path)
         yaml = YAML(typ="safe")
-        with open("../demes-fully-qualified-specification.yaml") as source:
+        with open("../schema/mdm-v1.0.yaml") as source:
             schema = yaml.load(source)
         jsonschema.validate(instance=resolved, schema=schema)
 
