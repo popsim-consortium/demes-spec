@@ -22,7 +22,7 @@ def load_yaml(filename):
 
 
 def validate(yaml_path):
-    schema = load_yaml("demes-specification.yaml")
+    schema = load_yaml("schema/hdm-v1.0.yaml")
     data = load_yaml(yaml_path)
     jsonschema.validate(instance=data, schema=schema)
 
@@ -46,9 +46,9 @@ def test_test_cases_valid(yaml_path):
 @hypothesis.settings(suppress_health_check=[hypothesis.HealthCheck.too_slow])
 @hypothesis.given(
     mdm_data=hypothesis_jsonschema.from_schema(
-        load_yaml("demes-fully-qualified-specification.yaml")
+        load_yaml("schema/mdm-v1.0.yaml")
     )
 )
 def test_subschema(mdm_data):
-    hdm_schema = load_yaml("demes-specification.yaml")
+    hdm_schema = load_yaml("schema/hdm-v1.0.yaml")
     jsonschema.validate(instance=mdm_data, schema=hdm_schema)
