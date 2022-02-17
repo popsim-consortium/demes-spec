@@ -76,8 +76,16 @@ def is_list_of_identifiers(value):
     return all(isinstance(v, str) and is_identifier(v) for v in value)
 
 
+def is_nonempty_list_of_identifiers(value):
+    return is_list_of_identifiers(value) and len(value) > 0
+
+
 def is_list_of_fractions(value):
     return all(isinstance(v, numbers.Number) and is_fraction(v) for v in value)
+
+
+def is_nonempty_list_of_fractions_with_sum_less_than_1(value):
+    return is_list_of_fractions(value) and len(value) > 0 and sum(value) <= 1
 
 
 def validate_item(name, value, required_type, validator=None):
@@ -755,10 +763,10 @@ def parse(data: dict) -> Graph:
     check_defaults(
         pulse_defaults,
         dict(
-            sources=(list, is_list_of_identifiers),
+            sources=(list, is_nonempty_list_of_identifiers),
             dest=(str, is_identifier),
             time=(numbers.Number, is_positive_and_finite),
-            proportions=(list, is_list_of_fractions),
+            proportions=(list, is_nonempty_list_of_fractions_with_sum_less_than_1),
         ),
     )
     for pulse_data in pop_list(data, "pulses", []):
