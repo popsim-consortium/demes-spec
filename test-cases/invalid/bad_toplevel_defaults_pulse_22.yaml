@@ -1,6 +1,6 @@
 time_units: generations
 defaults:
-  pulse: {proportions: [-.inf]}
+  pulse: {proportions: [0.6, 0.6]}
 demes:
 - name: a
   epochs:
