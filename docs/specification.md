@@ -143,6 +143,13 @@ Things to cover:
 - What do we mean by migration of individuals? Forward pointers to sections.
 :::
 
+(sec_spec_mdm_metadata)=
+#### Metadata
+
+:::{todo}
+Discussion of metadata. What's it for?
+:::
+
 ### MDM documents
 
 The top-level MDM document describes a single instance of a Demes model.
@@ -410,17 +417,93 @@ This section defines the structure of HDM documents, the rules by
 which they are transformed into MDM documents, and the error conditions
 that should be detected by parsers.
 
+We also provide a {ref}`reference implementation<sec_spec_reference_implementation>`
+of a parser
+for the HDM (which also parses the MDM, by definition) written in Python.
+This implementation
+is intended to clarify any ambiguities there may be in this specification,
+but is not intended to be used directly in downstream software. Please
+use the {external+demes:doc}`demes<introduction>` Python library instead.
+
+
+
 (sec_spec_hdm_defaults)=
 ### Defaults
 
 Repeated values such as shared population sizes represent a significant opportunity
 for error in human-generated models. The HDM provides the default value
-propagation mechanism to avoid this repetition.
+propagation mechanism to avoid this repetition. The essential idea is that
+we declare default values hierarchically within the document, and that
+the ultimate value assigned to a property is prioritised by proximity
+within the document hierarchy.
 
-:::{todo}
-Describe the process of hierarchical default value replacement.
+Default values can be provided in two places within a HDM document:
+at the top-level or within a deme definition.
+
+:::{seealso}
+See the {ref}`tutorial<sec_tutorial_defaults>`
+for examples of how the defaults section can be used.
 :::
 
+:::{seealso}
+See the {ref}`reference implementation<sec_spec_reference_implementation>`
+for a practical example of how defaults in the HDM can be implemented.
+:::
+
+(sec_spec_hdm_defaults_top_level)=
+#### Top-level defaults
+
+The top-level HDM document may contain a propery ``defaults``,
+which defines values to use for entities within rest of the document
+*unless otherwise specified*. The ``defaults`` object can have
+the following properties:
+
+- epoch: this can specify any property valid for an
+  {ref}`MDM epoch<sec_spec_mdm_epoch>`. All epochs in the
+  document will be assigned these properties, unless specified
+  within the epoch or the {ref}`deme defaults<sec_spec_hdm_defaults_deme>`.
+
+- migration: this can specify any property valid for an
+  {ref}`MDM migration<sec_spec_mdm_migration>`. All migrations in the
+  document will be assigned these properties, unless specified
+  within the migration itself.
+
+- pulse: this can specify any property valid for an
+  {ref}`MDM pulse<sec_spec_mdm_pulse>`. All pulses in the
+  document will be assigned these properties, unless specified
+  within the pulse itself.
+
+- deme: this can specify the following properties for a
+  {ref}`deme<sec_spec_mdm_deme>` only: ``description``,
+  ``ancestors``, ``proportions`` and ``start_time``.
+
+:::{seealso}
+See the {ref}`schema<sec_spec_hdm_schema>`
+for definitive information on the structural properties of the
+top level ``defaults`` section.
+:::
+
+(sec_spec_hdm_defaults_deme)=
+#### Deme defaults
+
+Deme defaults operate in the same manner as
+{ref}`top-level defaults<sec_spec_hdm_defaults_top_level>`: the specified
+values will used if omitted in any epochs within the deme. Defaults
+specified within a deme override any values specified in the
+{ref}`top level<sec_spec_hdm_defaults_top_level>` ``deme`` defaults.
+
+
+This can specify any property valid for an
+{ref}`MDM epoch<sec_spec_mdm_epoch>`. Any epochs in the
+deme will be assigned these properties, unless specified
+within an epoch itself.
+
+
+:::{seealso}
+See the {ref}`schema<sec_spec_hdm_schema>`
+for definitive information on the structural properties of the
+deme ``defaults`` section.
+:::
 
 ### Resolution
 
@@ -471,4 +554,14 @@ valid instances of the Demes standard.
 ```{eval-rst}
 .. literalinclude:: ../schema/hdm-v1.0.yaml
     :language: yaml
+```
+
+
+(sec_spec_reference_implementation)=
+
+## Reference parser implementation
+
+```{eval-rst}
+.. literalinclude:: ../reference_implementation/parser.py
+    :language: python
 ```

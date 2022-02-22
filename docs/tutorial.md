@@ -370,7 +370,7 @@ via a common ancestor `X` (a split event).
 To define continuous migration from `A` to `B`, we'll add an entry to the
 `migrations` list.
 Concretely, we are modelling migrants born in deme `A`, the `source` deme,
-who (potentially) have offspring in deme `B`, the `dest` deme. 
+who (potentially) have offspring in deme `B`, the `dest` deme.
 
 
 ```{code-cell}
@@ -578,6 +578,9 @@ More complex models involving multiple simultaneous pulses are possible,
 but we caution that they can be difficult to reason about.
 
 ````
+
+
+(sec_tutorial_defaults)=
 
 ## Setting defaults
 

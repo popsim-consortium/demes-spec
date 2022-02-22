@@ -38,6 +38,194 @@ EPSILON = 1e-6
 JSON_INFINITY_STR = "Infinity"
 
 
+def parse(data: dict) -> Graph:
+    # Parsing is done by popping items out of the input data dictionary and
+    # creating the appropriate Python objects. We ensure that extra items
+    # have not been included in the data payload by checking if the objects
+    # are empty once we have removed all the values defined in the
+    # specification. Type and range validation of simple items (e.g., the
+    # value must be a positive integer) is performed at the same time,
+    # using the pop_x functions. Once the full object model of the input
+    # data has been built, the rules for creating a fully-qualified Demes
+    # graph are applied in the "resolve" functions. Finally, we validate
+    # the fully-qualified graph to ensure that relationships between the
+    # entities have been specified correctly.
+    data = copy.deepcopy(data)
+
+    defaults = pop_object(data, "defaults", {})
+    deme_defaults = pop_object(defaults, "deme", {})
+    migration_defaults = pop_object(defaults, "migration", {})
+    pulse_defaults = pop_object(defaults, "pulse", {})
+    # epoch defaults may also be specified within a Deme definition.
+    global_epoch_defaults = pop_object(defaults, "epoch", {})
+    check_empty(defaults)
+
+    graph = Graph(
+        description=pop_string(data, "description", ""),
+        time_units=pop_string(data, "time_units", None),
+        doi=pop_list(data, "doi", [], str, is_nonempty),
+        generation_time=pop_number(
+            data, "generation_time", None, is_positive_and_finite
+        ),
+        metadata=pop_object(data, "metadata", {}),
+    )
+    check_defaults(
+        deme_defaults,
+        dict(
+            description=(str, None),
+            start_time=((str, numbers.Number), is_positive_or_json_infinity),
+            ancestors=(list, is_list_of_identifiers),
+            proportions=(list, is_list_of_fractions),
+        ),
+    )
+
+    allowed_epoch_defaults = dict(
+        end_time=(numbers.Number, is_non_negative_and_finite),
+        start_size=(numbers.Number, is_positive_and_finite),
+        end_size=(numbers.Number, is_positive_and_finite),
+        selfing_rate=(numbers.Number, is_fraction),
+        cloning_rate=(numbers.Number, is_fraction),
+        size_function=(str, None),
+    )
+    check_defaults(global_epoch_defaults, allowed_epoch_defaults)
+
+    for deme_data in pop_list(data, "demes"):
+        insert_defaults(deme_data, deme_defaults)
+        deme = graph.add_deme(
+            name=pop_string(deme_data, "name", validator=is_identifier),
+            description=pop_string(deme_data, "description", ""),
+            start_time=pop_number(
+                deme_data,
+                "start_time",
+                None,
+                is_positive_or_json_infinity,
+                allow_inf=True,
+            ),
+            ancestors=pop_list(deme_data, "ancestors", [], str, is_identifier),
+            proportions=pop_list(
+                deme_data, "proportions", None, numbers.Number, is_fraction
+            ),
+        )
+
+        local_defaults = pop_object(deme_data, "defaults", {})
+        local_epoch_defaults = pop_object(local_defaults, "epoch", {})
+        check_empty(local_defaults)
+        check_defaults(local_epoch_defaults, allowed_epoch_defaults)
+        epoch_defaults = global_epoch_defaults.copy()
+        epoch_defaults.update(local_epoch_defaults)
+        check_defaults(epoch_defaults, allowed_epoch_defaults)
+
+        # There is always at least one epoch defined with the default values.
+        for epoch_data in pop_list(deme_data, "epochs", [{}]):
+            insert_defaults(epoch_data, epoch_defaults)
+            deme.add_epoch(
+                end_time=pop_number(
+                    epoch_data, "end_time", None, is_non_negative_and_finite
+                ),
+                start_size=pop_number(
+                    epoch_data, "start_size", None, is_positive_and_finite
+                ),
+                end_size=pop_number(
+                    epoch_data, "end_size", None, is_positive_and_finite
+                ),
+                selfing_rate=pop_number(epoch_data, "selfing_rate", 0, is_fraction),
+                cloning_rate=pop_number(epoch_data, "cloning_rate", 0, is_fraction),
+                size_function=pop_string(epoch_data, "size_function", None),
+            )
+            check_empty(epoch_data)
+        check_empty(deme_data)
+
+        if len(deme.epochs) == 0:
+            raise ValueError(f"no epochs for deme {deme.name}")
+
+    if len(graph.demes) == 0:
+        raise ValueError("the graph must have one or more demes")
+
+    check_defaults(
+        migration_defaults,
+        dict(
+            rate=(numbers.Number, is_fraction),
+            start_time=((numbers.Number, str), is_positive_or_json_infinity),
+            end_time=(numbers.Number, is_non_negative_and_finite),
+            source=(str, is_identifier),
+            dest=(str, is_identifier),
+            demes=(list, is_list_of_identifiers),
+        ),
+    )
+    for migration_data in pop_list(data, "migrations", []):
+        insert_defaults(migration_data, migration_defaults)
+        graph.add_migration(
+            rate=pop_number(migration_data, "rate", validator=is_fraction),
+            start_time=pop_number(
+                migration_data,
+                "start_time",
+                None,
+                is_positive_or_json_infinity,
+                allow_inf=True,
+            ),
+            end_time=pop_number(
+                migration_data, "end_time", None, is_non_negative_and_finite
+            ),
+            source=pop_string(migration_data, "source", None, is_nonempty),
+            dest=pop_string(migration_data, "dest", None, is_nonempty),
+            demes=pop_list(
+                migration_data,
+                "demes",
+                default=None,
+                required_type=str,
+                validator=is_identifier,
+            ),
+        )
+        check_empty(migration_data)
+
+    check_defaults(
+        pulse_defaults,
+        dict(
+            sources=(list, is_nonempty_list_of_identifiers),
+            dest=(str, is_identifier),
+            time=(numbers.Number, is_positive_and_finite),
+            proportions=(list, is_nonempty_list_of_fractions_with_sum_less_than_1),
+        ),
+    )
+    for pulse_data in pop_list(data, "pulses", []):
+        insert_defaults(pulse_data, pulse_defaults)
+        graph.add_pulse(
+            sources=pop_list(
+                pulse_data,
+                "sources",
+                default=[],
+                required_type=str,
+                validator=is_identifier,
+            ),
+            dest=pop_string(pulse_data, "dest", validator=is_identifier),
+            time=pop_number(pulse_data, "time", validator=is_positive_and_finite),
+            proportions=pop_list(
+                pulse_data,
+                "proportions",
+                default=[],
+                required_type=numbers.Number,
+                validator=is_fraction,
+            ),
+        )
+        check_empty(pulse_data)
+
+    check_empty(data)
+
+    # The input object model has now been fully populated, and local type and
+    # value checking done. Default values (either from the schema or set explicitly
+    # by the user via "defaults" sections) have been assigned. We now "resolve"
+    # the model so that any values that can be imputed from the structure of the
+    # model are set explicitly. Once this is done, we then validate the model to
+    # check that the relationships between various entities make sense. Note that
+    # there isn't a clean separation between resolution and validation here, since
+    # some validation is simplest to perform as part of the resolution logic in
+    # this particular implementation.
+    graph.resolve()
+    graph.validate()
+
+    return graph
+
+
 def encode_inf(value):
     if math.isinf(value):
         return JSON_INFINITY_STR
@@ -618,191 +806,3 @@ class Graph:
             deme.resolve()
         for migration in self.migrations:
             migration.resolve()
-
-
-def parse(data: dict) -> Graph:
-    # Parsing is done by popping items out of the input data dictionary and
-    # creating the appropriate Python objects. We ensure that extra items
-    # have not been included in the data payload by checking if the objects
-    # are empty once we have removed all the values defined in the
-    # specification. Type and range validation of simple items (e.g., the
-    # value must be a positive integer) is performed at the same time,
-    # using the pop_x functions. Once the full object model of the input
-    # data has been built, the rules for creating a fully-qualified Demes
-    # graph are applied in the "resolve" functions. Finally, we validate
-    # the fully-qualified graph to ensure that relationships between the
-    # entities have been specified correctly.
-    data = copy.deepcopy(data)
-
-    defaults = pop_object(data, "defaults", {})
-    deme_defaults = pop_object(defaults, "deme", {})
-    migration_defaults = pop_object(defaults, "migration", {})
-    pulse_defaults = pop_object(defaults, "pulse", {})
-    # epoch defaults may also be specified within a Deme definition.
-    global_epoch_defaults = pop_object(defaults, "epoch", {})
-    check_empty(defaults)
-
-    graph = Graph(
-        description=pop_string(data, "description", ""),
-        time_units=pop_string(data, "time_units", None),
-        doi=pop_list(data, "doi", [], str, is_nonempty),
-        generation_time=pop_number(
-            data, "generation_time", None, is_positive_and_finite
-        ),
-        metadata=pop_object(data, "metadata", {}),
-    )
-    check_defaults(
-        deme_defaults,
-        dict(
-            description=(str, None),
-            start_time=((str, numbers.Number), is_positive_or_json_infinity),
-            ancestors=(list, is_list_of_identifiers),
-            proportions=(list, is_list_of_fractions),
-        ),
-    )
-
-    allowed_epoch_defaults = dict(
-        end_time=(numbers.Number, is_non_negative_and_finite),
-        start_size=(numbers.Number, is_positive_and_finite),
-        end_size=(numbers.Number, is_positive_and_finite),
-        selfing_rate=(numbers.Number, is_fraction),
-        cloning_rate=(numbers.Number, is_fraction),
-        size_function=(str, None),
-    )
-    check_defaults(global_epoch_defaults, allowed_epoch_defaults)
-
-    for deme_data in pop_list(data, "demes"):
-        insert_defaults(deme_data, deme_defaults)
-        deme = graph.add_deme(
-            name=pop_string(deme_data, "name", validator=is_identifier),
-            description=pop_string(deme_data, "description", ""),
-            start_time=pop_number(
-                deme_data,
-                "start_time",
-                None,
-                is_positive_or_json_infinity,
-                allow_inf=True,
-            ),
-            ancestors=pop_list(deme_data, "ancestors", [], str, is_identifier),
-            proportions=pop_list(
-                deme_data, "proportions", None, numbers.Number, is_fraction
-            ),
-        )
-
-        local_defaults = pop_object(deme_data, "defaults", {})
-        local_epoch_defaults = pop_object(local_defaults, "epoch", {})
-        check_empty(local_defaults)
-        check_defaults(local_epoch_defaults, allowed_epoch_defaults)
-        epoch_defaults = global_epoch_defaults.copy()
-        epoch_defaults.update(local_epoch_defaults)
-        check_defaults(epoch_defaults, allowed_epoch_defaults)
-
-        # There is always at least one epoch defined with the default values.
-        for epoch_data in pop_list(deme_data, "epochs", [{}]):
-            insert_defaults(epoch_data, epoch_defaults)
-            deme.add_epoch(
-                end_time=pop_number(
-                    epoch_data, "end_time", None, is_non_negative_and_finite
-                ),
-                start_size=pop_number(
-                    epoch_data, "start_size", None, is_positive_and_finite
-                ),
-                end_size=pop_number(
-                    epoch_data, "end_size", None, is_positive_and_finite
-                ),
-                selfing_rate=pop_number(epoch_data, "selfing_rate", 0, is_fraction),
-                cloning_rate=pop_number(epoch_data, "cloning_rate", 0, is_fraction),
-                size_function=pop_string(epoch_data, "size_function", None),
-            )
-            check_empty(epoch_data)
-        check_empty(deme_data)
-
-        if len(deme.epochs) == 0:
-            raise ValueError(f"no epochs for deme {deme.name}")
-
-    if len(graph.demes) == 0:
-        raise ValueError("the graph must have one or more demes")
-
-    check_defaults(
-        migration_defaults,
-        dict(
-            rate=(numbers.Number, is_fraction),
-            start_time=((numbers.Number, str), is_positive_or_json_infinity),
-            end_time=(numbers.Number, is_non_negative_and_finite),
-            source=(str, is_identifier),
-            dest=(str, is_identifier),
-            demes=(list, is_list_of_identifiers),
-        ),
-    )
-    for migration_data in pop_list(data, "migrations", []):
-        insert_defaults(migration_data, migration_defaults)
-        graph.add_migration(
-            rate=pop_number(migration_data, "rate", validator=is_fraction),
-            start_time=pop_number(
-                migration_data,
-                "start_time",
-                None,
-                is_positive_or_json_infinity,
-                allow_inf=True,
-            ),
-            end_time=pop_number(
-                migration_data, "end_time", None, is_non_negative_and_finite
-            ),
-            source=pop_string(migration_data, "source", None, is_nonempty),
-            dest=pop_string(migration_data, "dest", None, is_nonempty),
-            demes=pop_list(
-                migration_data,
-                "demes",
-                default=None,
-                required_type=str,
-                validator=is_identifier,
-            ),
-        )
-        check_empty(migration_data)
-
-    check_defaults(
-        pulse_defaults,
-        dict(
-            sources=(list, is_nonempty_list_of_identifiers),
-            dest=(str, is_identifier),
-            time=(numbers.Number, is_positive_and_finite),
-            proportions=(list, is_nonempty_list_of_fractions_with_sum_less_than_1),
-        ),
-    )
-    for pulse_data in pop_list(data, "pulses", []):
-        insert_defaults(pulse_data, pulse_defaults)
-        graph.add_pulse(
-            sources=pop_list(
-                pulse_data,
-                "sources",
-                default=[],
-                required_type=str,
-                validator=is_identifier,
-            ),
-            dest=pop_string(pulse_data, "dest", validator=is_identifier),
-            time=pop_number(pulse_data, "time", validator=is_positive_and_finite),
-            proportions=pop_list(
-                pulse_data,
-                "proportions",
-                default=[],
-                required_type=numbers.Number,
-                validator=is_fraction,
-            ),
-        )
-        check_empty(pulse_data)
-
-    check_empty(data)
-
-    # The input object model has now been fully populated, and local type and
-    # value checking done. Default values (either from the schema or set explicitly
-    # by the user via "defaults" sections) have been assigned. We now "resolve"
-    # the model so that any values that can be imputed from the structure of the
-    # model are set explicitly. Once this is done, we then validate the model to
-    # check that the relationships between various entities make sense. Note that
-    # there isn't a clean separation between resolution and validation here, since
-    # some validation is simplest to perform as part of the resolution logic in
-    # this particular implementation.
-    graph.resolve()
-    graph.validate()
-
-    return graph
