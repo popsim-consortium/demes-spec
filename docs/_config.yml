@@ -3,7 +3,7 @@
 
 title: Demes Specification
 author: PopSim Consortium
-copyright: "2021"
+copyright: "2022"
 only_build_toc_files: true
 
 execute:
@@ -39,3 +39,5 @@ sphinx:
     - colon_fence
     - deflist
     - substitution
+    intersphinx_mapping:
+      demes: ["https://popsim-consortium.github.io/demes-docs/main/", null]
