@@ -505,23 +505,55 @@ for definitive information on the structural properties of the
 deme ``defaults`` section.
 :::
 
+(sec_spec_hdm_resolution)=
 ### Resolution
 
+The Demes {ref}`machine data model<sec_spec_mdm>` contains many
+values that are technically redundant, in that they can be reliably
+inferred from other values in the model. For example, if a deme's
+``size_function`` is ``"constant"`` during an {ref}`sec_spec_mdm_epoch`,
+then clearly the ``start_size`` and ``end_size`` will be equal.
+The MDM still requires that both be specified, because it is intended
+for *machine* consumption, and having a fully specified and complete
+data model allows code that consumes this model to be simple and
+straightforward. However, such redundancy is a significant
+downside for *human* consumption, where having repeated
+or redundant values leads to poorer readability and increases
+the probability of errors.
+Thus, one of the differences
+between the Demes {ref}`sec_spec_hdm` and {ref}`sec_spec_mdm`
+is that the HDM tries to remove as much redundancy as possible.
+A major part of a Demes parser implementation's task is to
+fill in the redunant information, a process that we refer to
+as model "resolution".
+
+Resolution happens in a set of steps in a defined order, which we
+describe here. Please consult the
+{ref}`reference implementation<sec_spec_reference_implementation>`
+for more detailed information.
+
+A demes model is resolved by resolving each
+{ref}`deme<sec_spec_hdm_resolution_deme>` in the order that
+it occurs in the input. A deme can only be resolved if its
+ancestor demes have already been resolved,
+and the parser MUST raise an error if a deme is encountered that
+has unresolved ancestors. Thus, valid input files
+list the demes in topologically sorted order, such that
+ancestors are listed before their descendants.
+
+After all demes have been resolved,
+{ref}`migrations<sec_spec_hdm_resolution_migration>`
+are then resolved.
+
+(sec_spec_hdm_resolution_deme)=
+#### Deme resolution
+
 :::{todo}
-Tidy this up - just putting text in here for the moment that's
-pulled from other parts of the document.
+some preamble text for deme resolution
 :::
 
 start_time
-: The most ancient time at which the deme exists, in ``time_units``
-  before the present. Demes with no ancestors are root demes and must
-  have an infinite ``start_time``. Otherwise, the ``start_time`` must
-  correspond with the interval of existence
-  for each of the deme's ``ancestors``. I.e. the ``start_time`` must
-  be within the half-open interval ``(deme.start_time, deme.end_time]``
-  for each deme in ``ancestors``.
-
-  If not specified, the deme's ``start_time`` shall be obtained
+: If not specified, the deme's ``start_time`` shall be obtained
   according to the following rules (the first matching rule shall
   be used).
 
@@ -531,17 +563,18 @@ start_time
    - If the deme has no ancestors, the ``start_time`` shall be
      infinitely far into the past. I.e. the ``start_time`` shall
      have the value ``infinity``.
+   - Otherwise the ``start_time`` cannot be determined and an
+     error MUST be raised.
 
-  If the ``start_time`` has not been defined after following the
-  rules above, an error shall be raised. E.g. an error shall be
-  raised for the following conditions.
+(sec_spec_hdm_resolution_migration)=
+#### Migration resolution
 
-   - If the deme has multiple ancestors,
-     and the deme's ``start_time`` is not specified.
-   - If the deme has one ancestor with an ``end_time == 0``,
-     and the deme's ``start_time`` is not specified.
-   - If the deme has zero ancestors and a finite ``start_time``.
 
+### Validation
+
+:::{todo}
+Outline the basic logic of model validation
+:::
 
 (sec_spec_hdm_schema)=
 
