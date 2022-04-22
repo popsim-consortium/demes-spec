@@ -567,6 +567,46 @@ class TestPulse:
         with pytest.raises(ValueError, match="sum to more than 1"):
             parser.parse(data)
 
+    def test_pulse_order1(self):
+        # Pulses given in time-descending order, so order is maintained.
+        data = minimal_graph(num_demes=2)
+        data["pulses"] = [
+            {"sources": ["deme0"], "dest": "deme1", "proportions": [0.5], "time": 1.2},
+            {"sources": ["deme1"], "dest": "deme0", "proportions": [0.5], "time": 1},
+        ]
+        parsed = parser.parse(data).as_json_dict()
+        assert data["pulses"] == parsed["pulses"]
+
+    def test_pulse_order2(self):
+        # Pulses given in time-ascending order, so order should be reversed.
+        data = minimal_graph(num_demes=2)
+        data["pulses"] = [
+            {"sources": ["deme0"], "dest": "deme1", "proportions": [0.5], "time": 1},
+            {"sources": ["deme1"], "dest": "deme0", "proportions": [0.5], "time": 1.2},
+        ]
+        parsed = parser.parse(data).as_json_dict()
+        assert data["pulses"][0] == parsed["pulses"][1]
+        assert data["pulses"][1] == parsed["pulses"][0]
+
+    def test_pulse_order3(self):
+        # Pulses have the same time, so order is maintained.
+        data = minimal_graph(num_demes=2)
+        data["pulses"] = [
+            {"sources": ["deme0"], "dest": "deme1", "proportions": [0.5], "time": 1},
+            {"sources": ["deme1"], "dest": "deme0", "proportions": [0.5], "time": 1},
+        ]
+        parsed = parser.parse(data).as_json_dict()
+        assert data["pulses"] == parsed["pulses"]
+
+        # Switch the given ordering, to double check that we didn't maintain
+        # order by accident (e.g. by sorting on source name or something crazy).
+        data["pulses"] = [
+            {"sources": ["deme1"], "dest": "deme0", "proportions": [0.5], "time": 1},
+            {"sources": ["deme0"], "dest": "deme1", "proportions": [0.5], "time": 1},
+        ]
+        parsed = parser.parse(data).as_json_dict()
+        assert data["pulses"] == parsed["pulses"]
+
 
 class TestMigration:
     def test_simple_asymmetric(self):

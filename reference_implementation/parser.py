@@ -25,8 +25,6 @@ import numbers
 import copy
 import pprint
 import dataclasses
-import itertools
-import operator
 from typing import Dict, List, Union
 
 # Numerical wiggle room.
@@ -810,3 +808,15 @@ class Graph:
             deme.resolve()
         for migration in self.migrations:
             migration.resolve()
+
+        # Sort pulses from oldest to youngest.
+        # In a discrete-time setting, non-integer pulse times that are distinct
+        # could be rounded to the same time value. If the input file has the pulses
+        # in time-ascending order, then the pulses would occur in the opposite order
+        # compared to a continuous-time simulator. Sorting before the rounding
+        # occurs avoids this ambiguity, so we explicitly require pulses to be
+        # sorted as part of the parser.
+        # Note that Python implements "stable" sorting, which maintains the order
+        # of pulses that have the same time value to start with (as required by
+        # the spec).
+        self.pulses.sort(key=lambda pulse: pulse.time, reverse=True)
