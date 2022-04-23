@@ -101,11 +101,16 @@ class TestValidateGraph:
     def test_generation_time_generations(self):
         data = minimal_graph()
         data["time_units"] = "generations"
-        data["generation_time"] = 12
-        parser.parse(data)
         data["generation_time"] = 1
         graph = parser.parse(data)
         assert graph.generation_time == 1
+
+    def test_bad_generation_time(self):
+        data = minimal_graph()
+        data["time_units"] = "generations"
+        data["generation_time"] = 12
+        with pytest.raises(ValueError):
+            parser.parse(data)
 
     def test_generation_time(self):
         data = minimal_graph()

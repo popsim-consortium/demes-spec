@@ -754,6 +754,10 @@ class Graph:
                     "Must specify Graph.generation_time if time_units is not "
                     "'generations'"
                 )
+        if self.time_units == "generations" and self.generation_time != 1:
+            raise ValueError(
+                "If time_units are in generations, generation_time must be 1"
+            )
         for deme in self.demes.values():
             deme.validate()
         for pulse in self.pulses:
