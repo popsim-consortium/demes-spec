@@ -7,7 +7,14 @@ on:
 
 jobs:
   tests:
-    runs-on: ubuntu-20.04
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04, windows-2022, macos-11]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
