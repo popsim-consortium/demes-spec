@@ -29,7 +29,7 @@ jobs:
           cd reference_implementation
           # Require 100% test coverage for reference implementation.
           python -m pytest \
-            --cov=parser \
+            --cov=demes_parser \
             --cov-report=term-missing \
             --cov-fail-under=100 \
             tests.py

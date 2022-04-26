@@ -12,7 +12,7 @@ import pytest
 from ruamel.yaml import YAML
 from ruamel.yaml.constructor import ConstructorError
 
-import parser
+import demes_parser as parser
 
 
 def minimal_graph(num_demes=1, population_size=1):

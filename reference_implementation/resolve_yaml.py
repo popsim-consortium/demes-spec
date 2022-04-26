@@ -4,7 +4,7 @@ import sys
 import json
 from ruamel.yaml import YAML
 
-import parser
+import demes_parser as parser
 
 
 if __name__ == "__main__":

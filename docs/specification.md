@@ -562,6 +562,6 @@ valid instances of the Demes standard.
 ## Reference parser implementation
 
 ```{eval-rst}
-.. literalinclude:: ../reference_implementation/parser.py
+.. literalinclude:: ../reference_implementation/demes_parser.py
     :language: python
 ```
