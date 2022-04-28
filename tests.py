@@ -15,7 +15,7 @@ import hypothesis_jsonschema
 
 @functools.lru_cache(maxsize=None)
 def load_yaml(filename):
-    with open(filename) as f:
+    with open(filename, encoding="utf-8") as f:
         with YAML(typ="safe") as yaml:
             data = yaml.load(f)
     return data
@@ -45,9 +45,7 @@ def test_test_cases_valid(yaml_path):
 # random data matching the MDM schema and validating against the HDM schema.
 @hypothesis.settings(suppress_health_check=[hypothesis.HealthCheck.too_slow])
 @hypothesis.given(
-    mdm_data=hypothesis_jsonschema.from_schema(
-        load_yaml("schema/mdm-v1.0.yaml")
-    )
+    mdm_data=hypothesis_jsonschema.from_schema(load_yaml("schema/mdm-v1.0.yaml"))
 )
 def test_subschema(mdm_data):
     hdm_schema = load_yaml("schema/hdm-v1.0.yaml")

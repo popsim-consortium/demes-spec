@@ -7,7 +7,14 @@ on:
 
 jobs:
   tests:
-    runs-on: ubuntu-20.04
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04, windows-2022, macos-11]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -22,7 +29,7 @@ jobs:
           cd reference_implementation
           # Require 100% test coverage for reference implementation.
           python -m pytest \
-            --cov=parser \
+            --cov=demes_parser \
             --cov-report=term-missing \
             --cov-fail-under=100 \
             tests.py

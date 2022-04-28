@@ -12,7 +12,7 @@ import pytest
 from ruamel.yaml import YAML
 from ruamel.yaml.constructor import ConstructorError
 
-import parser
+import demes_parser as parser
 
 
 def minimal_graph(num_demes=1, population_size=1):
@@ -1204,14 +1204,14 @@ class TestGraphUtilities:
 )
 def test_examples(yaml_path):
     yaml = YAML(typ="safe")
-    with open(yaml_path) as source:
+    with open(yaml_path, encoding="utf-8") as source:
         data = yaml.load(source)
     graph = parser.parse(data)
     graph_data = graph.as_json_dict()
 
     yaml_path = pathlib.Path(yaml_path)
     json_path = yaml_path.parent / yaml_path.with_suffix(".resolved.json")
-    with open(json_path) as source:
+    with open(json_path, encoding="utf-8") as source:
         json_data = json.load(source)
     # Note: we'll probably need to do something less strict here.
     assert json_data == graph_data
@@ -1223,7 +1223,7 @@ def test_examples(yaml_path):
 class TestValidCases:
     def parse_file(self, yaml_path):
         yaml = YAML(typ="safe")
-        with open(yaml_path) as source:
+        with open(yaml_path, encoding="utf-8") as source:
             data = yaml.load(source)
         return parser.parse(data).as_json_dict()
 
@@ -1241,7 +1241,7 @@ class TestValidCases:
     def test_validates_base_schema(self, yaml_path):
         resolved = self.parse_file(yaml_path)
         yaml = YAML(typ="safe")
-        with open("../schema/hdm-v1.0.yaml") as source:
+        with open("../schema/hdm-v1.0.yaml", encoding="utf-8") as source:
             schema = yaml.load(source)
         jsonschema.validate(instance=resolved, schema=schema)
 
@@ -1251,7 +1251,7 @@ class TestValidCases:
     def test_validates_fully_qualified_schema(self, yaml_path):
         resolved = self.parse_file(yaml_path)
         yaml = YAML(typ="safe")
-        with open("../schema/mdm-v1.0.yaml") as source:
+        with open("../schema/mdm-v1.0.yaml", encoding="utf-8") as source:
             schema = yaml.load(source)
         jsonschema.validate(instance=resolved, schema=schema)
 
@@ -1261,13 +1261,12 @@ class TestValidCases:
 )
 def test_invalid_testcases(yaml_path):
     yaml = YAML(typ="safe")
-    if yaml_path.endswith("invalid_fields_11.yaml"):
-        # Weird case that's caught in ruamel.
-        with open(yaml_path) as source:
+    with open(yaml_path, encoding="utf-8") as source:
+        if yaml_path.endswith("invalid_fields_11.yaml"):
+            # Weird case that's caught in ruamel.
             with pytest.raises(ConstructorError):
                 data = yaml.load(source)
-    else:
-        with open(yaml_path) as source:
+        else:
             data = yaml.load(source)
-        with pytest.raises((ValueError, TypeError, KeyError)):
-            parser.parse(data)
+            with pytest.raises((ValueError, TypeError, KeyError)):
+                parser.parse(data)
