@@ -224,8 +224,7 @@ A concise description of the deme.
 The ancestors of the deme at the start of the deme's first epoch.
 May be omitted if the deme has no ancestors in the graph.
 If two or more ancestors are specified, the ``proportions``
-must also be specified, and the ``start_time`` must be defined
-(either specified directly, or indirectly in the deme's first epoch).
+must also be specified, and the ``start_time`` must be defined.
 Each ancestor must be in the graph, and each ancestor must be
 specified only once. A deme must not be one of its own ancestors.
 
