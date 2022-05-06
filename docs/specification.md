@@ -280,7 +280,7 @@ rates take values between zero and one, and their sum must be less than one.
 
 #### end_time
 The most recent {ref}`time<sec_spec_mdm_time>` of the epoch,
-in {ref}`sec_spec_mdm_time_units`` before the present.
+in {ref}`sec_spec_mdm_time_units` before the present.
 
 #### start_size
 The population size at the epoch's ``start_time``.
@@ -320,7 +320,7 @@ The deme name of the migration destination.
 
 #### time
 The time of migration, in
-in {ref}`sec_spec_mdm_time_units`` before the present.
+in {ref}`sec_spec_mdm_time_units` before the present.
 The ``source`` and ``dest`` demes must both exist at the given
 ``time``.  I.e. ``time`` must be contained in the
 ``(deme.start_time, deme.end_time]`` interval of the ``source``
@@ -369,7 +369,7 @@ The deme name of the asymmetric migration destination.
 
 #### start_time
 The time at which migration begins,
-in {ref}`sec_spec_mdm_time_units`` before the present.
+in {ref}`sec_spec_mdm_time_units` before the present.
 The ``start_time`` must be contained in the
 ``[deme.start_time, deme.end_time)`` interval of the ``source`` deme
 and the ``dest`` deme.
@@ -378,7 +378,7 @@ If not specified, the migration ``start_time`` shall be the minimum
 
 #### end_time
 The time at which migration stops,
-in {ref}`sec_spec_mdm_time_units`` before the present.
+in {ref}`sec_spec_mdm_time_units` before the present.
 The ``end_time`` must be contained in the
 ``(deme.start_time, deme.end_time]`` interval of the ``source`` deme
 and the ``dest`` deme.
@@ -522,16 +522,46 @@ Thus, one of the differences
 between the Demes {ref}`sec_spec_hdm` and {ref}`sec_spec_mdm`
 is that the HDM tries to remove as much redundancy as possible.
 A major part of a Demes parser implementation's task is to
-fill in the redunant information, a process that we refer to
+fill in the redundant information, a process that we refer to
 as model "resolution".
-
-Resolution happens in a set of steps in a defined order, which we
-describe here. Please consult the
+Please consult the
 {ref}`reference implementation<sec_spec_reference_implementation>`
 for more detailed information.
 
-A demes model is resolved by resolving each
-{ref}`deme<sec_spec_hdm_resolution_deme>` in the order that
+Resolution is idempotent; that is, resolution of an already
+resolved model (i.e., in MDM form) MUST result in identical output.
+Thus a parser need not know if a model is in HDM or MDM form a priori.
+
+Resolution happens in a set of steps in a defined order:
+- time_units, generation_time
+- description
+- doi
+- defaults
+- demes
+- migrations
+- pulses
+
+
+#### time_units, generation_time
+:::{todo}
+resolution text
+:::
+
+#### description
+If the ``description`` is omitted, it shall be given the value of an empty string.
+
+#### doi
+If the ``doi`` is omitted, it shall be given the value of an empty list.
+
+#### defaults
+:::{todo}
+resolution text. Merge with defaults info section above?
+:::
+
+(sec_spec_hdm_resolution_deme)=
+#### Deme resolution
+
+Each deme is resolved in the order that
 it occurs in the input. A deme can only be resolved if its
 ancestor demes have already been resolved,
 and the parser MUST raise an error if a deme is encountered that
@@ -539,16 +569,13 @@ has unresolved ancestors. Thus, valid input files
 list the demes in topologically sorted order, such that
 ancestors are listed before their descendants.
 
-After all demes have been resolved,
-{ref}`migrations<sec_spec_hdm_resolution_migration>`
-are then resolved.
+Resolution order:
+- defaults
+- ancestors
+- proportions
+- start_time
+- epochs
 
-(sec_spec_hdm_resolution_deme)=
-#### Deme resolution
-
-:::{todo}
-some preamble text for deme resolution
-:::
 
 #### start_time
 If not specified, the deme's {ref}`sec_spec_mdm_deme_start_time` shall be obtained
@@ -564,15 +591,71 @@ be used).
 - Otherwise the ``start_time`` cannot be determined and an
   error MUST be raised.
 
-:::{todo}
-More resolution text
-:::
+
+#### Epoch resolution
+
+Epochs are listed in time-descending order (from oldest to youngest),
+and population sizes are inherited from older epochs.
+Resolution order:
+ - defaults
+ - end_time,
+ - start_size, end_size,
+ - size_function, selfing_rate, cloning_rate.
+
+#### end_time
+
+The ``end_time`` value of the first epoch MUST be strictly
+smaller than the deme's `start_time`.
+The ``end_time`` values of successive epochs MUST be strictly decreasing.
+
+If the ``end_time`` of the final epoch is omitted, it shall be
+given the value ``0``.
+
+#### start_size, end_size
+
+In the first epoch,
+- at least one of the ``start_size`` or the ``end_size``
+  MUST be specified.
+- If the ``start_size`` is omitted, it shall be given the
+  same value as the ``end_size``.
+- If the ``end_size`` is omitted, it shall be given the
+  same value as the ``start_size``.
+- If the deme's ``start_time`` is infinite, the ``start_size``
+  MUST have the same value as the ``end_size``.
+
+In subsequent epochs,
+- If the ``start_size`` is omitted, it shall be given the
+  same value as the previous epoch's ``end_size``.
+- If the ``end_size`` is omitted, it shall be given the
+  same value as the ``start_size``.
+
+#### size_function
+
+If the ``size_function`` is omitted,
+- if the ``start_size`` has the same value as the ``end_size``,
+  the ``size_function`` will be given the value ``"constant"``.
+- Otherwise, the ``size_function`` will be given the value ``"exponential"``.
+
+#### selfing_rate
+
+If the ``selfing_rate`` is omitted, it shall be given the value ``0``.
+
+#### cloning_rate
+
+If the ``cloning_rate`` is omitted, it shall be given the value ``0``.
 
 (sec_spec_hdm_resolution_migration)=
 #### Migration resolution
 
 :::{todo}
 Migration resolution text
+:::
+
+(sec_spec_hdm_resolution_pulse)=
+#### Pulse resolution
+
+:::{todo}
+Pulse resolution text
 :::
 
 ### Validation
