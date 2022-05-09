@@ -486,7 +486,7 @@ top level ``defaults`` section.
 
 Deme defaults operate in the same manner as
 {ref}`top-level defaults<sec_spec_hdm_defaults_top_level>`: the specified
-values will used if omitted in any epochs within the deme. Defaults
+values will be used if omitted in any epochs within the deme. Defaults
 specified within a deme override any values specified in the
 {ref}`top level<sec_spec_hdm_defaults_top_level>` ``deme`` defaults.
 
@@ -533,30 +533,60 @@ resolved model (i.e., in MDM form) MUST result in identical output.
 Thus a parser need not know if a model is in HDM or MDM form a priori.
 
 Resolution happens in a set of steps in a defined order:
-- time_units, generation_time
-- description
-- doi
-- defaults
-- demes
-- migrations
-- pulses
+- {ref}`time_units <sec_spec_hdm_resolution_time_units>`
+- {ref}`generation_time <sec_spec_hdm_resolution_generation_time>`
+- {ref}`metadata <sec_spec_hdm_resolution_metadata>`
+- {ref}`description <sec_spec_hdm_resolution_description>`
+- {ref}`doi <sec_spec_hdm_resolution_doi>`
+- {ref}`defaults <sec_spec_hdm_resolution_defaults>`
+- {ref}`demes <sec_spec_hdm_resolution_deme>`
+- {ref}`migrations <sec_spec_hdm_resolution_migration>`
+- {ref}`pulses <sec_spec_hdm_resolution_pulse>`
 
-
-#### time_units, generation_time
 :::{todo}
-resolution text
+Resolution order matters for some things, but not for others.
+Clarify where order matters (and why).
 :::
 
+(sec_spec_hdm_resolution_time_units)=
+#### time_units
+``time_units`` must be specified. The value "generations" is special,
+in that it implies that the ``generation_time`` will be 1 and may thus be omitted.
+
+(sec_spec_hdm_resolution_generation_time)=
+#### generation_time
+If ``time_units`` is not "generations", then ``generation_time``
+MUST be specified.
+
+If ``time_units`` is "generations", then
+- ``generation_time`` may be omitted, in which case it
+  shall be given the value 1.
+- an error shall be raised if ``generation_time`` is not 1.
+
+(sec_spec_hdm_resolution_metadata)=
+#### metadata
+
+If ``metadata`` is omitted, it shall be given the value of an
+empty dictionary.
+If ``metadata`` is present, the value must be a dictionary,
+but metadata is otherwise transferred to the output
+without further processing. Errors may be raised if metadata is not
+parsable (e.g. invalid YAML), but the parser shall not attempt
+to validate fields within the metdata.
+
+(sec_spec_hdm_resolution_description)=
 #### description
-If the ``description`` is omitted, it shall be given the value of an empty string.
+If ``description`` is omitted, it shall be given the value of an empty string.
 
+(sec_spec_hdm_resolution_doi)=
 #### doi
-If the ``doi`` is omitted, it shall be given the value of an empty list.
+If ``doi`` is omitted, it shall be given the value of an empty list.
 
+(sec_spec_hdm_resolution_defaults)=
 #### defaults
-:::{todo}
-resolution text. Merge with defaults info section above?
-:::
+If top-level ``defaults`` is provided, default values shall be validated
+to the extent possible, to avoid propagating invalid values.
+E.g. ``defaults.epoch.start_size`` cannot be negative.
 
 (sec_spec_hdm_resolution_deme)=
 #### Deme resolution
@@ -570,79 +600,148 @@ list the demes in topologically sorted order, such that
 ancestors are listed before their descendants.
 
 Resolution order:
-- defaults
-- ancestors
-- proportions
-- start_time
-- epochs
+- {ref}`defaults <sec_spec_hdm_resolution_deme_defaults>`
+- {ref}`description <sec_spec_hdm_resolution_deme_description>`
+- {ref}`ancestors <sec_spec_hdm_resolution_deme_ancestors>`
+- {ref}`proportions <sec_spec_hdm_resolution_deme_proportions>`
+- {ref}`start_time <sec_spec_hdm_resolution_deme_start_time>`
+- {ref}`epochs <sec_spec_hdm_resolution_epoch>`
 
+(sec_spec_hdm_resolution_deme_defaults)=
+##### defaults
+If deme-level ``defaults`` is provided, default values shall be validated
+to the extent possible, to avoid propagating invalid values.
+E.g. ``defaults.epoch.start_size`` cannot be negative.
 
-#### start_time
-If not specified, the deme's {ref}`sec_spec_mdm_deme_start_time` shall be obtained
-according to the following rules (the first matching rule shall
-be used).
+For each deme, deme-level ``defaults`` override top-level defaults.
 
-- If the deme has one ancestor, and the ancestor has an
-  ``end_time > 0``, the ancestor's ``end_time`` value shall be
-  used.
-- If the deme has no ancestors, the ``start_time`` shall be
-  infinitely far into the past. I.e. the ``start_time`` shall
-  have the value ``infinity``.
-- Otherwise the ``start_time`` cannot be determined and an
+(sec_spec_hdm_resolution_deme_description)=
+##### description
+
+If ``description`` is omitted,
+- If the ``deme.description`` defaults field is present, ``description``
+  shall be given this value.
+- Otherwise, ``description`` shall be given the value of the empty string.
+
+(sec_spec_hdm_resolution_deme_ancestors)=
+##### ancestors
+
+If ``ancestors`` is omitted,
+- If the ``deme.ancestors`` defaults field is present, ``ancestors``
+  shall be given this value.
+- Otherwise, ``ancestors`` shall be given the value of the empty list.
+
+(sec_spec_hdm_resolution_deme_proportions)=
+##### proportions
+
+If ``proportions`` is omitted,
+- If the ``deme.proportions`` defaults field is present, ``proportions``
+  shall be given this value.
+- Otherwise, if ``ancestors`` has length one, ``proportions`` shall be
+  a single-element list containing the element ``1.0``.
+- Otherwise, if ``ancestors`` has length zero,
+  ``proportions`` shall be given the value of the empty list.
+- Otherwise, ``proportions`` cannot be determined and an error
+  MUST be raised.
+
+(sec_spec_hdm_resolution_deme_start_time)=
+##### start_time
+
+If ``start_time`` is omitted,
+- If the ``epoch.start_time`` defaults field is present, ``start_time``
+  shall be given this value.
+- Otherwise, if ``ancestors`` has length one and the ancestor has an
+  ``end_time > 0``, the ancestor's ``end_time`` value shall be used.
+- Otherwise, if ``ancestors`` has length zero, ``start_time`` shall be
+  given the value ``infinity``.
+- Otherwise, ``start_time`` cannot be determined and an
   error MUST be raised.
 
-
-#### Epoch resolution
+(sec_spec_hdm_resolution_epoch)=
+##### Epoch resolution
 
 Epochs are listed in time-descending order (from oldest to youngest),
 and population sizes are inherited from older epochs.
 Resolution order:
- - defaults
- - end_time,
- - start_size, end_size,
- - size_function, selfing_rate, cloning_rate.
+ - {ref}`end_time <sec_spec_hdm_resolution_epoch_end_time>`
+ - {ref}`start_size, end_size <sec_spec_hdm_resolution_epoch_size>`
+ - {ref}`size_function <sec_spec_hdm_resolution_epoch_size_function>`
+ - {ref}`selfing_rate <sec_spec_hdm_resolution_epoch_selfing_rate>`
+ - {ref}`cloning_rate <sec_spec_hdm_resolution_epoch_cloning_rate>`
 
-#### end_time
+If a deme's ``epochs`` field is omitted, it will be given the value of
+a single-element list, where the list element has the value of an epoch with
+all fields omitted. This may produce a valid epoch during subsequent resolution,
+e.g. if the ``epoch.start_size`` defaults field has a value.
+
+(sec_spec_hdm_resolution_epoch_end_time)=
+###### end_time
+
+If ``end_time`` is omitted,
+- If the ``epoch.end_time`` defaults field is present, ``end_time``
+  shall be given this value.
+- Otherwise, if this is the last epoch, ``end_time`` shall be
+  given the value ``0``.
+- Otherwise, ``end_time`` cannot be determined and an error MUST
+  be raised.
 
 The ``end_time`` value of the first epoch MUST be strictly
 smaller than the deme's `start_time`.
 The ``end_time`` values of successive epochs MUST be strictly decreasing.
 
-If the ``end_time`` of the final epoch is omitted, it shall be
-given the value ``0``.
+(sec_spec_hdm_resolution_epoch_size)=
+###### start_size, end_size
 
-#### start_size, end_size
+:::{note}
+Sizes are never inherited from ancestors.
+:::
+
+If ``start_size`` is omitted and the ``epoch.start_size`` defaults field
+is present, then the epoch's ``start_size`` shall be given this value.
+If ``end_size`` is omitted and the ``epoch.end_size`` defaults field
+is present, then the epoch's ``end_size`` shall be given this value.
 
 In the first epoch,
-- at least one of the ``start_size`` or the ``end_size``
-  MUST be specified.
-- If the ``start_size`` is omitted, it shall be given the
-  same value as the ``end_size``.
-- If the ``end_size`` is omitted, it shall be given the
-  same value as the ``start_size``.
-- If the deme's ``start_time`` is infinite, the ``start_size``
-  MUST have the same value as the ``end_size``.
+- at least one of ``start_size`` or ``end_size``
+  MUST be specified (possibly via a defaults field).
+- If ``start_size`` is omitted (and no default exists),
+  it shall be given the same value as ``end_size``.
+- If ``end_size`` is omitted (and no default exists),
+  it shall be given the same value as ``start_size``.
+- If the deme's ``start_time`` is infinite, ``start_size``
+  MUST have the same value as ``end_size``.
 
 In subsequent epochs,
-- If the ``start_size`` is omitted, it shall be given the
-  same value as the previous epoch's ``end_size``.
-- If the ``end_size`` is omitted, it shall be given the
-  same value as the ``start_size``.
+- If ``start_size`` is omitted (and no defaults exist),
+  it shall be given the same value as the previous epoch's ``end_size``.
+- If ``end_size`` is omitted (and no defaults exist),
+  it shall be given the same value as ``start_size``.
 
-#### size_function
+(sec_spec_hdm_resolution_epoch_size_function)=
+###### size_function
 
-If the ``size_function`` is omitted,
-- if the ``start_size`` has the same value as the ``end_size``,
-  the ``size_function`` will be given the value ``"constant"``.
-- Otherwise, the ``size_function`` will be given the value ``"exponential"``.
+If ``size_function`` is omitted,
+- if the ``epoch.size_function`` defaults field is present,
+  ``size_function`` shall be given this value.
+- Otherwise, if ``start_size`` has the same value as ``end_size``,
+  ``size_function`` will be given the value ``"constant"``.
+- Otherwise, ``size_function`` will be given the value ``"exponential"``.
 
-#### selfing_rate
+(sec_spec_hdm_resolution_epoch_selfing_rate)=
+###### selfing_rate
 
-If the ``selfing_rate`` is omitted, it shall be given the value ``0``.
+If ``selfing_rate`` is omitted,
+- if the ``epoch.selfing_rate`` defaults field is present,
+  ``selfing_rate`` shall be given this value.
+- Otherwise, ``selfing_rate`` shall be given the value ``0``.
 
-#### cloning_rate
+(sec_spec_hdm_resolution_epoch_cloning_rate)=
+###### cloning_rate
 
-If the ``cloning_rate`` is omitted, it shall be given the value ``0``.
+If ``cloning_rate`` is omitted,
+- if the ``epoch.cloning_rate`` defaults field is present,
+  ``cloning_rate`` shall be given this value.
+- Otherwise, ``cloning_rate`` shall be given the value ``0``.
 
 (sec_spec_hdm_resolution_migration)=
 #### Migration resolution
