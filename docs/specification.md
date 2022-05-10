@@ -746,9 +746,109 @@ If ``cloning_rate`` is omitted,
 (sec_spec_hdm_resolution_migration)=
 #### Migration resolution
 
-:::{todo}
-Migration resolution text
+Migrations must be resolved after all demes are resolved.
+Asymmetric migration can be specified using the ``source``
+and ``dest`` properties, or symmetric migration can be
+specified using the ``demes`` property to list the names
+of the participating demes. Each symmetric migration is resolved
+into two asymmetric migrations (one in each direction) for each
+pair of participating demes.
+
+Resolution order:
+- {ref}`rate <sec_spec_hdm_resolution_migration_rate>`
+- {ref}`source <sec_spec_hdm_resolution_migration_source>`
+- {ref}`dest <sec_spec_hdm_resolution_migration_dest>`
+- {ref}`demes <sec_spec_hdm_resolution_migration_demes>`
+- {ref}`Symmetric migration <sec_spec_hdm_resolution_migration_symmetric>`
+- {ref}`start_time <sec_spec_hdm_resolution_migration_start_time>`
+- {ref}`end_time <sec_spec_hdm_resolution_migration_end_time>`
+
+(sec_spec_hdm_resolution_migration_rate)=
+##### rate
+
+If the ``rate`` is omitted,
+- if the ``migration.rate`` defaults field is present,
+  ``rate`` shall be given this value.
+- Otherwise, an error MUST be raised.
+
+(sec_spec_hdm_resolution_migration_source)=
+##### source
+
+If ``source`` is omitted and the ``migration.source`` defaults field is present,
+``source`` shall be given this value.
+
+(sec_spec_hdm_resolution_migration_dest)=
+##### dest
+
+If ``dest`` is omitted and the ``migration.dest`` defaults field is present,
+``dest`` shall be given this value.
+
+(sec_spec_hdm_resolution_migration_demes)=
+##### demes
+
+If ``demes`` is omitted and the ``migration.demes`` defaults field is present,
+``demes`` shall be given this value.
+
+(sec_spec_hdm_resolution_migration_symmetric)=
+##### Symmetric migration
+
+The following rules shall determine the mode of migration
+(either asymmetric or symmetric):
+- If ``demes`` does not have a value, and both ``source`` and ``dest`` have values,
+  the migration is asymmetric.
+  Resolution continues from {ref}`sec_spec_hdm_resolution_migration_start_time`.
+- If ``demes`` has a value, and neither ``source`` nor ``dest`` have values,
+  the migration is symmetric.
+- Otherwise, the mode of migration cannot be determined,
+  and an error MUST be raised.
+
+If the migration is symmetric, ``demes`` MUST be validated
+before further resolution:
+- ``demes`` MUST be a list of at least two deme names.
+- Each element of the list ``demes`` must be the name of a resolved deme.
+
+If the migration is symmetric, two new asymmetric migrations shall be
+constructed for each pair of deme names in ``demes``.
+E.g. if ``demes = ["a", "b", "c"]``, then asymmetric migrations shall
+be constructed for the following cases:
+- ``source="a"``, ``dest="b"``,
+- ``source="b"``, ``dest="a"``,
+- ``source="a"``, ``dest="c"``,
+- ``source="c"``, ``dest="a"``,
+- ``source="b"``, ``dest="c"``,
+- ``source="c"``, ``dest="b"``.
+
+Values for ``rate``, ``start_time``, and ``end_time`` for the new asymmetric
+migrations shall be taken from the symmetric migration.
+If ``start_time`` and/or ``end_time`` are omitted from the symmetric
+migration, these shall also be omitted for the new asymmetric migrations.
+Resolution now proceeds separately for each distinct asymmetric migration.
+
+:::{note}
+The symmetric migration shall not appear in the MDM output.
+Once the symmetric migration has been resolved into the corresponding
+asymmetric migrations, the symmetric migration may be discarded.
 :::
+
+(sec_spec_hdm_resolution_migration_start_time)=
+##### start_time
+
+If ``start_time`` is omitted,
+- If the ``migration.start_time`` defaults field has a value,
+  ``start_time`` shall be given this value.
+- Otherwise, ``start_time`` shall be the oldest time at which
+  both the ``source`` and ``dest`` demes exist.
+  I.e. ``min(source.start_time, dest.start_time)``.
+
+(sec_spec_hdm_resolution_migration_end_time)=
+##### end_time
+
+If ``end_time`` is omitted,
+- If the ``migration.end_time`` defaults field has a value,
+  ``end_time`` shall be given this value.
+- Otherwise, ``end_time`` shall be the most recent time at which
+  both the ``source`` and ``dest`` demes exist.
+  I.e. ``max(source.end_time, dest.end_time)``.
 
 (sec_spec_hdm_resolution_pulse)=
 #### Pulse resolution
