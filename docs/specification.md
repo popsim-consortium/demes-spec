@@ -853,8 +853,61 @@ If ``end_time`` is omitted,
 (sec_spec_hdm_resolution_pulse)=
 #### Pulse resolution
 
-:::{todo}
-Pulse resolution text
+Pulses must be resolved after all demes are resolved.
+
+Resolution order:
+- {ref}`sources <sec_spec_hdm_resolution_pulse_sources>`
+- {ref}`proportions <sec_spec_hdm_resolution_pulse_proportions>`
+- {ref}`dest <sec_spec_hdm_resolution_pulse_dest>`
+- {ref}`time <sec_spec_hdm_resolution_pulse_time>`
+- {ref}`Sort pulses <sec_spec_hdm_resolution_pulse_sort>`
+
+(sec_spec_hdm_resolution_pulse_sources)=
+##### sources
+
+If ``sources`` is omitted,
+- if the ``pulse.sources`` defaults field has a value,
+  ``sources`` shall be given this value.
+- Otherwise, an error MUST be raised.
+
+(sec_spec_hdm_resolution_pulse_proportions)=
+##### proportions
+
+If ``proportions`` is omitted,
+- if the ``pulse.proportions`` defaults field has a value,
+  ``proportions`` shall be given this value.
+- Otherwise, an error MUST be raised.
+
+(sec_spec_hdm_resolution_pulse_dest)=
+##### dest
+
+If ``dest`` is omitted,
+- if the ``pulse.dest`` defaults field has a value,
+  ``dest`` shall be given this value.
+- Otherwise, an error MUST be raised.
+
+(sec_spec_hdm_resolution_pulse_time)=
+##### time
+
+If ``time`` is omitted,
+- if the ``pulse.time`` defaults field has a value,
+  ``time`` shall be given this value.
+- Otherwise, an error MUST be raised.
+
+(sec_spec_hdm_resolution_pulse_sort)=
+##### Sort pulses
+
+Pulses MUST be sorted in time-descending order (from oldest to youngest).
+A [stable](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability)
+sorting algorithm MUST be used to avoid changing the model interpretation
+when multiple pulses are specified with the same ``time`` value.
+
+:::{note}
+In a discrete-time setting, non-integer pulse times that are distinct
+could be rounded to the same time value. If pulses are in time-ascending
+order when times are rounded, then the pulses would be applied
+in the opposite order compared to a continuous-time setting.
+Sorting in time-descending order avoids this discrepancy.
 :::
 
 ### Validation
