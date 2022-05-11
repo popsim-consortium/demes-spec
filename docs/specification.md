@@ -157,7 +157,11 @@ A concise description of the demographic model.
 
 #### doi
 The DOI(s) of the publication(s) in which the model was inferred or
-  originally described.
+originally described.
+
+#### metadata
+An object containing arbitrary additional properties and values.
+May be empty.
 
 (sec_spec_mdm_time_units)=
 #### time_units
@@ -166,12 +170,12 @@ SHOULD be one of "generations" or "years".
 
 #### generation_time
 The number by which times must be divided, to convert them to have
-  units of generations. Unless ``time_units`` are ``generations``,
-  the ``generation_time`` MUST be specified.
+units of generations.
+Hence ``generation_time`` uses the same time units specified by ``time_units``.
 
 #### demes
 The list of {ref}`demes<sec_spec_mdm_deme>` in the model.
-  At least one deme MUST be specified.
+At least one deme MUST be specified.
 
 #### pulses
 The list of {ref}`pulses <sec_spec_mdm_pulse>` in the model.
@@ -212,8 +216,8 @@ defined as the ``end_time`` of the deme's last epoch.
 
 #### name
 A string identifier for a deme, which MUST be unique among all demes in a document.
-  Must be a valid
-  [python identifier](https://docs.python.org/3/reference/lexical_analysis.html#identifiers)
+Must be a valid
+[python identifier](https://docs.python.org/3/reference/lexical_analysis.html#identifiers)
 
 #### description
 A concise description of the deme.
@@ -221,10 +225,9 @@ A concise description of the deme.
 (sec_spec_mdm_deme_ancestors)=
 
 #### ancestors
-The ancestors of the deme at the start of the deme's first epoch.
-May be omitted if the deme has no ancestors in the graph.
-If two or more ancestors are specified, the ``proportions``
-must also be specified, and the ``start_time`` must be defined.
+The list of ancestors of the deme at the start of the deme's first epoch.
+May be an empty list if the deme has no ancestors in the graph,
+in which case the ``start_time`` must be infinite.
 Each ancestor must be in the graph, and each ancestor must be
 specified only once. A deme must not be one of its own ancestors.
 
@@ -233,8 +236,6 @@ specified only once. A deme must not be one of its own ancestors.
 #### proportions
 The proportions of ancestry derived from each of the ``ancestors``
 at the start of the deme's first epoch.
-The ``proportions`` may be omitted if there are no ancestors, or if
-there is only one ancestor.
 The ``proportions`` must be ordered to correspond with the
 order of ``ancestors``. The proportions must sum to 1 (within a
 reasonable tolerance, e.g. 1e-9). See the
@@ -264,7 +265,8 @@ There MUST be at least one epoch.
 
 A deme-specific period of time spanning the half-open interval
 ``(start_time, end_time]``, in which a fixed set of population parameters
-apply. The epoch's ``start_time`` is defined as the ``end_time`` of the
+apply. The epoch's ``start_time`` is implicit (there is no ``start_time``
+epoch property), but for convenience we define it as the ``end_time`` of the
 previous epoch, or the deme's ``start_time`` if it is the first epoch.
 
 Each epoch specifies the {ref}`population size<sec_spec_mdm_population_sizes>`
@@ -276,7 +278,7 @@ Epochs can also
 specify parameters for nonrandom mating, such as selfing or cloning rates,
 which give the probability that offspring are generated from one generation to
 the next by self-fertilisation or cloning of an individual. Selfing and cloning
-rates take values between zero and one, and their sum must be less than one.
+rates take values between zero and one.
 
 #### end_time
 The most recent {ref}`time<sec_spec_mdm_time>` of the epoch,
@@ -303,7 +305,7 @@ FIXME DEFINE ME
 ### Pulse
 
 An instantaneous pulse of migration at ``time``, from a list of source demes
-(``sources``) into the ``dest`` deme.
+(``sources``) into the destination deme (``dest``).
 
 Pulse
 migration events specify the instantaneous replacement of a given fraction of
@@ -321,10 +323,10 @@ The deme name of the migration destination.
 #### time
 The time of migration, in
 in {ref}`sec_spec_mdm_time_units` before the present.
-The ``source`` and ``dest`` demes must both exist at the given
+The demes defined by ``sources`` and ``dest`` must both exist at the given
 ``time``.  I.e. ``time`` must be contained in the
-``(deme.start_time, deme.end_time]`` interval of the ``source``
-deme and the ``dest`` deme.
+``(deme.start_time, deme.end_time]`` interval of the ``sources``
+demes and the ``dest`` deme.
 
 #### proportions
 The proportions of ancestry in the ``dest`` deme derived from the demes
@@ -340,26 +342,26 @@ how proportions should be interpreted.
 
 ### Migration
 
-Continuous migration
-rates are defined as the probability that parents in the "destination"
+Continuous asymmetric migration over the half-open time interval
+``(start_time, end_time]``, from the deme with name ``source`` to the
+deme with name ``dest``.
+Rates are defined as the probability that parents in the "destination"
 population are chosen from the "source" population.  Migration rates are thus
-per generation and must be less than one. Furthermore, if more than one source
+per generation and must be less than or equal to one.
+There must be at most one migration specified per source/destination pair
+for any given time interval.
+Furthermore, if more than one source
 population have continuous migration into the same destination population, the
-sum of those migration rates must also be less than one, as rates define
+sum of those migration rates must also be less than or equal to one, as rates define
 probabilities. The probability that parents come from the same population is
 just one minus the sum of incoming migration rates.
 
+:::{warning}
+When continuous migration occurs over a time period that includes a pulse,
+the continuous migration probabilities define the probability of choosing
+parents from each deme conditional on individuals not arriving via the pulse.
+:::
 
-Continuous migration over the half-open time interval ``(start_time, end_time]``.
-If ``demes`` is specified, then migration shall be symmetric between all
-pairs of demes with deme names in the array. If ``source`` and ``dest`` are
-specified instead, migration shall be asymmetric from the deme with name
-``source`` to the deme with name ``dest``. Either ``demes``, or alternately
-both ``source`` and ``dest``, must be specified. If ``demes`` is specified,
-neither ``source`` nor ``dest`` may be specified.
-
-#### demes
-The deme names of the symmetrically migrating demes.
 
 #### source
 The deme name of the asymmetric migration source.
@@ -373,8 +375,6 @@ in {ref}`sec_spec_mdm_time_units` before the present.
 The ``start_time`` must be contained in the
 ``[deme.start_time, deme.end_time)`` interval of the ``source`` deme
 and the ``dest`` deme.
-If not specified, the migration ``start_time`` shall be the minimum
-``deme.start_time`` of the ``source`` deme and the ``dest`` deme.
 
 #### end_time
 The time at which migration stops,
@@ -382,8 +382,6 @@ in {ref}`sec_spec_mdm_time_units` before the present.
 The ``end_time`` must be contained in the
 ``(deme.start_time, deme.end_time]`` interval of the ``source`` deme
 and the ``dest`` deme.
-If not specified, the migration ``end_time`` shall be the maximum
-``deme.end_time`` of the ``source`` deme and the ``dest`` deme.
 
 #### rate
 The rate of migration per generation.
