@@ -914,6 +914,14 @@ Sorting in time-descending order avoids this discrepancy.
 Outline the basic logic of model validation
 :::
 
+#### Migration validation
+
+Migration start and end times are resolved in a pairwise fashion.
+(See {ref}`migration resolution <sec_spec_hdm_resolution_migration>`.)
+If the resolved `start_time` or the `end_time` of a migration is not
+contained by the time interval of BOTH `source` and `dest` demes,
+an error MUST be raised.
+
 (sec_spec_hdm_schema)=
 
 ### Schema
