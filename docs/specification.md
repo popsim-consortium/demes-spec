@@ -805,6 +805,8 @@ before further resolution:
 - ``demes`` MUST be a list of at least two deme names.
 - Each element of the list ``demes`` must be the name of a resolved deme.
 
+If neither of the previous two conditions are met, an error MUST be raised.
+
 If the migration is symmetric, two new asymmetric migrations shall be
 constructed for each pair of deme names in ``demes``.
 E.g. if ``demes = ["a", "b", "c"]``, then asymmetric migrations shall
