@@ -805,6 +805,8 @@ before further resolution:
 - ``demes`` MUST be a list of at least two deme names.
 - Each element of the list ``demes`` must be the name of a resolved deme.
 
+If neither of the previous two conditions are met, an error MUST be raised.
+
 If the migration is symmetric, two new asymmetric migrations shall be
 constructed for each pair of deme names in ``demes``.
 E.g. if ``demes = ["a", "b", "c"]``, then asymmetric migrations shall
@@ -913,6 +915,14 @@ Sorting in time-descending order avoids this discrepancy.
 :::{todo}
 Outline the basic logic of model validation
 :::
+
+#### Migration validation
+
+Migration start and end times are resolved in a pairwise fashion.
+(See {ref}`migration resolution <sec_spec_hdm_resolution_migration>`.)
+If the resolved `start_time` or the `end_time` of a migration is not
+contained by the time interval of both `source` and `dest` demes,
+an error MUST be raised.
 
 (sec_spec_hdm_schema)=
 
