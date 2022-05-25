@@ -308,9 +308,11 @@ are explicitly acknowledged to have the following meanings.
   If `t` is a time within the span of the epoch,
   the deme size `N` at time `t` can be calculated as:
 
-      dt = (epoch.start_time - t) / (epoch.start_time - epoch.end_time)
-       r = log(epoch.end_size / epoch.start_size)
-       N = epoch.start_size * exp(r * dt)
+  ```
+  dt = (epoch.start_time - t) / (epoch.start_time - epoch.end_time)
+  r = log(epoch.end_size / epoch.start_size)
+  N = epoch.start_size * exp(r * dt)
+  ```
 
 ``size_function`` must be ``constant`` if the epoch has an infinite ``start_time``.
 
@@ -328,7 +330,7 @@ have parents drawn at random from the previous generation.
 Depending on the simulator, this random drawing of parent may occur
 either with or without replacement. When drawing occurs with replacement, a small
 amount of residual selfing is expected, so that even with `cloning_rate=0`
-and `selfing_rate=0`, selfing may still occur with probability `1/N`).
+and `selfing_rate=0`, selfing may still occur with probability `1/N`.
 Simulators that allow variable rates of selfing are expected to clearly
 document their behaviour.
 :::
