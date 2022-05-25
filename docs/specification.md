@@ -92,8 +92,12 @@ documents conforming to the specification is formally defined
 in the {ref}`sec_spec_mdm_schema`, and the detailed requirements for each of the
 elements in this data model are defined in this section.
 
-The {ref}`sec_spec_hdm` is a closely related specification that is intended
+The Demes {ref}`Human Data Model <sec_spec_hdm>` (HDM)
+is a closely related specification that is intended
 to be easily human-readable and writable.
+An MDM document is also a valid HDM document.
+An MDM document is constructed by {ref}`resolving <sec_spec_hdm_resolution>`
+and {ref}`validating <sec_spec_hdm_validation>` an HDM document.
 
 (sec_spec_defs_common)=
 
@@ -121,7 +125,7 @@ order.
 (sec_spec_mdm_population_sizes)=
 #### Population sizes
 
-A fundamental concept is demes is the population size.
+A fundamental concept in demes is the population size.
 
 :::{todo}
 Things to cover:
@@ -129,9 +133,9 @@ Things to cover:
 - We're counting **individuals** not genomes
 - We usually mean the population size in expectation, but there's
   no hard requirements. For example, it's up the implementation whether it thinks
-  a population size of 1/3 is meaningful. Clarify with
+  a population size of 0.33 is meaningful. Clarify with
   some examples from forward and backward sims.
-- What do proportions mean? Similar point to pop size above. Given forward
+- What do proportions mean? Similar point to pop size above. Give forward
   pointers to sections we mention proportions in.
 - What do we mean by migration of individuals? Forward pointers to sections.
 :::
@@ -833,9 +837,10 @@ The following rules shall determine the mode of migration
 If the migration is symmetric, ``demes`` MUST be validated
 before further resolution:
 - ``demes`` MUST be a list of at least two deme names.
-- Each element of the list ``demes`` must be the name of a resolved deme.
+- Each element of ``demes`` must be unique.
+- Each element of ``demes`` must be the name of a resolved deme.
 
-If neither of the previous two conditions are met, an error MUST be raised.
+If any of the previous conditions are not met, an error MUST be raised.
 
 If the migration is symmetric, two new asymmetric migrations shall be
 constructed for each pair of deme names in ``demes``.
@@ -940,19 +945,90 @@ in the opposite order compared to a continuous-time setting.
 Sorting in time-descending order avoids this discrepancy.
 :::
 
+(sec_spec_hdm_validation)=
 ### Validation
 
-:::{todo}
-Outline the basic logic of model validation
+:::{note}
+It may be convenient to perform some or all validation during model resolution.
+E.g. to avoid code duplication, or to provide better error messages to the user.
 :::
 
-#### Migration validation
+Following resolution, the model must be validated against the MDM schema.
+This includes checking:
+- all required properties now have values,
+- no additional properties are present (except where permitted by the schema),
+- the types of properties match the schema,
+- the values are within the ranges specified
+  (noting that infinity is permitted only for deme `start_time`
+  and for migration `start_time`).
 
-Migration start and end times are resolved in a pairwise fashion.
-(See {ref}`migration resolution <sec_spec_hdm_resolution_migration>`.)
-If the resolved `start_time` or the `end_time` of a migration is not
-contained by the time interval of both `source` and `dest` demes,
-an error MUST be raised.
+In addition to validation against the schema, the following constraints
+must be checked to ensure overall consistency of the model.
+If any condition is not met, an error must be raised.
+
+#### generation_time
+
+If `time_units` is "generations", then `generation_time` must be 1.
+
+#### demes
+
+- There must be at least one deme.
+- Each deme's `name` must be unique in the model.
+- `name` must be a valid Python identifier.
+- If `start_time` is infinity, `ancestors` must be an empty list.
+- If `ancestors` is an empty list, `start_time` must have the value infinity.
+- No deme may appear in its own `ancestors` list.
+- Each element of the `ancestors` list must be unique.
+- The `proportions` list must have the same length as the `ancestors` list.
+- If the `proportions` list is not empty, then the values must sum to 1
+  (within a reasonable tolerance, e.g. 1e-9).
+
+##### epochs
+
+- Each deme must have at least one epoch.
+- The `end_time` values of successive epochs must be strictly descending
+  (ordered from the past towards the present).
+- The `end_time` values must be strictly smaller than the deme's `start_time`.
+- If the deme has an infinite `start_time`, the first epoch's `size_function`
+  must have the value "constant".
+- If the `size_function` is "constant", the `start_size` and `end_size`
+  must be equal.
+
+#### migrations
+
+This section assumes that symmetric migrations have been resolved into
+pairs of asymmetric migrations and validated as per the
+{ref}`migration resolution <sec_spec_hdm_resolution_migration>`
+section. Resolution of symmetric migrations includes
+validation of the ``migration.demes`` property, and this property
+is not considered below as it is not part of the MDM.
+
+- `source` must not be the same as `dest`.
+- `start_time` and `end_time` must both be in the closed interval
+   `[deme.start_time, deme.end_time]`, for both the `source` deme
+   and the `dest` deme.
+- `start_time` must be strictly greater than `end_time`.
+- There must be at most one migration specified per source/destination pair
+  for any given time interval.
+- If more than one source population have continuous migration into the same
+  destination population, the sum of those migration rates must also be less
+  than or equal to 1
+  (within a reasonable tolerance, e.g. 1e-9).
+
+#### pulses
+
+- `sources` must be list containing at least one element.
+- Each element of `sources` must be unique.
+- The `dest` deme must not appear in the `sources` list.
+- For each source deme in `sources`,
+  `time` must be in the open-closed interval `(deme.start_time, deme.end_time]`,
+  defined by the existence interval of the source deme.
+- `time` must be in the closed-open interval `[deme.start_time, deme.end_time)`,
+  defined by the existence interval of the `dest` deme.
+- Hence, `time` must not have the value infinity, nor the value 0.
+- The `proportions` list must have the same length as the `sources` list.
+- The sum of values in the `proportions` list must be less than or equal to 1
+  (within a reasonable tolerance, e.g. 1e-9).
 
 (sec_spec_hdm_schema)=
 
