@@ -212,7 +212,8 @@ The deme may be a descendant of one or more demes in the graph, and may
 be an ancestor to others. The deme exists over the half-open time interval
 ``(start_time, end_time]``, and it may continue to exist after
 contributing ancestry to a descendant deme. The deme's ``end_time`` is
-defined as the ``end_time`` of the deme's last epoch.
+implicit (there is no ``end_time`` deme property), but for convenience we
+define it as the ``end_time`` of the deme's last epoch.
 
 #### name
 A string identifier for a deme, which MUST be unique among all demes in a document.
@@ -237,8 +238,8 @@ specified only once. A deme must not be one of its own ancestors.
 The proportions of ancestry derived from each of the ``ancestors``
 at the start of the deme's first epoch.
 The ``proportions`` must be ordered to correspond with the
-order of ``ancestors``. The proportions must sum to 1 (within a
-reasonable tolerance, e.g. 1e-9). See the
+order of ``ancestors``. The proportions must be an empty list or sum to 1
+(within a reasonable tolerance, e.g. 1e-9). See the
 {ref}`sec_spec_mdm_population_sizes` section for more details on
 how these proportions should be interpreted.
 
@@ -257,7 +258,7 @@ for each deme in ``ancestors``.
 
 #### epochs
 The list of {ref}`epochs<sec_spec_mdm_epoch>` for this deme.
-There MUST be at least one epoch.
+There MUST be at least one epoch for each deme.
 
 (sec_spec_mdm_epoch)=
 
@@ -292,13 +293,41 @@ The population size at the epoch's ``end_time``.
 
 #### size_function
 A function describing the population size change between
-``start_time`` and ``end_time``. FIXME, MORE DETAIL.
+``start_time`` and ``end_time``.
+This may be any string, but the values "constant" and "exponential"
+are explicitly acknowledged to have the following meanings.
+
+* ``constant``: the deme's size does not change over the epoch.
+  ``start_size`` and ``end_size`` must be equal.
+* ``exponential``: the deme's size changes exponentially from
+  ``start_size`` to ``end_size`` over the epoch.
+  If `t` is a time within the span of the epoch,
+  the deme size `N` at time `t` can be calculated as:
+
+      dt = (epoch.start_time - t) / (epoch.start_time - epoch.end_time)
+       r = log(epoch.end_size / epoch.start_size)
+       N = epoch.start_size * exp(r * dt)
+
+``size_function`` must be ``constant`` if the epoch has an infinite ``start_time``.
 
 #### cloning_rate
-FIXME DEFINE ME
+The proportion of offspring in each generation that
+are expected to be generated through clonal reproduction.
+`1 - cloning_rate` are expected to arise through sexual reproduction.
 
 #### selfing_rate
-FIXME DEFINE ME
+Within the sexually-reproduced offspring,
+`selfing_rate` are born via self-fertilisation while the rest
+have parents drawn at random from the previous generation.
+
+:::{note}
+Depending on the simulator, this random drawing of parent may occur
+either with or without replacement. When drawing occurs with replacement, a small
+amount of residual selfing is expected, so that even with `cloning_rate=0`
+and `selfing_rate=0`, selfing may still occur with probability `1/N`).
+Simulators that allow variable rates of selfing are expected to clearly
+document their behaviour.
+:::
 
 (sec_spec_mdm_pulse)=
 
@@ -313,6 +342,7 @@ individuals in a destination population by individuals with parents from
 a source population.  The fraction must be between zero and one, and if more
 than one pulse occurs at the same time, those replacement events are applied
 sequentially in the order that they are specified in the model.
+The list of pulses must be sorted in time-descending order.
 
 #### sources
 The list of deme names of the migration sources.
