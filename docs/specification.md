@@ -92,8 +92,12 @@ documents conforming to the specification is formally defined
 in the {ref}`sec_spec_mdm_schema`, and the detailed requirements for each of the
 elements in this data model are defined in this section.
 
-The {ref}`sec_spec_hdm` is a closely related specification that is intended
+The Demes {ref}`Human Data Model <sec_spec_hdm>` (HDM)
+is a closely related specification that is intended
 to be easily human-readable and writable.
+An MDM document is also a valid HDM document.
+An MDM document is constructed by {ref}`resolving <sec_spec_hdm_resolution>`
+and {ref}`validating <sec_spec_hdm_validation>` an HDM document.
 
 (sec_spec_defs_common)=
 
@@ -121,7 +125,7 @@ order.
 (sec_spec_mdm_population_sizes)=
 #### Population sizes
 
-A fundamental concept is demes is the population size.
+A fundamental concept in demes is the population size.
 
 :::{todo}
 Things to cover:
@@ -129,9 +133,9 @@ Things to cover:
 - We're counting **individuals** not genomes
 - We usually mean the population size in expectation, but there's
   no hard requirements. For example, it's up the implementation whether it thinks
-  a population size of 1/3 is meaningful. Clarify with
+  a population size of 0.33 is meaningful. Clarify with
   some examples from forward and backward sims.
-- What do proportions mean? Similar point to pop size above. Given forward
+- What do proportions mean? Similar point to pop size above. Give forward
   pointers to sections we mention proportions in.
 - What do we mean by migration of individuals? Forward pointers to sections.
 :::
@@ -212,7 +216,8 @@ The deme may be a descendant of one or more demes in the graph, and may
 be an ancestor to others. The deme exists over the half-open time interval
 ``(start_time, end_time]``, and it may continue to exist after
 contributing ancestry to a descendant deme. The deme's ``end_time`` is
-defined as the ``end_time`` of the deme's last epoch.
+implicit (there is no ``end_time`` deme property), but for convenience we
+define it as the ``end_time`` of the deme's last epoch.
 
 #### name
 A string identifier for a deme, which MUST be unique among all demes in a document.
@@ -237,8 +242,8 @@ specified only once. A deme must not be one of its own ancestors.
 The proportions of ancestry derived from each of the ``ancestors``
 at the start of the deme's first epoch.
 The ``proportions`` must be ordered to correspond with the
-order of ``ancestors``. The proportions must sum to 1 (within a
-reasonable tolerance, e.g. 1e-9). See the
+order of ``ancestors``. The proportions must be an empty list or sum to 1
+(within a reasonable tolerance, e.g. 1e-9). See the
 {ref}`sec_spec_mdm_population_sizes` section for more details on
 how these proportions should be interpreted.
 
@@ -257,7 +262,7 @@ for each deme in ``ancestors``.
 
 #### epochs
 The list of {ref}`epochs<sec_spec_mdm_epoch>` for this deme.
-There MUST be at least one epoch.
+There MUST be at least one epoch for each deme.
 
 (sec_spec_mdm_epoch)=
 
@@ -292,13 +297,43 @@ The population size at the epoch's ``end_time``.
 
 #### size_function
 A function describing the population size change between
-``start_time`` and ``end_time``. FIXME, MORE DETAIL.
+``start_time`` and ``end_time``.
+This may be any string, but the values "constant" and "exponential"
+are explicitly acknowledged to have the following meanings.
+
+* ``constant``: the deme's size does not change over the epoch.
+  ``start_size`` and ``end_size`` must be equal.
+* ``exponential``: the deme's size changes exponentially from
+  ``start_size`` to ``end_size`` over the epoch.
+  If `t` is a time within the span of the epoch,
+  the deme size `N` at time `t` can be calculated as:
+
+  ```
+  dt = (epoch.start_time - t) / (epoch.start_time - epoch.end_time)
+  r = log(epoch.end_size / epoch.start_size)
+  N = epoch.start_size * exp(r * dt)
+  ```
+
+``size_function`` must be ``constant`` if the epoch has an infinite ``start_time``.
 
 #### cloning_rate
-FIXME DEFINE ME
+The proportion of offspring in each generation that
+are expected to be generated through clonal reproduction.
+`1 - cloning_rate` are expected to arise through sexual reproduction.
 
 #### selfing_rate
-FIXME DEFINE ME
+Within the sexually-reproduced offspring,
+`selfing_rate` are born via self-fertilisation while the rest
+have parents drawn at random from the previous generation.
+
+:::{note}
+Depending on the simulator, this random drawing of parent may occur
+either with or without replacement. When drawing occurs with replacement, a small
+amount of residual selfing is expected, so that even with `cloning_rate=0`
+and `selfing_rate=0`, selfing may still occur with probability `1/N`.
+Simulators that allow variable rates of selfing are expected to clearly
+document their behaviour.
+:::
 
 (sec_spec_mdm_pulse)=
 
@@ -313,6 +348,7 @@ individuals in a destination population by individuals with parents from
 a source population.  The fraction must be between zero and one, and if more
 than one pulse occurs at the same time, those replacement events are applied
 sequentially in the order that they are specified in the model.
+The list of pulses must be sorted in time-descending order.
 
 #### sources
 The list of deme names of the migration sources.
@@ -803,9 +839,10 @@ The following rules shall determine the mode of migration
 If the migration is symmetric, ``demes`` MUST be validated
 before further resolution:
 - ``demes`` MUST be a list of at least two deme names.
-- Each element of the list ``demes`` must be the name of a resolved deme.
+- Each element of ``demes`` must be unique.
+- Each element of ``demes`` must be the name of a resolved deme.
 
-If neither of the previous two conditions are met, an error MUST be raised.
+If any of the previous conditions are not met, an error MUST be raised.
 
 If the migration is symmetric, two new asymmetric migrations shall be
 constructed for each pair of deme names in ``demes``.
@@ -910,19 +947,90 @@ in the opposite order compared to a continuous-time setting.
 Sorting in time-descending order avoids this discrepancy.
 :::
 
+(sec_spec_hdm_validation)=
 ### Validation
 
-:::{todo}
-Outline the basic logic of model validation
+:::{note}
+It may be convenient to perform some or all validation during model resolution.
+E.g. to avoid code duplication, or to provide better error messages to the user.
 :::
 
-#### Migration validation
+Following resolution, the model must be validated against the MDM schema.
+This includes checking:
+- all required properties now have values,
+- no additional properties are present (except where permitted by the schema),
+- the types of properties match the schema,
+- the values are within the ranges specified
+  (noting that infinity is permitted only for deme `start_time`
+  and for migration `start_time`).
 
-Migration start and end times are resolved in a pairwise fashion.
-(See {ref}`migration resolution <sec_spec_hdm_resolution_migration>`.)
-If the resolved `start_time` or the `end_time` of a migration is not
-contained by the time interval of both `source` and `dest` demes,
-an error MUST be raised.
+In addition to validation against the schema, the following constraints
+must be checked to ensure overall consistency of the model.
+If any condition is not met, an error must be raised.
+
+#### generation_time
+
+If `time_units` is "generations", then `generation_time` must be 1.
+
+#### demes
+
+- There must be at least one deme.
+- Each deme's `name` must be unique in the model.
+- `name` must be a valid Python identifier.
+- If `start_time` is infinity, `ancestors` must be an empty list.
+- If `ancestors` is an empty list, `start_time` must have the value infinity.
+- No deme may appear in its own `ancestors` list.
+- Each element of the `ancestors` list must be unique.
+- The `proportions` list must have the same length as the `ancestors` list.
+- If the `proportions` list is not empty, then the values must sum to 1
+  (within a reasonable tolerance, e.g. 1e-9).
+
+##### epochs
+
+- Each deme must have at least one epoch.
+- The `end_time` values of successive epochs must be strictly descending
+  (ordered from the past towards the present).
+- The `end_time` values must be strictly smaller than the deme's `start_time`.
+- If the deme has an infinite `start_time`, the first epoch's `size_function`
+  must have the value "constant".
+- If the `size_function` is "constant", the `start_size` and `end_size`
+  must be equal.
+
+#### migrations
+
+This section assumes that symmetric migrations have been resolved into
+pairs of asymmetric migrations and validated as per the
+{ref}`migration resolution <sec_spec_hdm_resolution_migration>`
+section. Resolution of symmetric migrations includes
+validation of the ``migration.demes`` property, and this property
+is not considered below as it is not part of the MDM.
+
+- `source` must not be the same as `dest`.
+- `start_time` and `end_time` must both be in the closed interval
+   `[deme.start_time, deme.end_time]`, for both the `source` deme
+   and the `dest` deme.
+- `start_time` must be strictly greater than `end_time`.
+- There must be at most one migration specified per source/destination pair
+  for any given time interval.
+- If more than one source population have continuous migration into the same
+  destination population, the sum of those migration rates must also be less
+  than or equal to 1
+  (within a reasonable tolerance, e.g. 1e-9).
+
+#### pulses
+
+- `sources` must be list containing at least one element.
+- Each element of `sources` must be unique.
+- The `dest` deme must not appear in the `sources` list.
+- For each source deme in `sources`,
+  `time` must be in the open-closed interval `(deme.start_time, deme.end_time]`,
+  defined by the existence interval of the source deme.
+- `time` must be in the closed-open interval `[deme.start_time, deme.end_time)`,
+  defined by the existence interval of the `dest` deme.
+- Hence, `time` must not have the value infinity, nor the value 0.
+- The `proportions` list must have the same length as the `sources` list.
+- The sum of values in the `proportions` list must be less than or equal to 1
+  (within a reasonable tolerance, e.g. 1e-9).
 
 (sec_spec_hdm_schema)=
 
