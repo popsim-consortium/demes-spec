@@ -374,6 +374,119 @@ See the
 {ref}`sec_spec_mdm_population_sizes` section for more details on
 how proportions should be interpreted.
 
+#### Example: sequential application of pulses
+
+Consider the following model:
+
+```yaml
+time_units: generations
+demes:
+ - name: A
+   epochs:
+    - start_size: 1000
+ - name: B
+   epochs:
+    - start_size: 1000
+ - name: C
+   epochs:
+    - start_size: 1000
+pulses:
+- sources: [A]
+  dest: C
+  proportions: [0.25]
+  time: 10
+- sources: [B]
+  dest: C
+  proportions: [0.2]
+  time: 10
+```
+
+Ten (10) generations ago, pulse events occur from source demes `A` and `B`
+into destination deme `C`.
+
+We need to arrive at the final ancestry proportions for destination deme `C` after this time.
+Software implementing pulse events must generate output that is equivalent to the following
+procedure.
+
+The steps are:
+
+1. Initialize an array of zeros with length equal to the number of demes.
+2. Set the ancestry proportion of the destination deme to 1.
+3. For each pulse:
+   a. Multiply the array by one (1) minus the sum of proportions.
+   b. For each source, add its proportion to the array.
+
+For the above model, the steps are:
+
+```
+1. x = [0, 0, 0]
+2. x = [0, 0, 1]
+3. p = 1 - 0.25
+   x = x*p = [0, 0, 0.75]
+   x[A] += 0.25, x = [0.25, 0, 0.75]
+   p = 1 - 0.2
+   x = x*p = [0.2, 0, 0.6]
+   x[B] += 0.2, x = [0.2, 0.2, 0.6]
+```
+
+Thus, our final ancestry proportions for deme `C` after time 10 are `[0.2, 0.2, 0.6]`.
+
+#### Important considerations
+
+* The final ancestry proportions depend on the order of the pulses in the model!
+  If we reverse the above model such that:
+
+  ```yaml
+  pulses:
+  - sources: [B]
+    dest: C
+    proportions: [0.2]
+    time: 10
+  - sources: [A]
+    dest: C
+    proportions: [0.25]
+    time: 10
+  ```
+
+  We get `[0.25, 0.15, 0.6]` as our ancestry proportions due to pulses.
+
+  The fact that the outcome of applying sequential pulses depends on
+  the order is why `demes-python` emits a warning when resolving such models.
+
+* Given the procedure used to apply sequential pulses at the same time,
+  the followng two sets of `Pulses` are not equivalent:
+
+  ```yaml
+  pulses:
+  - sources: [A]
+    dest: C
+    proportions: [0.2]
+    time: 10
+  - sources: [B]
+    dest: C
+    proportions: [0.2]
+    time: 10
+  ```
+
+  ```yaml
+  pulses:
+  - sources: [B, A]
+    dest: C
+    proportions: [0.2, 0.2]
+    time: 10
+  ```
+
+* Therefore, we strongly recommend that models be represented using the following
+  syntax that makes the intended outcome of the model explicit:
+
+  ```yaml
+  pulses:
+  - sources: [A, B]
+    dest: C
+    proportions: [0.2, 0.2]
+    time: 10
+  ```
+
 (sec_spec_mdm_migration)=
 
 ### Migration
