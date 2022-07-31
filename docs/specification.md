@@ -1167,3 +1167,29 @@ valid instances of the Demes standard.
 .. literalinclude:: ../reference_implementation/demes_parser.py
     :language: python
 ```
+
+(sec_appendix)=
+
+## Appendix
+
+(sec_appendix_bacwards_to_forwards)=
+
+### Converting backwards time to forwards time
+
+To convert times in a `demes` model into a forward-time representation:
+
+* Set `y` equal to the minimum end time in the graph.
+  This value could be an epoch end time or the most recent pulse time, migration
+  epoch time, etc..
+* Set `x` equal to the most ancient, finite, start time.
+  This value could be a deme start time or the start time of any other event
+  in a graph.
+* The model duration is `d = x - y`;
+* Using the convention of starting a forward-in-time model at time zero (
+  representing the parental generation at the beginning of a model), the model
+  runs forward in time from `[0, d)`.
+* For explicit simulations involving a "burn in time", the previous interval is shifted by that length.
+  The duration of the burn-in period is `[0, b)`
+  and the events in the `demes` graph occur from
+  `[b, b + d)`.
+* Given these definitions, `f = b + d - 1 - t`, where `t` is a backwards time in the `demes` model and `f` is the forwards-time equivalent.
