@@ -1185,7 +1185,7 @@ To convert times in a Demes model into a forward-time representation:
 
 * Set `y` equal to the minimum epoch end time in the resolved graph.
 * Set `x` equal to the most ancient, finite, value out of epoch `start_time`,
-  migration `start_time`, or pulse `time.
+  epoch `end_time`, migration `start_time`, or pulse `time.
 * The model duration is `d = x - y`;
 * Using the convention of starting a forward-in-time model at time zero (
   representing the parental generation at the beginning of a model), the model
