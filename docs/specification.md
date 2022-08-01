@@ -1189,9 +1189,8 @@ To convert times in a Demes model into a forward-time representation:
 * The model duration is `d = x - y`;
 * Using the convention of starting a forward-in-time model at time zero (
   representing the parental generation at the beginning of a model), the model
-  runs forward in time from `[0, d)`.
+  runs forward in time from `(0, d]`.
 * For explicit simulations involving a "burn in time", the previous interval is shifted by that length.
-  The duration of the burn-in period is `[0, b)`
-  and the events in the Demes graph occur from
-  `[b, b + d)`.
-* Given these definitions, `f = b + d - 1 - t`, where `t` is a backwards time in the Demes model and `f` is the forwards-time equivalent.
+  The duration of the burn-in period is `(0, b]`
+  and the events in the Demes graph occur from `(b, b + d]`.
+* Given these definitions, `f = b + d - t`, where `t` is a backwards time in the Demes model and `f` is the forwards-time equivalent.
