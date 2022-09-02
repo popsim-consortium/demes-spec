@@ -11,24 +11,25 @@ kernelspec:
 
 substitutions:
   example: |
-    `````{panels}
-    :column: container
-    :header: bg-info text-white
+    ``````{card}
+    :class-header: sd-bg-dark sd-text-light
     Example LABEL
     ^^^
-    ````{tabbed} YAML
+    `````{tab-set}
+    ````{tab-item} YAML
     :class-label: pt-0
     ```{literalinclude} ../examples/tutorial/example_LABEL.yaml
     :language: yaml
     ```
     ````
-    ````{tabbed} Drawing
+    ````{tab-item} Drawing
     :class-label: pt-0
     %DRAWING_TAG
     ```{glue:} example_LABEL
     ```
     ````
     `````
+    ``````
 ---
 
 ```{code-cell}
