@@ -9,3 +9,5 @@ ruamel.yaml==0.17.17
 demes==0.2.2
 demesdraw==0.3.0
 hypothesis-jsonschema==0.20.1
+# See https://github.com/executablebooks/jupyter-book/issues/1902
+jupyter-server<2
