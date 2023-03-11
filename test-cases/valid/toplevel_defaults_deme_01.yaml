@@ -23,7 +23,7 @@ demes:
   start_time: 100
   epochs:
   - {start_size: 1}
-- name: y
+- name: "y"
   start_time: 100
   epochs:
   - {start_size: 1}
