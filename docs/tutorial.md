@@ -9,27 +9,28 @@ kernelspec:
   language: python
   name: python3
 
-substitutions:
-  example: |
-    ``````{card}
-    :class-header: sd-bg-dark sd-text-light
-    Example LABEL
-    ^^^
-    `````{tab-set}
-    ````{tab-item} YAML
-    :class-label: pt-0
-    ```{literalinclude} ../examples/tutorial/example_LABEL.yaml
-    :language: yaml
-    ```
-    ````
-    ````{tab-item} Drawing
-    :class-label: pt-0
-    %DRAWING_TAG
-    ```{glue:} example_LABEL
-    ```
-    ````
-    `````
-    ``````
+myst:
+    substitutions:
+      example: |
+        ``````{card}
+        :class-header: sd-bg-dark sd-text-light
+        Example LABEL
+        ^^^
+        `````{tab-set}
+        ````{tab-item} YAML
+        :class-label: pt-0
+        ```{literalinclude} ../examples/tutorial/example_LABEL.yaml
+        :language: yaml
+        ```
+        ````
+        ````{tab-item} Drawing
+        :class-label: pt-0
+        %DRAWING_TAG
+        ```{glue:} example_LABEL
+        ```
+        ````
+        `````
+        ``````
 ---
 
 ```{code-cell}
