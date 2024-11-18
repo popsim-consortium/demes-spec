@@ -23,7 +23,7 @@ jobs:
         run: make -C docs
 
       - name: Checkout docs site
-        if: (!github.event.pull_request)
+      # if: (!github.event.pull_request)
         uses: actions/checkout@v3
         with:
           repository: popsim-consortium/demes-spec-docs
