@@ -73,7 +73,7 @@ def parse(data: dict) -> Graph:
             description=(str, None),
             start_time=((str, numbers.Number), is_positive_or_json_infinity),
             ancestors=(list, is_list_of_identifiers),
-            proportions=(list, is_list_of_fractions),
+            proportions=(list, is_list_of_proportions),
         ),
     )
 
@@ -81,8 +81,8 @@ def parse(data: dict) -> Graph:
         end_time=(numbers.Number, is_non_negative_and_finite),
         start_size=(numbers.Number, is_positive_and_finite),
         end_size=(numbers.Number, is_positive_and_finite),
-        selfing_rate=(numbers.Number, is_fraction),
-        cloning_rate=(numbers.Number, is_fraction),
+        selfing_rate=(numbers.Number, is_rate),
+        cloning_rate=(numbers.Number, is_rate),
         size_function=(str, None),
     )
     check_defaults(global_epoch_defaults, allowed_epoch_defaults)
@@ -101,7 +101,7 @@ def parse(data: dict) -> Graph:
             ),
             ancestors=pop_list(deme_data, "ancestors", [], str, is_identifier),
             proportions=pop_list(
-                deme_data, "proportions", None, numbers.Number, is_fraction
+                deme_data, "proportions", None, numbers.Number, is_proportion
             ),
         )
 
@@ -126,8 +126,8 @@ def parse(data: dict) -> Graph:
                 end_size=pop_number(
                     epoch_data, "end_size", None, is_positive_and_finite
                 ),
-                selfing_rate=pop_number(epoch_data, "selfing_rate", 0, is_fraction),
-                cloning_rate=pop_number(epoch_data, "cloning_rate", 0, is_fraction),
+                selfing_rate=pop_number(epoch_data, "selfing_rate", 0, is_rate),
+                cloning_rate=pop_number(epoch_data, "cloning_rate", 0, is_rate),
                 size_function=pop_string(epoch_data, "size_function", None),
             )
             check_empty(epoch_data)
@@ -142,7 +142,7 @@ def parse(data: dict) -> Graph:
     check_defaults(
         migration_defaults,
         dict(
-            rate=(numbers.Number, is_fraction),
+            rate=(numbers.Number, is_rate),
             start_time=((numbers.Number, str), is_positive_or_json_infinity),
             end_time=(numbers.Number, is_non_negative_and_finite),
             source=(str, is_identifier),
@@ -153,7 +153,7 @@ def parse(data: dict) -> Graph:
     for migration_data in pop_list(data, "migrations", []):
         insert_defaults(migration_data, migration_defaults)
         graph.add_migration(
-            rate=pop_number(migration_data, "rate", validator=is_fraction),
+            rate=pop_number(migration_data, "rate", validator=is_rate),
             start_time=pop_number(
                 migration_data,
                 "start_time",
@@ -182,7 +182,7 @@ def parse(data: dict) -> Graph:
             sources=(list, is_nonempty_list_of_identifiers),
             dest=(str, is_identifier),
             time=(numbers.Number, is_positive_and_finite),
-            proportions=(list, is_nonempty_list_of_fractions_with_sum_less_than_1),
+            proportions=(list, is_nonempty_list_of_proportions_with_sum_less_than_1),
         ),
     )
     for pulse_data in pop_list(data, "pulses", []):
@@ -202,7 +202,7 @@ def parse(data: dict) -> Graph:
                 "proportions",
                 default=[],
                 required_type=numbers.Number,
-                validator=is_fraction,
+                validator=is_proportion,
             ),
         )
         check_empty(pulse_data)
@@ -246,8 +246,12 @@ def is_non_negative_and_finite(value):
     return value >= 0 and not math.isinf(value)
 
 
-def is_fraction(value):
+def is_rate(value):
     return 0 <= value <= 1
+
+
+def is_proportion(value):
+    return 0 < value <= 1
 
 
 def is_nonempty(value):
@@ -266,12 +270,12 @@ def is_nonempty_list_of_identifiers(value):
     return is_list_of_identifiers(value) and len(value) > 0
 
 
-def is_list_of_fractions(value):
-    return all(isinstance(v, numbers.Number) and is_fraction(v) for v in value)
+def is_list_of_proportions(value):
+    return all(isinstance(v, numbers.Number) and is_proportion(v) for v in value)
 
 
-def is_nonempty_list_of_fractions_with_sum_less_than_1(value):
-    return is_list_of_fractions(value) and len(value) > 0 and sum(value) <= 1
+def is_nonempty_list_of_proportions_with_sum_less_than_1(value):
+    return is_list_of_proportions(value) and len(value) > 0 and sum(value) <= 1
 
 
 def validate_item(name, value, required_type, validator=None):
