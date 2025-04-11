@@ -360,9 +360,9 @@ The deme name of the migration destination.
 The time of migration, in
 in {ref}`sec_spec_mdm_time_units` before the present.
 The demes defined by ``sources`` and ``dest`` must both exist at the given
-``time``.  I.e. ``time`` must be contained in the
-``(deme.start_time, deme.end_time]`` interval of the ``sources``
-demes and the ``dest`` deme.
+``time``. 
+The pulse time must be in `(start_time, end_time]` with respect to each deme in `sources`
+and in `[start_time, end_time)` with respect to `dest`.
 
 #### proportions
 The proportions of ancestry in the ``dest`` deme derived from the demes
