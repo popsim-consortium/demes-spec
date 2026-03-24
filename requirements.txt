@@ -1,5 +1,5 @@
 jinja2
-jupyter-book
+jupyter-book<2
 sphinx
 sphinx_rtd_theme
 pytest
