@@ -40,7 +40,7 @@ import pathlib
 import demes
 import demesdraw
 
-from IPython.display import set_matplotlib_formats
+from matplotlib_inline.backend_inline import set_matplotlib_formats
 from myst_nb import glue
 
 set_matplotlib_formats("svg")
